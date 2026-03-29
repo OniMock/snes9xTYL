@@ -200,18 +200,15 @@ void S9xSetIRQ (uint32 source)
 // But for Mighty Morphin Power Rangers Fighting Edition, we must set to 0.
 //
   CPU.IRQCycleCount = SNESGameFixes.IRQCycleCount;
- /* if (CPU.WaitingForInterrupt)
+  if (CPU.WaitingForInterrupt)
     {
     // Force IRQ to trigger immediately after WAI - 
-    // Final Fantasy Mystic Quest crashes without this.
+    // Final Fantasy Mystic Quest, Chrono Trigger and many others
+    // crash without this.
       CPU.IRQCycleCount = 0;
-	  
-	//Since the order of execution in the MainLoop has been shifted, 
-	//we can't do a CPU.PC++ here. Otherwise FF Mystic Quest will crash.
-	//
       CPU.WaitingForInterrupt = FALSE;
       CPU.PC++;
-    }*/
+    }
 }
 
 void S9xClearIRQ (uint32 source)

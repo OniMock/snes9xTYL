@@ -113,6 +113,7 @@ public:
 	void SRAM1024KLoROMMap ();
 	void SufamiTurboLoROMMap ();
 	void HiROMMap ();
+	void ExtendedHiROMMap ();
 	void SuperFXROMMap ();
 	void TalesROMMap (bool8);
 	void AlphaROMMap ();
@@ -164,6 +165,7 @@ public:
 		,MAP_BSX//add azz 20080517
 #endif
 		, MAP_SPC7110_ROM, MAP_SPC7110_DRAM, MAP_RONLY_SRAM
+		, MAP_OBC1
 		, MAP_LAST
 	};
   //  enum { MAX_ROM_SIZE = 0x400000 };

@@ -91,6 +91,7 @@
 #include "memmap.h"
 #include "hwregisters.h"
 #include "apu.h"
+#include "obc1.h"
 
 uint8 S9xGetByteFromRegister (uint8 *GetAddress, uint32 Address)
 {
@@ -124,6 +125,8 @@ uint8 S9xGetByteFromRegister (uint8 *GetAddress, uint32 Address)
 		case CMemory::MAP_BSX:
 			return S9xGetBSX(Address);
 	#endif
+		case CMemory::MAP_OBC1:
+			return S9xGetOBC1(Address & 0xffff);
 		default:
 		case CMemory::MAP_NONE:
 			return ((Address >> 8) & 0xff);
@@ -242,6 +245,10 @@ void S9xSetByteToRegister (uint8 Byte, uint8* SetAddress, uint32 Address)
 			S9xSetBSX(Byte,Address);
 			return;
 	#endif
+
+		case CMemory::MAP_OBC1:
+			S9xSetOBC1(Byte, Address & 0xffff);
+			return;
 
 		default:
 		case CMemory::MAP_NONE:

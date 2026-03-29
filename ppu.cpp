@@ -911,7 +911,7 @@ void S9xSetPPU (uint8 Byte, uint16 Address)
 	}
 	break;
     case 0x2133:
-	// Screen settings
+	// Screen settings (SETINI)
 	if (Byte != ROM_GLOBAL [0x2133])
 	{
 #ifdef DEBUGGER
@@ -929,6 +929,15 @@ void S9xSetPPU (uint8 Byte, uint16 Address)
 	    }
 	    else
 	        PPUPack.PPU.ScreenHeight = (Settings.PAL?SNES_HEIGHT_PAL:SNES_HEIGHT_NTSC);
+	    
+	    // Track interlace state for proper field toggling
+	    if (Byte & 0x01)
+	    {
+	        IPPU.LatchedInterlace = TRUE;
+	    }
+	    
+	    // Mode 7 EXTBG - enables second BG with priority in Mode 7
+	    // Used by many games for priority effects
 #ifdef DEBUGGER
 	    if (Byte & 0x02)
 		missing.sprite_double_height = 1;

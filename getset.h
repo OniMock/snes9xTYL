@@ -98,6 +98,7 @@
 #include "bsx.h"
 #include "spc7110.h"
 #include "hwregisters.h"
+#include "obc1.h"
 
 INLINE uint8 S9xGetByte (uint32 Address)
 {

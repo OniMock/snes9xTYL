@@ -1683,6 +1683,7 @@ void CMemory::InitROM (bool8 Interleaved)
     Settings.SA1 = FALSE;
     Settings.C4 = FALSE;
     Settings.SDD1 = FALSE;
+    Settings.OBC1 = FALSE;
     Settings.SRTC = FALSE;
 	Settings.SPC7110 = FALSE;
 	Settings.SPC7110RTC = FALSE;
@@ -4514,6 +4515,9 @@ if (ROM [adr] == ov) \
     }
 	
 	//ApplySpeedHackPatches();
+
+	// Additional game compatibility fixes
+#include "game_fixes_extra.h"
 }
 
 #define IPS_EOF 0x00454F46l

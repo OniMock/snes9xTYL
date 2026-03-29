@@ -87,7 +87,7 @@
 /* SNES screen width and height */
 #define SNES_WIDTH		256
 #define SNES_HEIGHT_NTSC		224
-#define SNES_HEIGHT_PAL			224
+#define SNES_HEIGHT_PAL			239
 #define SNES_HEIGHT_EXTENDED	239
 #define IMAGE_WIDTH		(Settings.SupportHiRes ? SNES_WIDTH * 2 : SNES_WIDTH)
 #define IMAGE_HEIGHT		(Settings.SupportHiRes ? SNES_HEIGHT_EXTENDED * 2 : SNES_HEIGHT_EXTENDED)
@@ -323,6 +323,7 @@ struct SSettings{
 
 	bool8  SPC7110;
 	bool8  SPC7110RTC;
+	bool8  OBC1;
 
     // Sound options
     uint32 SoundPlaybackRate;

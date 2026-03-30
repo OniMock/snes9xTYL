@@ -14,11 +14,12 @@ jobs:
       image: pspdev/pspdev:latest
     
     strategy:
+      fail-fast: false
       matrix:
         variant: [me, cm]
         include:
           - variant: me
-            make_target: mehomeadhoc
+            make_target: me
             artifact_name: snes9xTYLme_mod
           - variant: cm
             make_target: cm
@@ -38,64 +39,78 @@ jobs:
           export PSPDEV=$(psp-config --pspdev-path)
           export PATH=$PATH:$PSPDEV/bin
           make clean || true
-          make ${{ matrix.make_target }} 2>&1 | tail -50
+          make ${{ matrix.make_target }}
 
-      - name: Verify build output
+      - name: Find and list build outputs
+        if: always()
         run: |
-          echo "=== Build artifacts ==="
-          find . -name "EBOOT.PBP" -o -name "*.elf" -o -name "*.prx" | head -20
-          ls -la EBOOT.PBP 2>/dev/null || ls -la snes9xTYL/EBOOT.PBP 2>/dev/null || echo "EBOOT.PBP not found at expected paths"
+          echo "=== Looking for EBOOT.PBP ==="
+          find . -name "EBOOT.PBP" -type f 2>/dev/null
+          echo "=== Looking for ELF files ==="
+          find . -name "*.elf" -type f 2>/dev/null
+          echo "=== Looking for PRX files ==="
+          find . -name "*.prx" -type f 2>/dev/null
+          echo "=== Looking for PBP files ==="
+          find . -name "*.PBP" -type f 2>/dev/null
+          echo "=== Looking for SFO files ==="
+          find . -name "*.SFO" -type f 2>/dev/null
+          echo "=== Root directory listing ==="
+          ls -la *.PBP *.elf *.prx *.SFO 2>/dev/null || echo "No build outputs in root"
+          echo "=== Full root directory ==="
+          ls -la
 
       - name: Prepare artifact
+        if: always()
         run: |
           mkdir -p artifact/${{ matrix.artifact_name }}
-          # Try multiple possible output locations
-          cp EBOOT.PBP artifact/${{ matrix.artifact_name }}/ 2>/dev/null || \
-          cp snes9xTYL/EBOOT.PBP artifact/${{ matrix.artifact_name }}/ 2>/dev/null || \
-          echo "Warning: EBOOT.PBP not found"
-          # Copy data files for the release
-          if [ -d data ]; then
-            cp -r data artifact/${{ matrix.artifact_name }}/
+          
+          # Find EBOOT.PBP wherever it was generated
+          EBOOT_PATH=$(find . -name "EBOOT.PBP" -type f | head -1)
+          
+          if [ -n "$EBOOT_PATH" ]; then
+            echo "Found EBOOT.PBP at: $EBOOT_PATH"
+            cp "$EBOOT_PATH" artifact/${{ matrix.artifact_name }}/EBOOT.PBP
+          else
+            echo "WARNING: EBOOT.PBP not found!"
+            echo "Checking if ELF was generated..."
+            ELF_PATH=$(find . -name "*.elf" -type f | head -1)
+            if [ -n "$ELF_PATH" ]; then
+              echo "Found ELF at: $ELF_PATH - trying to generate EBOOT.PBP manually"
+              # PRX path
+              PRX_PATH=$(find . -name "*.prx" -type f | head -1)
+              SFO_PATH=$(find . -name "*.SFO" -type f | head -1)
+              
+              if [ -z "$SFO_PATH" ]; then
+                echo "Generating PARAM.SFO..."
+                mksfoex -d MEMSIZE=1 '${{ matrix.artifact_name }}' PARAM.SFO
+                SFO_PATH="PARAM.SFO"
+              fi
+              
+              if [ -n "$PRX_PATH" ]; then
+                echo "Packing PRX into EBOOT.PBP..."
+                pack-pbp artifact/${{ matrix.artifact_name }}/EBOOT.PBP \
+                  "$SFO_PATH" data/icon0.png NULL NULL NULL NULL "$PRX_PATH" NULL
+              elif [ -n "$ELF_PATH" ]; then
+                echo "Packing ELF into EBOOT.PBP..."
+                pack-pbp artifact/${{ matrix.artifact_name }}/EBOOT.PBP \
+                  "$SFO_PATH" data/icon0.png NULL NULL NULL NULL "$ELF_PATH" NULL
+              fi
+            fi
           fi
-          # Add readme
-          echo "snes9xTYL-mecm ${{ matrix.variant }} build" > artifact/${{ matrix.artifact_name }}/BUILD_INFO.txt
-          echo "Built: $(date -u)" >> artifact/${{ matrix.artifact_name }}/BUILD_INFO.txt
-          echo "Commit: ${{ github.sha }}" >> artifact/${{ matrix.artifact_name }}/BUILD_INFO.txt
+          
+          # Copy data files if they exist
+          if [ -f data/icon0.png ]; then
+            cp data/icon0.png artifact/${{ matrix.artifact_name }}/ 2>/dev/null || true
+          fi
+          
+          # Show what we packaged
+          echo "=== Artifact contents ==="
+          ls -la artifact/${{ matrix.artifact_name }}/
 
       - name: Upload EBOOT artifact
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact_name }}
-          path: artifact/
+          path: artifact/${{ matrix.artifact_name }}/
           if-no-files-found: warn
-          
-  release:
-    needs: build
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/mecm' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-    
-    steps:
-      - name: Download ME artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: snes9xTYLme_mod
-          path: release/me/
-          
-      - name: Download CM artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: snes9xTYLcm_mod
-          path: release/cm/
-
-      - name: Create release archive
-        run: |
-          cd release
-          zip -r ../snes9xTYL-mecm-release.zip .
-          
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          files: snes9xTYL-mecm-release.zip
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -197,7 +197,7 @@ int save_rom_settings(int game_crc32,const char *name);
 
 extern int pg_drawframe;
 
-int menu_modified;
+extern int menu_modified;
 
 int bypass_rom_settings;
 

@@ -9,7 +9,7 @@ int os9x_getstate(char *ext,char *str_time) {
 
 	save_filename=S9xGetSaveFilename (ext);
 	if (sceIoGetstat(save_filename,&stat)>=0) {
-			tfile=&(stat.st_mtime);	
+			tfile=&(stat.sce_st_mtime);	
 			sprintf(str_time,"%4d/%02d/%02d %02d:%02d:%02d",tfile->year,tfile->month,tfile->day,
 			tfile->hour,tfile->minute,tfile->second);
 			S9xOpenSnapshotFile(save_filename,1,&file);

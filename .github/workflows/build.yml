@@ -19,11 +19,15 @@ jobs:
         variant: [me, cm]
         include:
           - variant: me
-            make_target: me
+            make_target: mehome
             artifact_name: snes9xTYLme_mod
+            needs_me_prx: true
+            needs_homehook_prx: true
           - variant: cm
             make_target: cm
             artifact_name: snes9xTYLcm_mod
+            needs_me_prx: false
+            needs_homehook_prx: false
     
     steps:
       - name: Checkout code
@@ -33,6 +37,43 @@ jobs:
         run: |
           apk add --no-cache build-base zlib-dev
 
+      # ---------------------------------------------------------------
+      # Build kernel PRX modules BEFORE the main EBOOT
+      # These are separate kernel-mode plugins loaded at runtime
+      # ---------------------------------------------------------------
+      - name: Build mediaengine.prx
+        if: matrix.needs_me_prx
+        run: |
+          export PSPSDK=$(psp-config --pspsdk-path)
+          export PSPDEV=$(psp-config --pspdev-path)
+          export PATH=$PATH:$PSPDEV/bin
+          echo "=== Building mediaengine.prx ==="
+          cd psp/mediaengineprx
+          make clean || true
+          make
+          echo "=== Build result ==="
+          ls -la *.prx *.elf 2>/dev/null || echo "No output files found"
+
+      - name: Build homehook.prx
+        if: matrix.needs_homehook_prx
+        run: |
+          export PSPSDK=$(psp-config --pspsdk-path)
+          export PSPDEV=$(psp-config --pspdev-path)
+          export PATH=$PATH:$PSPDEV/bin
+          echo "=== Building homehook.prx ==="
+          cd psp/homehookprx
+          make clean || true
+          make
+          echo "=== Build result ==="
+          ls -la *.prx *.elf 2>/dev/null || echo "No output files found"
+          # The homehook Makefile rule copies prx to ../../ and .S to ../
+          # Verify it ended up in the right place
+          echo "=== Checking root for homehook.prx ==="
+          ls -la ../../homehook.prx 2>/dev/null || echo "Not in root"
+
+      # ---------------------------------------------------------------
+      # Build main EBOOT
+      # ---------------------------------------------------------------
       - name: Build ${{ matrix.artifact_name }}
         run: |
           export PSPSDK=$(psp-config --pspsdk-path)
@@ -41,73 +82,90 @@ jobs:
           make clean || true
           make ${{ matrix.make_target }}
 
-      - name: Find and list build outputs
+      - name: Find and list all build outputs
         if: always()
         run: |
-          echo "=== Looking for EBOOT.PBP ==="
-          find . -name "EBOOT.PBP" -type f 2>/dev/null
-          echo "=== Looking for ELF files ==="
-          find . -name "*.elf" -type f 2>/dev/null
-          echo "=== Looking for PRX files ==="
-          find . -name "*.prx" -type f 2>/dev/null
-          echo "=== Looking for PBP files ==="
-          find . -name "*.PBP" -type f 2>/dev/null
-          echo "=== Looking for SFO files ==="
-          find . -name "*.SFO" -type f 2>/dev/null
-          echo "=== Root directory listing ==="
-          ls -la *.PBP *.elf *.prx *.SFO 2>/dev/null || echo "No build outputs in root"
-          echo "=== Full root directory ==="
+          echo "=== All PRX files ==="
+          find . -name "*.prx" -type f -exec ls -la {} \;
+          echo "=== All PBP files ==="
+          find . -name "*.PBP" -type f -exec ls -la {} \;
+          echo "=== All ELF files ==="
+          find . -name "*.elf" -type f -exec ls -la {} \;
+          echo "=== All SFO files ==="
+          find . -name "*.SFO" -type f -exec ls -la {} \;
+          echo "=== Root directory ==="
           ls -la
 
+      # ---------------------------------------------------------------
+      # Assemble the release artifact with ALL required files
+      # ---------------------------------------------------------------
       - name: Prepare artifact
         if: always()
         run: |
-          mkdir -p artifact/${{ matrix.artifact_name }}
+          DEST="artifact/${{ matrix.artifact_name }}"
+          mkdir -p "$DEST/DATA"
           
-          # Find EBOOT.PBP wherever it was generated
+          # === EBOOT.PBP ===
           EBOOT_PATH=$(find . -name "EBOOT.PBP" -type f | head -1)
-          
           if [ -n "$EBOOT_PATH" ]; then
-            echo "Found EBOOT.PBP at: $EBOOT_PATH"
-            cp "$EBOOT_PATH" artifact/${{ matrix.artifact_name }}/EBOOT.PBP
+            echo "✓ Found EBOOT.PBP at: $EBOOT_PATH"
+            cp "$EBOOT_PATH" "$DEST/EBOOT.PBP"
           else
-            echo "WARNING: EBOOT.PBP not found!"
-            echo "Checking if ELF was generated..."
-            ELF_PATH=$(find . -name "*.elf" -type f | head -1)
-            if [ -n "$ELF_PATH" ]; then
-              echo "Found ELF at: $ELF_PATH - trying to generate EBOOT.PBP manually"
-              # PRX path
-              PRX_PATH=$(find . -name "*.prx" -type f | head -1)
-              SFO_PATH=$(find . -name "*.SFO" -type f | head -1)
-              
-              if [ -z "$SFO_PATH" ]; then
-                echo "Generating PARAM.SFO..."
-                mksfoex -d MEMSIZE=1 '${{ matrix.artifact_name }}' PARAM.SFO
-                SFO_PATH="PARAM.SFO"
-              fi
-              
-              if [ -n "$PRX_PATH" ]; then
-                echo "Packing PRX into EBOOT.PBP..."
-                pack-pbp artifact/${{ matrix.artifact_name }}/EBOOT.PBP \
-                  "$SFO_PATH" data/icon0.png NULL NULL NULL NULL "$PRX_PATH" NULL
-              elif [ -n "$ELF_PATH" ]; then
-                echo "Packing ELF into EBOOT.PBP..."
-                pack-pbp artifact/${{ matrix.artifact_name }}/EBOOT.PBP \
-                  "$SFO_PATH" data/icon0.png NULL NULL NULL NULL "$ELF_PATH" NULL
-              fi
+            echo "✗ EBOOT.PBP not found! Attempting manual pack..."
+            PRX_PATH=$(find . -name "snes9xTYL.prx" -type f | head -1)
+            ELF_PATH=$(find . -name "snes9xTYL.elf" -type f | head -1)
+            SFO_PATH=$(find . -name "PARAM.SFO" -type f | head -1)
+            if [ -z "$SFO_PATH" ]; then
+              mksfoex -d MEMSIZE=1 '${{ matrix.artifact_name }}' PARAM.SFO
+              SFO_PATH="PARAM.SFO"
+            fi
+            DATA_FILE="${PRX_PATH:-$ELF_PATH}"
+            if [ -n "$DATA_FILE" ]; then
+              pack-pbp "$DEST/EBOOT.PBP" \
+                "$SFO_PATH" data/icon0.png NULL NULL NULL NULL "$DATA_FILE" NULL
             fi
           fi
           
-          # Copy data files if they exist
-          if [ -f data/icon0.png ]; then
-            cp data/icon0.png artifact/${{ matrix.artifact_name }}/ 2>/dev/null || true
+          # === mediaengine.prx (ME variant only) ===
+          if [ "${{ matrix.needs_me_prx }}" = "true" ]; then
+            ME_PRX=$(find . -name "mediaengine.prx" -type f | head -1)
+            if [ -n "$ME_PRX" ]; then
+              echo "✓ Found mediaengine.prx at: $ME_PRX"
+              cp "$ME_PRX" "$DEST/mediaengine.prx"
+            else
+              echo "✗ ERROR: mediaengine.prx not found! The emulator WILL crash without it!"
+              exit 1
+            fi
           fi
           
-          # Show what we packaged
-          echo "=== Artifact contents ==="
-          ls -la artifact/${{ matrix.artifact_name }}/
+          # === homehook.prx ===
+          if [ "${{ matrix.needs_homehook_prx }}" = "true" ]; then
+            HH_PRX=$(find . -name "homehook.prx" -type f | head -1)
+            if [ -n "$HH_PRX" ]; then
+              echo "✓ Found homehook.prx at: $HH_PRX"
+              cp "$HH_PRX" "$DEST/homehook.prx"
+            else
+              echo "✗ ERROR: homehook.prx not found! The emulator WILL crash without it!"
+              exit 1
+            fi
+          fi
+          
+          # === DATA/snesadvance.dat (speed hacks database) ===
+          if [ -f "data/snesadvance.dat" ]; then
+            echo "✓ Copying snesadvance.dat"
+            cp data/snesadvance.dat "$DEST/DATA/snesadvance.dat"
+          else
+            echo "⚠ WARNING: data/snesadvance.dat not found (speed hacks won't work)"
+          fi
+          
+          # === Final artifact contents ===
+          echo ""
+          echo "========================================="
+          echo "  Release artifact: ${{ matrix.artifact_name }}"
+          echo "========================================="
+          find "$DEST" -type f -exec ls -lh {} \;
 
-      - name: Upload EBOOT artifact
+      - name: Upload release artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:

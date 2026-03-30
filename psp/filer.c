@@ -70,9 +70,10 @@ char FilerMsg[256];
 char FileName[MAXPATH];
 u16 *filer_bg;
 
+#undef timercmp
 #define timercmp(a, b, CMP)	(((a)->tv_sec == (b)->tv_sec) ? ((a)->tv_usec CMP (b)->tv_usec) : ((a)->tv_sec CMP (b)->tv_sec))
 
-struct timeval filer_next,filer_cur;
+struct SceKernelTimeval filer_next,filer_cur;
 
 extern void show_bg(u16 *bg);
 

@@ -1,10 +1,10 @@
 /*
  * ExtendedHiROMMap - Support for 48Mbit+ ExHiROM games
  * Used by: Tales of Phantasia, Daikaijuu Monogatari II
- * 
- * Include this file at the end of memmap.cpp (before IPS patch code)
- * and call ExtendedHiROMMap() from InitROM when ExHiROM is detected.
  */
+
+#include "snes9x.h"
+#include "memmap.h"
 
 void CMemory::ExtendedHiROMMap ()
 {

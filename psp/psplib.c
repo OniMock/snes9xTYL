@@ -695,7 +695,7 @@ time_t time(time_t *tm){
 	return sceKernelLibcTime(tm);
 }
 
-int gettimeofday(struct timeval *__p, struct timezone *__z){
+int gettimeofday(struct SceKernelTimeval *__p, struct timezone *__z){
 	return sceKernelLibcGettimeofday(__p,__z);
 }
 
@@ -721,13 +721,13 @@ _raise (){
 
 
 
-static struct timeval s_analyze;
+static struct SceKernelTimeval s_analyze;
 void StartAnalyze(){
 	sceKernelLibcGettimeofday( &s_analyze, 0 );
 }
 
 void StopAnalyze(){
-	struct timeval now;
+	struct SceKernelTimeval now;
 	int		diff;
 
 	sceKernelLibcGettimeofday( &now, 0 );

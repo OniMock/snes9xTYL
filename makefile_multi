@@ -6,7 +6,7 @@ else
 EMUNAME_VERSION = Snes9xTYLcm Mod 180404
 endif
 
-INCDIR = psp psp/me psp/openspc++ psp/adhoc zlib danzeff
+INCDIR = psp psp/me psp/openspc++ psp/adhoc danzeff
 
 CFLAGS = -march=allegrex -O2 -G0 -Wall -pipe \
 	-fsingle-precision-constant -fpredictive-commoning -ffunction-sections -frename-registers -fno-gcse \
@@ -28,7 +28,7 @@ PSP_FW_VERSION = 371
 CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti -fpermissive -Wno-register
 ASFLAGS = $(CFLAGS) -c
 
-LIBS = -ljpeg -lpng -lstdc++ \
+LIBS = -ljpeg -lpng -lz -lstdc++ \
 	-lpspaudio -lpsppower -lpsputility -lpspwlan -lpspkubridge \
 	-lpspgum_vfpu -lpspvfpu -lpspgu \
 	-lpspusb -lpspusbstor
@@ -61,9 +61,11 @@ SPCOBJ = psp/openspc++/dsp.o psp/openspc++/spc.o psp/openspc++/ospcmain.o psp/op
 
 NETOBJ = psp/psp_net.o psp/adhoc/pspadhoc.o psp/adhoc/selectorMenu.o
 
-ZLIBOBJ = zlib/adler32.o zlib/compress.o zlib/crc32.o zlib/gzio.o \
-	zlib/uncompr.o zlib/deflate.o zlib/trees.o zlib/zutil.o zlib/inflate.o \
-	zlib/infback.o zlib/inftrees.o zlib/inffast.o
+# Use system zlib (-lz) instead of bundled old zlib (lacks inflateReset2 for modern libpng)
+#ZLIBOBJ = zlib/adler32.o zlib/compress.o zlib/crc32.o zlib/gzio.o \
+#	zlib/uncompr.o zlib/deflate.o zlib/trees.o zlib/zutil.o zlib/inflate.o \
+#	zlib/infback.o zlib/inftrees.o zlib/inffast.o
+ZLIBOBJ =
 
 DANZOBJ = danzeff/danzeff.o
 

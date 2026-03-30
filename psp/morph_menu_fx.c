@@ -123,7 +123,7 @@ void fx_init() {
 
 void fx_main(void *drawbuffer) {
 	// run sample
-	struct timeval now;
+	struct SceKernelTimeval now;
 	sceKernelLibcGettimeofday( &now, 0 );
 	val=(now.tv_usec+now.tv_sec*1000000)>>14;
 			

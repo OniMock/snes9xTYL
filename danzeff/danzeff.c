@@ -7,6 +7,7 @@
 #include "pspgu.h"
 #include "png.h"
 #include "psp/pg.h"
+#include <string.h>
 #endif // #ifdef DANZEFF_SCEGU
 
 #define false 0

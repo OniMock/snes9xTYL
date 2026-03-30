@@ -25,7 +25,7 @@ endif
 
 PSP_FW_VERSION = 371
 
-CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
+CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti -fpermissive -Wno-register
 ASFLAGS = $(CFLAGS) -c
 
 LIBS = -ljpeg -lpng -lstdc++ \

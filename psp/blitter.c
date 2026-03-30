@@ -2,7 +2,7 @@
 
 #include "tile_psp.h"
 
-/*extern "C" */long pg_drawframe;
+extern long pg_drawframe;
 
 extern int os9x_vsync,swap_buf,os9x_smoothing,os9x_snesheight;
 extern int os9x_screenLeft,os9x_screenTop,os9x_screenHeight,os9x_screenWidth;

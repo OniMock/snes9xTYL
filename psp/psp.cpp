@@ -209,10 +209,10 @@ u16 *clut256;
 int swap_buf;
 
 
-static struct timeval next1 = { 0, 0 };
-static struct timeval next1_autofs = { 0, 0 };
+static struct SceKernelTimeval next1 = { 0, 0 };
+static struct SceKernelTimeval next1_autofs = { 0, 0 };
 
-static struct timeval os9x_autosavetimer_tv = {0,0};
+static struct SceKernelTimeval os9x_autosavetimer_tv = {0,0};
 
 int os9x_load(const char *ext);
 int os9x_remove(const char *ext);
@@ -1637,7 +1637,7 @@ uint32 S9xReadJoypad( int which1 ) {
 void S9xSyncSpeed()
 {
 	static int waited=1;
-	struct timeval now;
+	struct SceKernelTimeval now;
 
 	s_TotalFrame++;
 
@@ -2383,7 +2383,7 @@ void S9xProcessEvents( bool8 block ) {
 		after_pause();
 	}
 	if (os9x_autosavetimer) {
-		struct timeval now;
+		struct SceKernelTimeval now;
 		int diff;
 		sceKernelLibcGettimeofday( &now, 0 );
 		diff  = (now.tv_sec - os9x_autosavetimer_tv.tv_sec) * 1000000 + now.tv_usec - os9x_autosavetimer_tv.tv_usec;

@@ -82,7 +82,7 @@ void load_background(){
 	zip_file = unzOpen(str);
 	if (zip_file) {
 		unz_global_info pglobal_info;
-		struct timeval now;
+		struct SceKernelTimeval now;
 		int num;
 		sceKernelLibcGettimeofday( &now, 0 );
 		srand((now.tv_usec+now.tv_sec*1000000));

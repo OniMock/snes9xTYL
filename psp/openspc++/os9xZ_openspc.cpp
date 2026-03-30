@@ -32,7 +32,7 @@ SPC_ID666 *OSPC_id=NULL;
 int OSPC_sound_fd;
 int OSPC_thread=-1;
 volatile int OSPC_exit,OSPC_volume;
-struct timeval OSPC_cur_time,OSPC_start_time;
+struct SceKernelTimeval OSPC_cur_time,OSPC_start_time;
 
 extern "C" {
 int OSPC_Init()

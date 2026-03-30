@@ -76,21 +76,21 @@ struct me_struct
 extern void me_stub(void);
 extern void me_stub_end(void);
 
-extern int sceSysregVmeResetEnable371();	
-extern int sceSysregAvcResetEnable371();	
-extern int sceSysregMeResetEnable371();
-extern int sceSysregMeResetDisable371();
-extern int sceSysregMeBusClockEnable371();
-extern int sceSysregMeBusClockDisable371();
-extern int sceSysregAvcResetEnable();
-extern int sceMeBootStart();
-extern int sceMeBootStart371();
-extern int sceMeBootStart380();
-extern int sceMeBootStart395();
-extern int sceMeBootStart500();
-extern int sceMeBootStart620();
-extern int sceMeBootStart635();
-extern int sceMeBootStart660();
+extern int sceSysregVmeResetEnable371(void);
+extern int sceSysregAvcResetEnable371(void);
+extern int sceSysregMeResetEnable371(void);
+extern int sceSysregMeResetDisable371(void);
+extern int sceSysregMeBusClockEnable371(void);
+extern int sceSysregMeBusClockDisable371(void);
+extern int sceSysregAvcResetEnable(void);
+extern int sceMeBootStart(int);
+extern int sceMeBootStart371(int);
+extern int sceMeBootStart380(int);
+extern int sceMeBootStart395(int);
+extern int sceMeBootStart500(int);
+extern int sceMeBootStart620(int);
+extern int sceMeBootStart635(int);
+extern int sceMeBootStart660(int);
 /*
  * cache functions
  *
@@ -317,7 +317,7 @@ void ResetME(int devkitVersion){
 }
 int module_start(SceSize args, void *argp)
 {
-	mod = sceKernelFindModuleByName("sceMeCodecWrapper");
+	mod = (SceModule2 *)sceKernelFindModuleByName("sceMeCodecWrapper");
 	return 0;
 }
 

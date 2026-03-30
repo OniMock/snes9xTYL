@@ -340,7 +340,7 @@ int in_emu;
 
 /*******************************/
 
-static struct timeval	s_tvStart;
+static struct SceKernelTimeval	s_tvStart;
 static int				s_iFrame,s_iFrameAuto,s_iFrameReal;
 int				s_TotalFrame;
 
@@ -1883,7 +1883,7 @@ static void after_pause(){
 ////////////////////////////////////////////////////////////////////////////////////////
 // Ge Callback
 ////////////////////////////////////////////////////////////////////////////////////////
-struct timeval	now;
+struct SceKernelTimeval	now;
 	unsigned long long	diff;
 	static int fps_val=0;
 	static int real_fps_val=0;

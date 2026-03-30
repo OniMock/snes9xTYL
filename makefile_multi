@@ -11,6 +11,7 @@ INCDIR = psp psp/me psp/openspc++ psp/adhoc zlib danzeff
 CFLAGS = -march=allegrex -O2 -G0 -Wall -pipe \
 	-fsingle-precision-constant -fpredictive-commoning -ffunction-sections -frename-registers -fno-gcse \
 	-finline-functions -finline-limit=20000 -falign-functions=64 -falign-loops=64 -fno-align-jumps -fno-align-labels \
+	-Wno-incompatible-pointer-types -Wno-format -Wno-array-bounds \
 	-DFW3X -DPSP -D__PSP__ -DEMUNAME_VERSION="\"$(EMUNAME_VERSION)\""
 LDFLAGS = -fwhole-program
 

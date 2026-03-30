@@ -1371,7 +1371,7 @@ static void menu_startmusic(){
 	if (zip_file) {
 		unz_global_info pglobal_info;
 		int num;
-		struct timeval now;
+		struct SceKernelTimeval now;
 		sceKernelLibcGettimeofday( &now, 0 );
 		srand((now.tv_usec+now.tv_sec*1000000));
 

@@ -55,7 +55,7 @@
 
 #ifdef ZLIB
 //#ifndef __WIN32__
-#include "zlib.h"
+#include <zlib.h>
 //#endif
 #define STREAM gzFile
 #define READ_STREAM(p,l,s) gzread (s,p,l)

@@ -1,3 +1,12 @@
+# Ccache configuration
+USE_CCACHE ?= 1
+
+ifeq ($(USE_CCACHE), 1)
+  CC  := ccache psp-gcc
+  CXX := ccache psp-g++
+  AS  := ccache psp-gcc
+endif
+
 TARGET = snes9xTYL
 
 ifdef ME_ACTIVE

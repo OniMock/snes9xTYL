@@ -242,6 +242,7 @@ char os9x_viewfile_path[256];
 char os9x_nickname[256];
 int os9x_timezone,os9x_daylsavings;
 int os9x_language=PSP_SYSTEMPARAM_LANGUAGE_ENGLISH; //need to be initialized for early error messages! (before calling getsysparam)
+int os9x_force_language=-1; // -1 means auto
 int os9x_menumusic,os9x_menufx,os9x_menupadbeep;
 int os9x_autostart,os9x_osk;
 int os9x_btn_positive_code;
@@ -3672,6 +3673,8 @@ static int init_snes_rom() {
 			}
 		}
 
+		psp_msg_init();
+
 		//net stuff, called here to have settings loaded and so server can broadcast them
 		if (os9x_netplay) {
 #ifdef USE_ADHOC
@@ -3884,6 +3887,8 @@ static int user_main(SceSize args, void* argp) {
 
 	initvar_withdefault();
 	load_settings();
+
+	psp_msg_init();
 
 	//OSK
 	if (os9x_osk) danzeff_load16(LaunchDir);

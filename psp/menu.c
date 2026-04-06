@@ -89,6 +89,7 @@ extern int os9x_speedlimit,os9x_sndfreq,os9x_showfps,os9x_showpass,os9x_getnewfi
 extern int os9x_lowbat,os9x_autosavetimer,os9x_menumusic,os9x_menufx,os9x_menupadbeep;
 extern int os9x_autostart;
 extern int os9x_osk;
+extern int os9x_force_language;
 extern int os9x_btn_positive_code;
 extern int os9x_btn_negative_code;
 extern const char *os9x_btn_positive_str;
@@ -127,6 +128,8 @@ extern int os9x_save(const char *ext);
 extern int os9x_load(const char *ext);
 extern int os9x_loadfname(const char *fname);
 extern int os9x_remove(const char *ext);
+extern void psp_msg_init();
+
 
 extern int scroll_message(char **msg_lines,int lines,int start_pos,int exit_only_at_end,char *title);
 
@@ -1340,7 +1343,7 @@ menu_xmb_icon_t menu_xmb_icons[MENU_XMB_ICONS_NB]={
 	{2,0,0,2,MENU_ICONS_CONTROLS},
 	{3,0,0,11,MENU_ICONS_VIDEO},
 	{4,0,0,4,MENU_ICONS_SOUND},
-	{5,0,0,10,MENU_ICONS_MISC},
+	{5,0,0,11,MENU_ICONS_MISC},
 	{6,0,0,10,MENU_ICONS_CHEATS},
 	{7,0,0,2,MENU_ICONS_ABOUT},
 };
@@ -2297,6 +2300,69 @@ static int menu_menufx(char *mode) {
 
 static int menu_menupadbeep(char *mode) {
 	MENU_ONOFF(os9x_menupadbeep)
+}
+
+static int menu_language(char *mode) {
+	int retval=0;
+	int to_exit=0;
+	int new_value=os9x_force_language; // -1 to MSG_TOTAL_LANG-1
+	if (mode) {
+        if (os9x_force_language == -1) strcpy(mode, "Auto");
+		else if (os9x_force_language == MSG_EN) strcpy(mode, "English");
+        else if (os9x_force_language == MSG_JA) strcpy(mode, "Japanese");
+        else if (os9x_force_language == MSG_CH) strcpy(mode, "Chinese");
+        else if (os9x_force_language == MSG_PT) strcpy(mode, "Portuguese");
+		return 0;
+	}
+	menu_panel_pos=479;
+	menu_cnt2=0;
+	for (;;) {
+		menu_basic(2+to_exit);
+		if (!g_bLoop) {retval=1;break;}
+
+        char lang_str[32];
+        if (new_value == -1) strcpy(lang_str, "Auto");
+		else if (new_value == MSG_EN) strcpy(lang_str, "English");
+        else if (new_value == MSG_JA) strcpy(lang_str, "Japanese");
+        else if (new_value == MSG_CH) strcpy(lang_str, "Chinese");
+        else if (new_value == MSG_PT) strcpy(lang_str, "Portuguese");
+
+		mh_printLimit(menu_panel_pos + 5, 104, 479, 272, lang_str, 31 | (24 << 5) | (24 << 10));
+		mh_printLimit(menu_panel_pos + 5, 130, 479, 272, s9xTYL_msg[MENU_CHANGE_VALUE], PANEL_TEXTCMD_COL);
+		mh_printLimit(menu_panel_pos+5,130,479,272,SJIS_UP " " SJIS_DOWN,PANEL_BUTTONCMD_COL);
+		mh_printLimit(menu_panel_pos + 5, 142, 479, 272, s9xTYL_msg[MENU_CANCEL_VALIDATE], PANEL_TEXTCMD_COL);
+		sprintf(str_tmp, SJIS_LEFT " %s              %s", os9x_btn_negative_str, os9x_btn_positive_str);
+		mh_printLimit(menu_panel_pos+5,142,479,272,str_tmp,PANEL_BUTTONCMD_COL);
+
+		if (to_exit) {
+			if (menu_panel_pos>=479) return 0;
+		} else {
+			if (new_pad&(os9x_btn_negative_code|PSP_CTRL_LEFT)) {
+				os9x_beep1();
+				to_exit=1;
+				menu_cnt2=0;
+			} else if (new_pad&(os9x_btn_positive_code)) {
+				os9x_beep1();
+				to_exit=1;
+				menu_cnt2=0;
+				os9x_force_language=new_value;
+				psp_msg_init();
+
+			} else if (new_pad&PSP_CTRL_DOWN) {
+                if (new_value > -1) { new_value--; MENU_CHGVAL(); }
+			} else if (new_pad&PSP_CTRL_UP) {
+                if (new_value < MSG_TOTAL_LANG-1) { new_value++; MENU_CHGVAL(); }
+			}  else if (new_pad & PSP_CTRL_SELECT) {
+				if (os9x_menumusic) {
+					menu_stopmusic();
+					menu_startmusic();
+				}
+			} SNAPSHOT_CODE()
+		}
+		//swap screen
+		pgScreenFlipV2();
+	}
+	return retval;
 }
 
 static int menu_autostart(char *mode) {
@@ -3777,7 +3843,7 @@ static int menu_swapbg(char *mode) {
 	return retval;
 }
 
-#define MENU_XMB_ENTRIES_NB (4+7+2+11+4+10+10+2)
+#define MENU_XMB_ENTRIES_NB (4+7+2+11+4+11+10+2)
 menu_xmb_entry_t menu_xmb_entries[MENU_XMB_ENTRIES_NB]={
 	// GAME
 	{0,0,menu_browser,MENU_ICONS_GAME_NEW,0},
@@ -3824,6 +3890,7 @@ menu_xmb_entry_t menu_xmb_entries[MENU_XMB_ENTRIES_NB]={
 	{5,7,menu_menupadbeep,MENU_ICONS_MISC_PADBEEP,MENU_ICONS_MISC_PADBEEP_HELP},
 	{5,8,menu_autostart,MENU_ICONS_MISC_AUTOSTART,MENU_ICONS_MISC_AUTOSTART_HELP},
 	{5,9,menu_osk,MENU_ICONS_MISC_OSK,MENU_ICONS_MISC_OSK_HELP},
+	{5,10,menu_language,MENU_ICONS_MISC_LANGUAGE,MENU_ICONS_MISC_LANGUAGE_HELP},
 	// CHEATS
 	{6,0,menu_addRAWcode,MENU_ICONS_CHEATS_ADDRAW,MENU_ICONS_CHEATS_ADDRAW_HELP},
 	{6,1,menu_addGGcode,MENU_ICONS_CHEATS_ADDGG,MENU_ICONS_CHEATS_ADDGG_HELP},

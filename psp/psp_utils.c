@@ -56,22 +56,22 @@ unsigned long get_background_num(){
 	return pglobal_info.number_entry;
 }
 
-void load_background(){	
+void load_background(){
 	/*FILE *fd;
 	sprintf(str_tmp,"%s/DATA/logo.bmp",LaunchDir);
 	fd = fopen(str_tmp,"rb");
-	if (fd==NULL) {		
+	if (fd==NULL) {
 		msgBoxLines("can't load bg image\n",60);
 		bg_img=NULL;
 		return;
-	}			
-	bg_img = load_bmp(fd);	
+	}
+	bg_img = load_bmp(fd);
 	fclose(fd); */
 
-	FILE *jpegFile;	
+	FILE *jpegFile;
 	unzFile zip_file;
 	unz_file_info unzinfo;
-	char str[256],*buffer;	
+	char str[256],*buffer;
 	int l,height;
 	sprintf(str,"%s/DATA/logo.zip",LaunchDir);
 
@@ -142,10 +142,10 @@ void load_background(){
 		if (!read_JPEG_file (str,(u16*)bg_img->pixels,480,272,480,&height)) {
 			free(bg_img->pixels);
 			free(bg_img);
-			bg_img=NULL;			
+			bg_img=NULL;
 		}
 		remove(str);
-		
+
 		if (bg_img) {
 			u16 *src=(u16*)(bg_img->pixels);
 			u16 col;
@@ -163,28 +163,28 @@ void load_background(){
 		}
 	}
 }
-	
+
 ////////////////////////////////////////////////////////////////////////////////////////
 //
 ////////////////////////////////////////////////////////////////////////////////////////
-static void load_icons(){	
+static void load_icons(){
 	int i;
 	for (i=0;i<8;i++) icons[i]=NULL;
-	
-	icons[0] = load_bmp_buffer(icon_game);	
+
+	icons[0] = load_bmp_buffer(icon_game);
 	icons_col[0]=0xFF00;
-	icons[1] = load_bmp_buffer(icon_save);	
-	icons_col[1]=0xFF00;		
-	icons[2] = load_bmp_buffer(icon_pad);	
+	icons[1] = load_bmp_buffer(icon_save);
+	icons_col[1]=0xFF00;
+	icons[2] = load_bmp_buffer(icon_pad);
 	icons_col[2]=0xFF;
-	icons[3] = load_bmp_buffer(icon_video);	
-	icons_col[3]=0xFF00;	
-	icons[4] = load_bmp_buffer(icon_sound);	
+	icons[3] = load_bmp_buffer(icon_video);
+	icons_col[3]=0xFF00;
+	icons[4] = load_bmp_buffer(icon_sound);
 	icons_col[4]=0xFF00;
-	icons[5] = load_bmp_buffer(icon_misc);	
+	icons[5] = load_bmp_buffer(icon_misc);
 	icons_col[5]=0xFF00;
-	icons[6] = load_bmp_buffer(icon_cheats);	
-	icons_col[6]=0xFF00;	
+	icons[6] = load_bmp_buffer(icon_cheats);
+	icons_col[6]=0xFF00;
 	icons[7] = load_bmp_buffer(icon_about);
 	icons_col[7]=0xFF00;
 }
@@ -192,9 +192,9 @@ static void load_icons(){
 ////////////////////////////////////////////////////////////////////////////////////////
 //
 ////////////////////////////////////////////////////////////////////////////////////////
-void show_background(int mul,int add){	
-		if (bg_img) image_put_mul((SCREEN_WIDTH-bg_img->width)/2,(SCREEN_HEIGHT-bg_img->height)/2,bg_img,mul,add);	
-		else pgFillvram(add);	
+void show_background(int mul,int add){
+		if (bg_img) image_put_mul((SCREEN_WIDTH-bg_img->width)/2,(SCREEN_HEIGHT-bg_img->height)/2,bg_img,mul,add);
+		else pgFillvram(add);
 	}
 
 
@@ -205,16 +205,16 @@ void show_background(int mul,int add){
 int save_rom_settings(int game_crc32,const char *name){
 	FILE *f;
 	char tmp_str[256];
-	int l;	
+	int l;
 	if (game_crc32)	sprintf(tmp_str,"%s/PROFILES/s9xTYL_%08X.ini",LaunchDir,game_crc32);
 	else sprintf(tmp_str,"%s/PROFILES/s9xTYL_default.ini",LaunchDir);
-	f = fopen(tmp_str,"wb");			
+	f = fopen(tmp_str,"wb");
 	if (!f){
 		ErrorMsg("cannot save settings");
 		return -1;
 	}
 	l=(VERSION_MAJOR<<16)|VERSION_MINOR;
-	fwrite(&l,1,4,f);	
+	fwrite(&l,1,4,f);
 	fwrite(&os9x_apuenabled,1,4,f);
 	fwrite(&os9x_sndfreq,1,4,f);
 	fwrite(&os9x_softrendering,1,4,f);
@@ -224,7 +224,7 @@ int save_rom_settings(int game_crc32,const char *name){
 	fwrite(&os9x_showfps,1,4,f);
 	fwrite(&os9x_cpuclock,1,4,f);
 	fwrite(&os9x_render,1,4,f);
-	fwrite(&os9x_smoothing,1,4,f);	
+	fwrite(&os9x_smoothing,1,4,f);
 	fwrite(&os9x_OBJ,1,4,f);
 	fwrite(&os9x_BG0,1,4,f);
 	fwrite(&os9x_BG1,1,4,f);
@@ -254,7 +254,7 @@ int save_rom_settings(int game_crc32,const char *name){
 	fwrite(&os9x_applyhacks,1,4,f);
 	fwrite(&os9x_SFX_overclock,1,4,f);
 	fwrite(&os9x_vol_adjust,1,4,f);
-	
+
 	fclose(f);
 	return 0;
 }
@@ -265,7 +265,7 @@ int save_rom_settings(int game_crc32,const char *name){
 //crc = 0 for default
 static int load_rom_settings(int game_crc32){
 	FILE *f;
-	char tmp_str[256],rom_name[64];	
+	char tmp_str[256],rom_name[64];
 	int l;
 	if (game_crc32)	sprintf(tmp_str,"%s/PROFILES/s9xTYL_%08X.ini",LaunchDir,game_crc32);
 	else sprintf(tmp_str,"%s/PROFILES/s9xTYL_default.ini",LaunchDir);
@@ -299,7 +299,7 @@ else {fclose(f);check_settings();return -3;}
 #define READ_SETTING_SIZE(buff,sz) \
 if (fread(tmp_str,1,sz,f)==sz) memcpy(buff,tmp_str,sz); \
 else {fclose(f);check_settings();return -3;}
-	
+
 	READ_SETTING(os9x_apuenabled)
 	READ_SETTING(os9x_sndfreq)
 	READ_SETTING(os9x_softrendering)
@@ -309,7 +309,7 @@ else {fclose(f);check_settings();return -3;}
 	READ_SETTING(os9x_showfps)
 	READ_SETTING(os9x_cpuclock)
 	READ_SETTING(os9x_render)
-	READ_SETTING(os9x_smoothing)	
+	READ_SETTING(os9x_smoothing)
 	READ_SETTING(os9x_OBJ)
 	READ_SETTING(os9x_BG0)
 	READ_SETTING(os9x_BG1)
@@ -317,7 +317,7 @@ else {fclose(f);check_settings();return -3;}
 	READ_SETTING(os9x_BG3)
 	READ_SETTING(os9x_easy)
 	READ_SETTING(os9x_fastsprite)
-	READ_SETTING(os9x_gammavalue)		
+	READ_SETTING(os9x_gammavalue)
 	READ_SETTING(os9x_hack)
 	READ_SETTING(os9x_forcepal_ntsc)
 	READ_SETTING(os9x_autosavetimer)
@@ -339,13 +339,13 @@ else {fclose(f);check_settings();return -3;}
 	if (fread(&l,1,4,f)==4) os9x_SFX_overclock=l; else os9x_SFX_overclock=100;
 	if (fread(&l,1,4,f)==4) os9x_vol_adjust=l; else os9x_vol_adjust=100;
 	fclose(f);
-	
+
 	check_settings();
-	
-	rom_name[63]=0;	
+
+	rom_name[63]=0;
 	sprintf(tmp_str, s9xTYL_msg[SETTINGS_FOUND], rom_name);
 	msgBoxLines(tmp_str,30);
-		
+
 	return 0;
 }
 
@@ -356,8 +356,8 @@ else {fclose(f);check_settings();return -3;}
 #ifdef USE_ADHOC
 static int save_buffer_settings(char *buffer){
 	int buffer_ofs=0;
-	int l;	
-	
+	int l;
+
 	l=(VERSION_MAJOR<<16)|VERSION_MINOR;
 	memcpy(&(buffer[buffer_ofs]),&l,4);	buffer_ofs+=4;
 	memcpy(&(buffer[buffer_ofs]),&os9x_apuenabled,4);buffer_ofs+=4;
@@ -392,8 +392,8 @@ static int save_buffer_settings(char *buffer){
 	//memcpy(&(buffer[buffer_ofs]),&os9x_screenHeight,4);buffer_ofs+=4;
 	memcpy(&(buffer[buffer_ofs]),&os9x_apu_ratio,4);buffer_ofs+=4;
 	memcpy(&(buffer[buffer_ofs]),&os9x_fpslimit,4);buffer_ofs+=4;
-	
-		
+
+
 	return 0;
 }
 #endif
@@ -406,14 +406,14 @@ int load_buffer_settings(char *buffer){
 	//char rom_name[64];
 	int buffer_ofs=0;
 	int l;
-	
+
 	memcpy(&l,buffer,4);
 	buffer_ofs+=4;
 	if (l!=((VERSION_MAJOR<<16)|VERSION_MINOR)){
 		msgBoxLines(s9xTYL_msg[SETTINGS_DIFF], 20);
 		return -2;
 	}
-		
+
 #ifdef READ_SETTING
 #undef READ_SETTING
 #endif
@@ -421,7 +421,7 @@ int load_buffer_settings(char *buffer){
 #define READ_SETTING(a) \
 	memcpy(&a,&(buffer[buffer_ofs]),4); \
 	buffer_ofs+=4;
-	
+
 
 #ifdef READ_SETTING_SIZE
 #undef READ_SETTING_SIZE
@@ -431,7 +431,7 @@ int load_buffer_settings(char *buffer){
 #define READ_SETTING_SIZE(buff,sz) \
 	memcpy(buff,&(buffer[buffer_ofs]),sz); \
 	buffer_ofs+=sz;
-	
+
 	READ_SETTING(os9x_apuenabled)
 	READ_SETTING(os9x_sndfreq)
 	READ_SETTING(os9x_softrendering)
@@ -441,7 +441,7 @@ int load_buffer_settings(char *buffer){
 	//READ_SETTING(os9x_showfps)
 	READ_SETTING(os9x_cpuclock)
 	READ_SETTING(os9x_render)
-	//READ_SETTING(os9x_smoothing)	
+	//READ_SETTING(os9x_smoothing)
 	//READ_SETTING(os9x_OBJ)
 	//READ_SETTING(os9x_BG0)
 	//READ_SETTING(os9x_BG1)
@@ -449,7 +449,7 @@ int load_buffer_settings(char *buffer){
 	//READ_SETTING(os9x_BG3)
 	//READ_SETTING(os9x_easy)
 	//READ_SETTING(os9x_fastsprite)
-	//READ_SETTING(os9x_gammavalue)		
+	//READ_SETTING(os9x_gammavalue)
 	READ_SETTING(os9x_hack)
 	READ_SETTING(os9x_forcepal_ntsc)
 	READ_SETTING(os9x_autosavetimer)
@@ -498,6 +498,7 @@ static int save_settings(void){
 	fwrite(&os9x_menupadbeep,1,4,f);
 	fwrite(&os9x_autostart,1,4,f);
 	fwrite(&os9x_osk,1,4,f);
+	fwrite(&os9x_force_language,1,4,f);
 	fclose(f);
 	return 0;
 }
@@ -551,6 +552,7 @@ else {fclose(f);return -3;}
 	READ_SETTING(os9x_menupadbeep)
 	if (fread(&l, 1, 4, f) == 4) os9x_autostart = l;
 	if (fread(&l, 1, 4, f) == 4) os9x_osk = l;
+	if (fread(&l, 1, 4, f) == 4) os9x_force_language = l;
 
 	fclose(f);
 	return 0;
@@ -564,7 +566,7 @@ else {fclose(f);return -3;}
 ////////////////////////////////////////////////////////////////////////////////////////
 #include "savedata_res.h"
 
-static void checkdirs() { 
+static void checkdirs() {
 	int i;
 	const char *src;
 	char *dst;
@@ -755,15 +757,15 @@ int os9x_savesnap() {
 	if (os9x_softrendering<2)	snes_image=(u16*)(0x44000000+512*272*2*2);
 	else snes_image=(u16*)(0x44000000+2*512*272*2+256*240*2+2*256*256*2);
 
-	write_JPEG_file ((char*)S9xGetSaveFilename(".jpg"),75,snes_image,256,os9x_snesheight,256); 
+	write_JPEG_file ((char*)S9xGetSaveFilename(".jpg"),75,snes_image,256,os9x_snesheight,256);
 	return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
 //
 ////////////////////////////////////////////////////////////////////////////////////////
-int os9x_loadsnap(char *fname,u16 *snes_image,int *height) {	
-	if (read_JPEG_file (fname,snes_image,256,240,256,height)) return 1;	
+int os9x_loadsnap(char *fname,u16 *snes_image,int *height) {
+	if (read_JPEG_file (fname,snes_image,256,240,256,height)) return 1;
 	return 0;
 }
 
@@ -775,7 +777,7 @@ int os9x_remove(const char *ext) {
 	const char *save_filename;
 	os9x_externstate_mode=0;
 
-	save_filename=S9xGetSaveFilename (ext);	
+	save_filename=S9xGetSaveFilename (ext);
 	savefile=fopen(save_filename,"rb");
 	if (savefile) {
   	fclose(savefile);
@@ -867,7 +869,7 @@ static int os9x_findhacks(int game_crc32){
 				sscanf(str,"%X=%X",&adr,&val);
 				//sprintf(str,"read : %X=%X",adr,val);
 				//pgPrintAllBG(32,31-p++,0xFFFF,str);
-				
+
 				if ((val==0x42)||((val&0xFF00)==0x4200)) {
 					Settings.SNESAdvanceHack = true;
 					if (val&0xFF00) {
@@ -889,7 +891,7 @@ static int os9x_findhacks(int game_crc32){
 void os9x_beep1() {
 	if (!os9x_menupadbeep) return;
 	if (!sceAudioGetChannelRestLen(snd_beep1_handle[snd_beep1_current])) {
-		sceAudioOutput(snd_beep1_handle[snd_beep1_current], MAXVOLUME/12, (char*)(&(snd_beep1[44])));	
+		sceAudioOutput(snd_beep1_handle[snd_beep1_current], MAXVOLUME/12, (char*)(&(snd_beep1[44])));
 		snd_beep1_current++;
 		if (snd_beep1_current==6) snd_beep1_current=0;
 	}
@@ -898,12 +900,12 @@ void os9x_beep1() {
 void os9x_beep2() {
 	if (!os9x_menupadbeep) return;
 	/*if (!sceAudioGetChannelRestLen(snd_beep2_handle[snd_beep2_current])) {
-		sceAudioOutput(snd_beep2_handle[snd_beep2_current], MAXVOLUME/12, (char*)(&(snd_beep2[44])));	
+		sceAudioOutput(snd_beep2_handle[snd_beep2_current], MAXVOLUME/12, (char*)(&(snd_beep2[44])));
 		snd_beep2_current++;
 		if (snd_beep2_current==3) snd_beep2_current=0;
 	}*/
 	if (!sceAudioGetChannelRestLen(snd_beep1_handle[snd_beep1_current])) {
-		sceAudioOutput(snd_beep1_handle[snd_beep1_current], MAXVOLUME/12, (char*)(&(snd_beep2[44])));	
+		sceAudioOutput(snd_beep1_handle[snd_beep1_current], MAXVOLUME/12, (char*)(&(snd_beep2[44])));
 		snd_beep1_current++;
 		if (snd_beep1_current==6) snd_beep1_current=0;
 	}
@@ -1044,7 +1046,7 @@ static int net_waitpause_state(int show_menu){
 	if (os9x_netplay) {
 		msgBoxLines(s9xTYL_msg[ADHOC_WAITING_OTHER], 10);
 
-		//filename																																			
+		//filename
 		filename=(char*)S9xGetSaveFilename (".znt");
 		if ((ret=psp_net_recv_file(filename))<0) {
 			msgBoxLines(s9xTYL_msg[ADHOC_NETWORKERR_1], 60);
@@ -1122,7 +1124,7 @@ static void net_receive_settings() {
 
 	msgBoxLines(s9xTYL_msg[ADHOC_WAITING_OTHER], 10);
 
-	//filename																																									
+	//filename
 	if ((ret=psp_net_recv_file(filename))<0) {
 		msgBoxLines(s9xTYL_msg[ADHOC_NETWORKERR_1], 60);
 		os9x_netplay=0;adhocTerm();os9x_adhoc_active=0;
@@ -1139,7 +1141,7 @@ static void net_receive_settings() {
 		f=fopen(filename,"rb");
 		fread(buffer,1,256,f);
 		fclose(f);
-		load_buffer_settings(buffer);													
+		load_buffer_settings(buffer);
 		//sync stuff
 		c=0;
 		adhocSendRecvAck(&c,1);

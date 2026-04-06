@@ -2308,10 +2308,10 @@ static int menu_language(char *mode) {
 	int new_value=os9x_force_language; // -1 to MSG_TOTAL_LANG-1
 	if (mode) {
         if (os9x_force_language == -1) strcpy(mode, "Auto");
-		else if (os9x_force_language == MSG_EN) strcpy(mode, "English");
-        else if (os9x_force_language == MSG_JA) strcpy(mode, "Japanese");
-        else if (os9x_force_language == MSG_CH) strcpy(mode, "Chinese");
-        else if (os9x_force_language == MSG_PT) strcpy(mode, "Portuguese");
+		else if (os9x_force_language == MSG_EN) strcpy(mode, "EN");
+        else if (os9x_force_language == MSG_JA) strcpy(mode, "JP");
+        else if (os9x_force_language == MSG_CH) strcpy(mode, "CN");
+        else if (os9x_force_language == MSG_PT) strcpy(mode, "PT-BR");
 		return 0;
 	}
 	menu_panel_pos=479;

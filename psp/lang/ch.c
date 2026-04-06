@@ -260,7 +260,7 @@
 		[MENU_ICONS_MISC_OSK] = "OSK",
 		[MENU_ICONS_MISC_OSK_HELP] = "OSK是畫面上的鍵盤。\nDanzeff OSK可在PSP輸入字母。\nSCE官方OSK可在PSP/PSV輸入日文。",
 		[MENU_ICONS_MISC_LANGUAGE] = "Language",
-		[MENU_ICONS_MISC_LANGUAGE_HELP] = "Change the emulator language.\nRequires restart to take full effect.",
+		[MENU_ICONS_MISC_LANGUAGE_HELP] = "更改模拟器语言。",
 
 		[MENU_MUSIC_SWAPBG_NODATA] = "沒有數據",
 		[MENU_MISC_SWAPBG_RAND] = "   隨機",

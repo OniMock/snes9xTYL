@@ -153,24 +153,24 @@
     [MENU_ICONS_GAME_RESET] = "Reiniciar SNES",
     [MENU_ICONS_GAME_NEW] = "Carregar novo jogo",
     [MENU_ICONS_GAME_DEFAULTSETTINGS] = "Tornar Configurações PADRÃO",
-    [MENU_ICONS_GAME_DEFAULTSETTINGS_HELP] =
-        "Tornar as configurações atuais o\npadrão\npara todas as ROMs quando "
-        "não\nhouver uma específica",
+    [MENU_ICONS_GAME_DEFAULTSETTINGS_HELP] = "Tornar config atual o padrão\n"
+                                             "para todas as ROMs se não\n"
+                                             "houver específica",
     [MENU_ICONS_GAME_EXIT] = "Sair do Snes9xTYL",
     // CARREGAR/SALVAR
     [MENU_ICONS_LOADSAVE] = "CARREGAR/SALVAR",
     [MENU_ICONS_LOADSAVE_LOADSTATE] = "Carregar progresso",
-    [MENU_ICONS_LOADSAVE_LOADSTATE_HELP] =
-        "Carregar um progresso salvo anteriormente.\nprogresso salvo é como "
-        "uma "
-        "foto\ndo progresso do SNES, tudo\né salvo.",
+    [MENU_ICONS_LOADSAVE_LOADSTATE_HELP] = "Carregar progresso salvo.\n"
+                                           "É como uma foto do\n"
+                                           "progresso do SNES.\n"
+                                           "Tudo é salvo.",
     [MENU_ICONS_LOADSAVE_SAVESTATE] = "Salvar progresso",
     [MENU_ICONS_LOADSAVE_SAVESTATE_HELP] = "Salvar progresso",
     [MENU_ICONS_LOADSAVE_DELETESTATE] = "Excluir progresso",
     [MENU_ICONS_LOADSAVE_DELETESTATE_HELP] = "Excluir progresso",
     [MENU_ICONS_LOADSAVE_IMPORTSTATE] = "Importar progresso",
     [MENU_ICONS_LOADSAVE_IMPORTSTATE_HELP] =
-        "Importar um progresso de uma versão\nanterior ou do uosnes9x.",
+        "Importar um progresso de uma\nversão anterior ou do\nuosnes9x.",
 
     [MENU_ICONS_LOADSAVE_EXPORTS9XSTATE] = "Exportar progresso SNES9X",
     [MENU_ICONS_LOADSAVE_EXPORTS9XSTATE_HELP] =
@@ -185,7 +185,7 @@
     // CONTROLES
     [MENU_ICONS_CONTROLS] = "CONTROLES",
     [MENU_ICONS_CONTROLS_REDEFINE] = "Redefinir",
-    [MENU_ICONS_CONTROLS_REDEFINE_HELP] = "Redefinir o mapeamento dos botões.",
+    [MENU_ICONS_CONTROLS_REDEFINE_HELP] = "Redefinir o mapeamento dos\nbotões.",
     [MENU_ICONS_CONTROLS_INPUT] = "Entrada emulada",
     [MENU_ICONS_CONTROLS_INPUT_HELP] =
         "Escolher o controle de SNES\nativo atualmente.",
@@ -248,25 +248,24 @@
         "Usado apenas se o limite de\nvelocidade estiver ativado.",
     [MENU_ICONS_VIDEO_FSKIP] = "Pulo de quadros",
     [MENU_ICONS_VIDEO_FSKIP_HELP] =
-        "Escolha um valor fixo se você\ntiver sprites\nsumindo.",
+        "Escolha um valor fixo se você\ntiver sprites sumindo.",
     [MENU_ICONS_VIDEO_SMOOTHING] = "Suavização",
     [MENU_ICONS_VIDEO_SMOOTHING_HELP] =
         "Deve ficar ligado pois não\ncusta nada.",
     [MENU_ICONS_VIDEO_VSYNC] = "VSync",
     [MENU_ICONS_VIDEO_VSYNC_HELP] =
-        "Isso custa muitos fps\ne deve ser desligado.",
+        "Isso custa muitos fps e deve\nser desligado.",
     [MENU_ICONS_VIDEO_PALASNTSC] = "Renderizar PAL como NTSC",
     [MENU_ICONS_VIDEO_PALASNTSC_HELP] =
-        "Força jogos PAL a serem emulados\ncomo NTSC: 224 linhas\nem vez de "
-        "240.",
+        "Força jogos PAL a rodar\ncomo NTSC: 224 linhas\nem vez de 240.",
     [MENU_ICONS_VIDEO_GAMMA] = "Correção gama",
-    [MENU_ICONS_VIDEO_GAMMA_HELP] = "Permite renderização mais brilhante",
+    [MENU_ICONS_VIDEO_GAMMA_HELP] = "Permite renderização mais\nbrilhante",
     [MENU_ICONS_VIDEO_SCRCALIB] = "Calibração da tela",
     [MENU_ICONS_VIDEO_SCRCALIB_HELP] =
         "Ajuda a se livrar das chatas\nbordas pretas.",
     [MENU_ICONS_VIDEO_SHOWFPS] = "Mostrar FPS",
     [MENU_ICONS_VIDEO_SHOWFPS_HELP] =
-        "Primeira linha são quadros emulados\nSegunda linha é fps real.",
+        "Primeira linha: quadros\nSegunda: FPS real.",
 
     [MENU_VIDEO_MODE_1_1] = "1:1",
     [MENU_VIDEO_MODE_ZOOM_FIT] = "zoom ajustar",
@@ -294,54 +293,54 @@
     [MENU_ICONS_SOUND] = "SOM",
     [MENU_ICONS_SOUND_MODE] = "Modo de som",
     [MENU_ICONS_SOUND_MODE_HELP] =
-        "Não emulado é o mais rápido,\nmas alguns jogos não funcionarão.",
+        "Não emulado é mais rápido,\nmas alguns jogos não rodam.",
     [MENU_ICONS_SOUND_FREQ] = "Frequência de saída",
     [MENU_ICONS_SOUND_FREQ_HELP] =
         "Quanto menor, mais rápido.\nQuanto maior, melhor a\nqualidade do som.",
     [MENU_ICONS_SOUND_VOLADJUST] = "Nível de volume",
-    [MENU_ICONS_SOUND_VOLADJUST_HELP] = "Aumentar o nível do volume do som",
+    [MENU_ICONS_SOUND_VOLADJUST_HELP] = "Aumentar o nível do volume do\nsom",
     [MENU_ICONS_SOUND_APURATIO] = "Proporção de ciclos da APU",
     [MENU_ICONS_SOUND_APURATIO_HELP] =
         "Para usuários avançados que\nsabem o que estão fazendo.",
     // OPÇÕES DIVERSAS
     [MENU_ICONS_MISC] = "DIVERSOS",
     [MENU_ICONS_MISC_FILEVIEWER] = "Ver arquivo",
-    [MENU_ICONS_MISC_FILEVIEWER_HELP] = "Visualizador de arquivo minimalista",
+    [MENU_ICONS_MISC_FILEVIEWER_HELP] = "Visualizador de arquivo\nminimalista",
     [MENU_ICONS_MISC_PSPCLOCK] = "Velocidade do Clock do PSP",
     [MENU_ICONS_MISC_PSPCLOCK_HELP] =
-        "valor>222Mhz NÃO é\noverclock. É seguro, mas a\nbateria acaba mais "
-        "rápido.",
+        "valor>222Mhz NÃO é overclock.\nÉ seguro, mas a bateria\nacaba mais "
+        "rápido",
     [MENU_ICONS_MISC_HACKDEBUG] = "Menu Hack/debug",
     [MENU_ICONS_MISC_HACKDEBUG_HELP] =
-        "Para usuários avançados.\nAjuda a ajustar a renderização e\nganhar "
+        "Para usuários avançados.\nAjuda a ajustar a renderização\ne ganhar "
         "velocidade.",
     [MENU_ICONS_MISC_SNAPSHOT] = "Captura de tela",
-    [MENU_ICONS_MISC_SNAPSHOT_HELP] = "Tirar uma captura da tela atual\ndo "
+    [MENU_ICONS_MISC_SNAPSHOT_HELP] = "Tirar uma captura da tela\natual do "
                                       "jogo.\nUsado no navegador de arquivos.",
     [MENU_ICONS_MISC_SWAPBG] = "Trocar BG",
-    [MENU_ICONS_MISC_SWAPBG_HELP] = "Trocar BG do arquivo DATA/logo.zip.",
+    [MENU_ICONS_MISC_SWAPBG_HELP] = "Trocar BG do arquivo:\nDATA/logo.zip.",
     [MENU_ICONS_MISC_BGMUSIC] = "Música de fundo do menu",
-    [MENU_ICONS_MISC_BGMUSIC_HELP] =
-        "Música de fundo do menu requer\nque o PSP esteja rodando a "
-        "300MHz.\nAs músicas são do arquivo DATA/music.zip.\nApenas formato "
-        "SPC.",
+    [MENU_ICONS_MISC_BGMUSIC_HELP] = "Música do menu requer\n"
+                                     "PSP a 300 MHz.\n"
+                                     "Músicas em DATA/music.zip\n"
+                                     "Formato: SPC.",
     [MENU_ICONS_MISC_BGFX] = "Efeitos de fundo do menu",
     [MENU_ICONS_MISC_BGFX_HELP] =
-        "Efeitos legais do exemplo spline\ndo PS2DEV.",
+        "Efeitos legais do exemplo\nspline do PS2DEV.",
     [MENU_ICONS_MISC_PADBEEP] = "Bipe do controle",
     [MENU_ICONS_MISC_PADBEEP_HELP] =
         "O bipe soa ao navegar pelo\nmenu e arquivos.",
-    [MENU_ICONS_MISC_AUTOSTART] = "Início automático da última ROM",
-    [MENU_ICONS_MISC_AUTOSTART_HELP] =
-        "Se você definir como [sim], a ROM\nque foi carregada por último\nserá "
-        "iniciada automaticamente\nquando o emulador for iniciado.",
+    [MENU_ICONS_MISC_AUTOSTART] = "Auto última ROM",
+    [MENU_ICONS_MISC_AUTOSTART_HELP] = "Se definir como [sim], a\n"
+                                       "última ROM carregada será\n"
+                                       "iniciada automaticamente\n"
+                                       "ao abrir o emulador.",
     [MENU_ICONS_MISC_OSK] = "OSK",
     [MENU_ICONS_MISC_OSK_HELP] =
         "OSK é o Teclado na Tela.\nDanzeff é útil para digitar\nalfabeto no "
         "PSP. O OSK oficial\nda SCE é útil no ePSP.",
-    [MENU_ICONS_MISC_LANGUAGE] = "Idioma",
-    [MENU_ICONS_MISC_LANGUAGE_HELP] = "Alterar o idioma do emulador.\nRequer "
-                                      "reinicialização para efeito completo.",
+    [MENU_ICONS_MISC_LANGUAGE] = "Language",
+    [MENU_ICONS_MISC_LANGUAGE_HELP] = "Troca o idioma do emulador",
 
     [MENU_MUSIC_SWAPBG_NODATA] = "Sem Dados",
     [MENU_MISC_SWAPBG_RAND] = "   Aleatório",
@@ -377,8 +376,8 @@
     [MENU_ICONS_CHEATS_ADDRAW_HELP] = "Adicionar um código RAW",
     [MENU_ICONS_CHEATS_ADDGG] = "Adicionar código Game Genie",
     [MENU_ICONS_CHEATS_ADDGG_HELP] = "Adicionar um código Game Genie",
-    [MENU_ICONS_CHEATS_ADDPAR] = "Adicionar código Pro Action Replay",
-    [MENU_ICONS_CHEATS_ADDPAR_HELP] = "Adicionar um código Pro Action Replay",
+    [MENU_ICONS_CHEATS_ADDPAR] = "Adicionar código Pro ActionReplay",
+    [MENU_ICONS_CHEATS_ADDPAR_HELP] = "Adicionar um código Pro Action\nReplay",
     [MENU_ICONS_CHEATS_ADDGF] = "Adicionar código GoldFinger",
     [MENU_ICONS_CHEATS_ADDGF_HELP] = "Adicionar um código GoldFinger",
     [MENU_ICONS_CHEATS_DISABLE] = "Desativar código",

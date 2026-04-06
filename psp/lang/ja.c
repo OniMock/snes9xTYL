@@ -261,7 +261,7 @@
 		[MENU_ICONS_MISC_OSK] = "OSK",
 		[MENU_ICONS_MISC_OSK_HELP] = "OSKは画面上のキーボードです。\nDanzeffはローマ字をPSPで入力\nする際に、公式OSKは日本語や\nePSPで入力する際に最適です。",
 		[MENU_ICONS_MISC_LANGUAGE] = "Language",
-		[MENU_ICONS_MISC_LANGUAGE_HELP] = "Change the emulator language.\nRequires restart to take full effect.",
+		[MENU_ICONS_MISC_LANGUAGE_HELP] = "エミュレーターの言語を変更。\n",
 
 		[MENU_MUSIC_SWAPBG_NODATA] = "データがありません",
 		[MENU_MISC_SWAPBG_RAND] = "   ランダム",

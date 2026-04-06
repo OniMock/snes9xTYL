@@ -13,7 +13,7 @@ CFLAGS = -march=allegrex -O2 -G0 -Wall -pipe \
 	-finline-functions -finline-limit=20000 -falign-functions=64 -falign-loops=64 -fno-align-jumps -fno-align-labels \
 	-Wno-incompatible-pointer-types -Wno-format -Wno-array-bounds \
 	-DFW3X -DPSP -D__PSP__ -DEMUNAME_VERSION="\"$(EMUNAME_VERSION)\""
-LDFLAGS = -fwhole-program
+LDFLAGS =
 
 ifndef ME_ACTIVE
 USE_USER_LIBS = 1
@@ -23,7 +23,7 @@ ifndef FAT_SUPPORT
 BUILD_PRX = 1
 endif
 
-PSP_FW_VERSION = 371
+PSP_FW_VERSION = 661
 
 CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti -fpermissive -Wno-register
 ASFLAGS = $(CFLAGS) -c
@@ -39,7 +39,7 @@ EXTRA_TARGETS = EBOOT.PBP
 # use my own target - thx to zelurker for pointing this to me in neocdpsp ;-)
 PSP_EBOOT_TITLE = $(EMUNAME_VERSION)
 PSP_EBOOT_ICON = data/icon0.png
- 
+
 # Object files
 PSP_OBJECTS = apu.o apudebug.o c4.o c4emu.o cheats.o cheats2.o clip.o \
 	cpu.o cpuexec.o cpuops.o data.o debug.o dma.o dsp1.o \
@@ -47,7 +47,7 @@ PSP_OBJECTS = apu.o apudebug.o c4.o c4emu.o cheats.o cheats2.o clip.o \
 	globals.o hwregisters.o loadzip.o memmap.o obc1.o exhirom.o ppu.o sa1.o sa1cpu.o sdd1.o sdd1emu.o \
 	snapshot.o snes9x.o spc700.o spc7110.o srtc.o soundux.o \
 	tile.o tile_org.o tile_sw.o tile_psp.o unzip.o
-	#sound_mips.o snaporig.o 
+	#sound_mips.o snaporig.o
 
 PLATFORMOBJ = psp/blitter.o psp/config.o psp/decrypt.o psp/filer.o \
 	psp/imageio.o psp/img_jpeg.o psp/math.o psp/menu.o psp/menu_fx.o \

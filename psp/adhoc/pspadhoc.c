@@ -2,12 +2,12 @@
 // PSP Adhoc
 //
 //   Code was used from PspPet's PSP network library helper for all
-//   of the patching of modules 
+//   of the patching of modules
 
 ////////////////////////////////////////////////////////////////////
 // Reverse engineering source material:
 // "fair use" for making compatible software.
-// All call sequences and parameter values were taken from Lumines 
+// All call sequences and parameter values were taken from Lumines
 // by patching the network procs to return the parameters passed in
 // and value returned.
 ////////////////////////////////////////////////////////////////////
@@ -29,8 +29,8 @@
 
 extern int os9x_btn_positive_code;
 extern int os9x_btn_negative_code;
-const char *os9x_btn_positive_str;
-const char *os9x_btn_negative_str;
+extern const char *os9x_btn_positive_str;
+extern const char *os9x_btn_negative_str;
 
 ////////////////////////////////////////////////////////////////////
 // system entries
@@ -61,7 +61,7 @@ int adhocLoadDrivers(SceModuleInfo* modInfoPtr)
 	LoadAndStartAndPatch(modInfoPtr, "flash0:/kd/pspnet_adhoc_matching.prx");
 	FlushCaches();
 #endif
-	
+
 	return 0;
 }
 
@@ -132,7 +132,7 @@ int adhocInit(char *MatchingData)
     if (err != 0)
         return err;
 	g_NetAdhocInit = true;
-	
+
 	printf2("sceNetAdhocctlInit()\n");
     err = sceNetAdhocctlInit(0x2000, 0x20, &product);
     if (err != 0)
@@ -193,7 +193,7 @@ int adhocInit(char *MatchingData)
 	g_NetAdhocPdpCreate = true;
 
 	printf2("sceNetAdhocMatchingInit()\n");
-	
+
 	err = sceNetAdhocMatchingInit(0x20000);
 	if(err != 0)
 	{
@@ -201,7 +201,7 @@ int adhocInit(char *MatchingData)
 		printf("error = %x\n", err);
 	}
 	g_NetAdhocMatchingInit = true;
-	
+
 	printf2("sceNetAdhocMatchingCreate()\n");
 	matchingId = sceNetAdhocMatchingCreate( 3,
 						0xa,
@@ -221,7 +221,7 @@ int adhocInit(char *MatchingData)
 	g_NetAdhocMatchingCreate = true;
 
 	/*char tempStr[100];
-	tempStr[0] = '\0';	
+	tempStr[0] = '\0';
 	if(strlen(MatchingData))
 	{
 		strncpy(tempStr, strrchr(MatchingData, '/')+1, 100);
@@ -230,20 +230,20 @@ int adhocInit(char *MatchingData)
 	printf("tempStr=%s\n", tempStr);*/
 
 	printf2("sceNetAdhocMatchingStart()\n");
-	
+
 	err = sceNetAdhocMatchingStart(matchingId, 	// 1 in lumines (presuming what is returned from create)
 			 0x10,		// 0x10
 			 0x2000,		// 0x2000
 			 0x10,		// 0x10
 			 0x2000,		// 0x2000
 			 strlen(MatchingData)+1,
-			 MatchingData);		
+			 MatchingData);
 	if(err != 0)
 	{
 		pspDebugScreenInit();
 		printf("error = %x\n", err);
 	}
-	
+
 	g_NetAdhocMatchingStart = true;
 
 	// All the init functions have passed
@@ -266,7 +266,7 @@ int adhocReconnect(char *ssid)
 
 	// Disconnect Wifi
 	if(g_NetAdhocctlConnect)
-	{		
+	{
 		printf2("sceNetAdhocctlDisconnect\n");
 		err = sceNetAdhocctlDisconnect();
 		if(err != 0)
@@ -312,7 +312,7 @@ int adhocReconnect(char *ssid)
 		}
 		g_NetAdhocMatchingCreate = false;
 	}
-	
+
 	if(g_NetAdhocMatchingInit)
 	{
 		printf2("sceNetAdhocMatchingTerm\n");
@@ -362,7 +362,7 @@ int adhocReconnect(char *ssid)
         return err;
 	}
 	g_NetAdhocctlConnect = true;
-	
+
     stateLast = -1;
 	msgBoxLines(s9xTYL_msg[ADHOC_CONNECTING], 0);
     while (1)
@@ -420,7 +420,7 @@ int adhocReconnect(char *ssid)
 //   - The other PSP displays a message to accept or cancel
 //   - If accepted the other PSP calls sceMatchingSelectTarget
 //   - The first PSP receives PSP_ADHOC_MATCHING_EVENT_COMPLETE
-// 
+//
 // In lumines they then close the connection and start a new adhoc connection
 // with just those two machines in it.
 ///////////////////////////////////////////////////////////////////////////////////
@@ -433,7 +433,7 @@ int adhocSelect(void)
 	int oldButtons = 0;
 	char tempStr[100];
 	char str[256];
-	
+
 	sceDisplaySetMode( 0, SCREEN_WIDTH, SCREEN_HEIGHT );
 	sceDisplaySetFrameBuf( (char*)VRAM_ADDR, 512, 1, 1 );
 	pgFillAllvram(0);pgScreenFrame(2,0);
@@ -451,9 +451,9 @@ int adhocSelect(void)
 				//pspDebugScreenPrintf("Select a server to connect to, or triangle to return\n\n\n");
 				pgFillAllvram(0);pgScreenFrame(2,0);
 				mh_print(0, 0, s9xTYL_msg[ADHOC_SELECTORRETURN], 0xFFFF);
-				
+
 				DisplayPspList();
-				
+
 				pgScreenFlipV();
 
 				g_Server = 0;
@@ -481,7 +481,7 @@ int adhocSelect(void)
 
 					if(m_PspPad.Buttons & os9x_btn_negative_code)
 						return -1;
-				}		
+				}
 				if(matchChanged)
 				{
 					if(g_matchEvent ==  PSP_ADHOC_MATCHING_EVENT_JOIN)
@@ -497,7 +497,7 @@ int adhocSelect(void)
 			{
 				//pspDebugScreenInit();
 				pgFillAllvram(0);pgScreenFrame(2,0);
-				
+
 				sceNetEtherNtostr(mac, tempStr);
 				//printf("Waiting for %s to accept the connection\nTo cancel press O\n", tempStr);
 				sprintf(str, s9xTYL_msg[ADHOC_WAITING], tempStr, os9x_btn_negative_str);
@@ -536,7 +536,7 @@ int adhocSelect(void)
 
 				//pspDebugScreenInit();
 				pgFillAllvram(0);pgScreenFrame(2,0);
-				
+
 				sceNetEtherNtostr(mac, tempStr);
 				sprintf(str, s9xTYL_msg[ADHOC_REQUESTED], tempStr, os9x_btn_positive_str, os9x_btn_negative_str);
 				mh_print(0,0,str,0xFFFF);
@@ -602,7 +602,7 @@ int adhocSelect(void)
 	sceNetEtherNtostr(tempMac, tempStr);
 
 	char ssid[10];
-	sprintf(ssid, "%c%c%c%c%c%c", tempStr[9], tempStr[10], tempStr[12], tempStr[13], 
+	sprintf(ssid, "%c%c%c%c%c%c", tempStr[9], tempStr[10], tempStr[12], tempStr[13],
 			tempStr[15], tempStr[16]);
 	adhocReconnect(ssid);
 
@@ -661,7 +661,7 @@ int adhocRecv(void *buffer, unsigned int *length)
 			printf("err=%x\n", err);
 			return err;
 		}
-		else	
+		else
 		{
 			return 1;
 		}
@@ -674,18 +674,18 @@ int adhocRecvBlocked(void *buffer, unsigned int *length,int max_retry)
 {
 	int err=0;
 	int retry_cpt=0;
-		
+
 	do {
 		err = adhocRecv(buffer, length);
 		if (err>0) break;
 		sceKernelDelayThread(RECV_DELAY);
-		if (max_retry>=0) {		
+		if (max_retry>=0) {
 			retry_cpt++; if (retry_cpt>max_retry) return 0;
 		} else {
 			if (get_pad()&PSP_CTRL_TRIANGLE) return -1;
 		}
 	} while (err == 0);
-	
+
 
 	return err;
 }
@@ -811,7 +811,7 @@ int adhocTerm()
 		}
 		g_NetAdhocMatchingCreate = false;
 	}
-	
+
 	if(g_NetAdhocMatchingInit)
 	{
 		printf2("sceNetAdhocMatchingTerm\n");
@@ -823,7 +823,7 @@ int adhocTerm()
 		}
 		g_NetAdhocMatchingInit = false;
 	}
-	
+
 	if(g_NetAdhocctlInit)
 	{
 		printf2("sceNetAdhocctlTerm\n");

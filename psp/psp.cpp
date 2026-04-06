@@ -121,11 +121,13 @@
 
 /* Define the module info section */
 //PSP_MODULE_INFO("snes9xTYL", 0x1000, 0, 4);
+/*
 __asm__ (
 	".global __lib_ent_top;"
 	".global __lib_ent_bottom;"
 	".global __lib_stub_top;"
 	".global __lib_stub_bottom;");
+*/
 
 PSP_MODULE_INFO("snes9xTYL", 0, 1, 0);
 /* Define the main thread's attribute value (optional) */
@@ -2231,7 +2233,7 @@ void S9xProcessEvents( bool8 block ) {
 			if (menu_modified) {
 				save_rom_settings(Memory.ROMCRC32,Memory.ROMName);
 				save_settings();
-				
+
 				if (Settings.SuperFX)
 					S9xResetSuperFX (false);
 			}
@@ -2446,7 +2448,7 @@ static void initvar_withdefault() {
 	//os9x_SA1_exec=1;
 	os9x_SFX_overclock=100;
 	os9x_vol_adjust=100;
-	
+
 	os9x_apuenabled=2;
 
 	os9x_gammavalue=0;
@@ -2610,7 +2612,7 @@ int main(int argc,char **argv) {
 	// Kernel mode thread
 	/* Install our custom exception handler. If this was NULL then the default would be used */
 #ifndef NOKERNEL
-	pspDebugInstallErrorHandler(MyExceptionHandler);
+	//pspDebugInstallErrorHandler(MyExceptionHandler);
 #endif
 	sceCtrlSetSamplingCycle(0);
 	sceCtrlSetSamplingMode(0);
@@ -3501,12 +3503,12 @@ static void setup_Main_Loops()
 		S9x_Current_Main_Loop = &ApplySpeedHackPatches;
 	else
 		S9x_Current_Main_Loop = &S9xMainLoop;
-	
+
 	// This is a modification inspired on CATSFC.
 	// The emulator selects a Main Loop based on the chip used by game.
 	// This avoids the constant Settings.SA1 and Settings.SuperFX checks on S9xMainLoop.
 	//
-	
+
 	if (Settings.SA1)
 	{
 		S9x_Current_Main_Loop_cpuexec = &S9xMainLoop_SA1_APU;
@@ -3625,11 +3627,11 @@ static int init_snes_rom() {
   Settings.StopEmulation = TRUE;
   Settings.Paused = FALSE;
   Settings.HBlankStart = (256 * Settings.H_Max) / SNES_HCOUNTER_MAX;
-  
+
   os9x_SFX_overclock = 100;
   os9x_vol_adjust=100;
   os9x_applyhacks = 1;
-    
+
   Settings.SNESAdvanceHack = false;
   ///////////////////
   ///////////////////
@@ -3972,9 +3974,9 @@ static int user_main(SceSize args, void* argp) {
 		{
 			//Memory.ApplySpeedHackPatches();
 			//S9xMainLoop();
-			
+
 			(*S9x_Current_Main_Loop)();
-			
+
 			/*static int printed=false;
 			extern uint32 g_nCount;
 			if(g_nCount>200 && printed==false)

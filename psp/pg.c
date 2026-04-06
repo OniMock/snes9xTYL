@@ -6,6 +6,7 @@
 
 #include "font.c"
 #include "fontNaga12.c"
+#include "fontLatin1.c"
 #include "imageio.h"
 #include <math.h>
 
@@ -84,37 +85,37 @@ static void pgPutChar(unsigned long x,unsigned long y,unsigned long color,unsign
 
 
 	if (ch>255) return;
-		
+
 	memset(buffer,0,10*10);
 	r=color&31;
 	v=(color>>5)&31;
 	bl=(color>>10)&31;
-		
+
 	cfont=(unsigned char *)font+ch*8;
-	for (cy=0; cy<8; cy++) {		
+	for (cy=0; cy<8; cy++) {
 			b=0x80;
-			for (cx=0; cx<8; cx++) {				
+			for (cx=0; cx<8; cx++) {
 					if ((*cfont&b)) buffer[(cy+1)*10+cx]=1;
 				b=b>>1;
-			}		
+			}
 		cfont++;
 	}
-	
+
 	vptr0=pgGetVramAddr(x,y);
 	for (cy=0; cy<8; cy++) {
 		for (my=0; my<mag; my++) {
 			vptr=vptr0;
 			b=0x80;
 			for (cx=0; cx<8; cx++) {
-				
+
 				ANTIALIAS_CODE(cx,cy,10)
-		
+
 				rr=r*tot/ANTIALIAS_FACTOR;
 				vv=v*tot/ANTIALIAS_FACTOR;
 				bb=bl*tot/ANTIALIAS_FACTOR;
-				
+
 				fcol=(rr)|(vv<<5)|(bb<<10);
-						
+
 				for (mx=0; mx<mag; mx++) {
 						if (fcol) {
 							if (drawfg) *(unsigned short *)vptr=fcol;
@@ -128,7 +129,7 @@ static void pgPutChar(unsigned long x,unsigned long y,unsigned long color,unsign
 			vptr0+=LINESIZE*2;
 		}
 		cfont++;
-	}		
+	}
 }
 
 static void pgPutChar_shadow(unsigned long x,unsigned long y,unsigned char ch,char drawfg,char drawbg,char mag)
@@ -145,56 +146,56 @@ static void pgPutChar_shadow(unsigned long x,unsigned long y,unsigned char ch,ch
 
 
 	if (ch>255) return;
-		
+
 	memset(buffer,0,10*10);
-	
-		
+
+
 	cfont=(unsigned char *)font+ch*8;
-	for (cy=0; cy<8; cy++) {		
+	for (cy=0; cy<8; cy++) {
 			b=0x80;
-			for (cx=0; cx<8; cx++) {				
+			for (cx=0; cx<8; cx++) {
 					if ((*cfont&b)) buffer[(cy+1)*10+cx]=1;
 				b=b>>1;
-			}		
+			}
 		cfont++;
 	}
-	
+
 	vptr0=pgGetVramAddr(x,y);
 	for (cy=0; cy<8; cy++) {
 		for (my=0; my<mag; my++) {
 			vptr=vptr0;
 			b=0x80;
 			for (cx=0; cx<8; cx++) {
-				
+
 				ANTIALIAS_CODE(cx,cy,10)
-				
-				if (tot) {			
+
+				if (tot) {
 					for (mx=0; mx<mag; mx++) {
-						
+
 						col=*(unsigned short *)vptr;
 						r=col&31; v=(col>>5)&31; b=(col>>10)&31;
 						rr=r-tot;if (rr<0) rr=0;
 						vv=v-tot;if (vv<0) vv=0;
 						bb=b-tot;if (bb<0) bb=0;
-							
+
 						fcol=(rr)|(vv<<5)|(bb<<10);
-						
+
 						if (fcol) {
 							if (drawfg) *(unsigned short *)vptr=fcol;
 						} else {
 							if (drawbg) *(unsigned short *)vptr=0;
 						}
-						
+
 						vptr+=PIXELSIZE*2;
-					}										
+					}
 				}
-				
+
 					b=b>>1;
 			}
 			vptr0+=LINESIZE*2;
 		}
 		cfont++;
-	}		
+	}
 }
 
 
@@ -259,10 +260,10 @@ void pgPrintCenter(unsigned long y,unsigned long color,const char *str){
 void pgPrintSel(unsigned long x,unsigned long y,unsigned long color,char *str){
 	char *str2;
 	int xm,ym;
-			
+
 	xm=x;ym=y;
 	str2=str;
-	while (*str!=0 && xm<CMAX_X && ym<CMAX_Y) {					
+	while (*str!=0 && xm<CMAX_X && ym<CMAX_Y) {
 		str++;
 		xm++;
 		if (xm>=CMAX_X) {
@@ -292,7 +293,7 @@ void pgPrintBG(unsigned long x,unsigned long y,unsigned long color,const char *s
 void pgPrintBGRev(unsigned long x,unsigned long y,unsigned long color,const char *str)
 {
 	pg_drawframe^=1;
-	while (*str!=0 && x<CMAX_X && y<CMAX_Y) {		
+	while (*str!=0 && x<CMAX_X && y<CMAX_Y) {
 		pgPutChar_shadow(x*8+1,y*8+1,*str,1,1,1);
 		pgPutChar(x*8,y*8,color,0,*str,1,1,1);
 		str++;
@@ -325,23 +326,23 @@ void pgPrintAllBG(unsigned long x,unsigned long y,unsigned long color,const char
 
 
 void pgPrint4(unsigned long x,unsigned long y,unsigned long color,unsigned long color2,const char *str)
-{		
+{
 	while (*str!=0 && x<CMAX4_X && y<CMAX4_Y) {
-		
+
 		pgPutChar_shadow(x*32+1,y*32+1,*str,1,0,4);
 		pgPutChar_shadow(x*32+1+1,y*32+1+1,*str,1,0,4);
 		pgPutChar_shadow(x*32+2+1,y*32+2+1,*str,1,0,4);
 		pgPutChar_shadow(x*32+3+1,y*32+3+1,*str,1,0,4);
 		pgPutChar_shadow(x*32+4+1,y*32+4+1,*str,1,0,4);
-		
+
 		pgPutChar(x*32,y*32,color,0,*str,1,0,4);
-		
+
 		pgPutChar(x*32+1,y*32+1,color,0,*str,1,0,4);
-		
+
 		pgPutChar(x*32+2,y*32+2,color,0,*str,1,0,4);
-		
+
 		pgPutChar(x*32+3,y*32+3,color,0,*str,1,0,4);
-		
+
 		pgPutChar(x*32+4,y*32+4,color2,0,*str,1,0,4);
 		str++;
 		x++;
@@ -359,7 +360,7 @@ void pgPrint4(unsigned long x,unsigned long y,unsigned long color,unsigned long 
 //	unsigned char  *fnt;
 //	unsigned char  pt;
 //	unsigned char ch;
-//	int x1,y1;	
+//	int x1,y1;
 //
 //	ch = c;
 //
@@ -389,6 +390,116 @@ void pgPrint4(unsigned long x,unsigned long y,unsigned long color,unsigned long 
 //	}
 //}
 
+extern int utf8_to_sjis(int utf8code);
+
+// Draw Latin1 characters
+static void Draw_Char_Latin1(int x, int y, unsigned char c, int col,
+	unsigned short *vbuff, int pitch, int init_with_bg)
+{
+	unsigned short *vr;
+	unsigned char  *fnt;
+	unsigned char  pt;
+	unsigned char buffer[14*8];
+	int x1,y1;
+	int rr,vv,bb,r,v,b;
+	int tot;
+
+	if (c < 0xA0) return;
+	fnt = (unsigned char *)&latin1_font12[(c - 0xA0) * 12];
+
+	if (vbuff) vr=&vbuff[y*pitch+x];
+	else {vr = (unsigned short *)pgGetVramAddr(x,y);	pitch=LINESIZE;}
+
+	memset(buffer,0,14*8);
+
+	for(y1=0;y1<12;y1++) {
+		pt = *fnt++;
+		for(x1=0;x1<6;x1++) {
+			if (pt & 1) buffer[(y1+1)*8+x1+1] = 1;
+			pt = pt >> 1;
+		}
+	}
+
+	r=col&31;
+	v=(col>>5)&31;
+	b=(col>>10)&31;
+
+	if (pg_init_with_bg) {
+		for (y1=0;y1<12;y1++)
+		for (x1=0;x1<6;x1++) {
+			if (buffer[(y1+1)*8+(x1+1)])
+				vr[y1*pitch + x1]=col;
+		}
+	} else {
+		for (y1=0;y1<12;y1++)
+		for (x1=0;x1<6;x1++) {
+			ANTIALIAS_CODE(x1,y1,8)
+
+			rr=r*tot/ANTIALIAS_FACTOR;
+			vv=v*tot/ANTIALIAS_FACTOR;
+			bb=b*tot/ANTIALIAS_FACTOR;
+
+			if (rr||vv||bb) {
+				vr[y1*pitch + x1]=(rr)|(vv<<5)|(bb<<10);
+			}
+		}
+	}
+}
+
+// Draw Latin1 characters shadow
+static void Draw_Char_Latin1_shadow(int x, int y, unsigned char c,
+	unsigned short *vbuff, int pitch, int init_with_bg)
+{
+	unsigned short *vr;
+	unsigned char  *fnt;
+	unsigned char  pt;
+	unsigned char buffer[14*8];
+	int x1,y1;
+	int rr,vv,bb,r,v,b,col;
+	int tot;
+
+	if (c < 0xA0) return;
+	fnt = (unsigned char *)&latin1_font12[(c - 0xA0) * 12];
+
+	if (vbuff) vr=&vbuff[y*pitch+x];
+	else {vr = (unsigned short *)pgGetVramAddr(x,y);	pitch=LINESIZE;}
+	memset(buffer,0,14*8);
+
+	for(y1=0;y1<12;y1++) {
+		pt = *fnt++;
+		for(x1=0;x1<6;x1++) {
+			if (pt & 1) buffer[(y1+1)*8+x1+1] = 1;
+			pt = pt >> 1;
+		}
+	}
+
+	if (pg_init_with_bg) {
+		for (y1=0;y1<12;y1++)
+		for (x1=0;x1<6;x1++) {
+			if (buffer[(y1+1)*8+(x1+1)]) {
+				col=vr[y1*pitch + x1];
+				vr[y1*pitch + x1]=(((col>>11)&0xf)<<10)|(((col>>6)&0xf)<<5)|(((col>>1)&0xf)<<0);
+			}
+		}
+	} else {
+		for (y1=0;y1<12;y1++)
+		for (x1=0;x1<6;x1++) {
+
+			ANTIALIAS_CODE(x1,y1,8)
+
+			if (tot) {
+				col=vr[y1*pitch + x1];
+				r=col&31; v=(col>>5)&31; b=(col>>10)&31;
+				rr=r-tot;if (rr<0) rr=0;
+				vv=v-tot;if (vv<0) vv=0;
+				bb=b-tot;if (bb<0) bb=0;
+
+				vr[y1*pitch + x1]=(rr)|(vv<<5)|(bb<<10);
+			}
+		}
+	}
+}
+
 static void Draw_Char_Hankaku(int x, int y, unsigned char c, int col,
 	unsigned short *vbuff, int pitch, int init_with_bg)
 {
@@ -397,7 +508,7 @@ static void Draw_Char_Hankaku(int x, int y, unsigned char c, int col,
 	unsigned char  pt;
 	unsigned char ch;
 	unsigned char buffer[14*8];
-	int x1,y1;	
+	int x1,y1;
 	int rr,vv,bb,r,v,b;
 	int tot;
 
@@ -414,12 +525,12 @@ static void Draw_Char_Hankaku(int x, int y, unsigned char c, int col,
 		ch -= 0x40;
 
 	fnt = (unsigned char *)&hankaku_font12[ch*12];
-	
+
 	if (vbuff) vr=&vbuff[y*pitch+x];
 	else {vr = (unsigned short *)pgGetVramAddr(x,y);	pitch=LINESIZE;}
 
 	memset(buffer,0,14*8);
-	
+
 	// draw
 	//vr = (unsigned short *)pgGetVramAddr(x,y);
 	for(y1=0;y1<12;y1++) {
@@ -427,29 +538,29 @@ static void Draw_Char_Hankaku(int x, int y, unsigned char c, int col,
 		for(x1=0;x1<6;x1++) {
 			if (pt & 1) buffer[(y1+1)*8+x1+1] = 1;
 			pt = pt >> 1;
-		}		
+		}
 	}
-	
+
 	r=col&31;
 	v=(col>>5)&31;
 	b=(col>>10)&31;
-	
+
 	if (pg_init_with_bg) {
 		for (y1=0;y1<12;y1++)
-		for (x1=0;x1<6;x1++) {		
+		for (x1=0;x1<6;x1++) {
 			if (buffer[(y1+1)*8+(x1+1)])
 				vr[y1*pitch + x1]=col;
 		}
 	} else {
 		for (y1=0;y1<12;y1++)
-		for (x1=0;x1<6;x1++) {		
+		for (x1=0;x1<6;x1++) {
 			ANTIALIAS_CODE(x1,y1,8)
-			
+
 			rr=r*tot/ANTIALIAS_FACTOR;
 			vv=v*tot/ANTIALIAS_FACTOR;
 			bb=b*tot/ANTIALIAS_FACTOR;
-			
-			if (rr||vv||bb) {			
+
+			if (rr||vv||bb) {
 				vr[y1*pitch + x1]=(rr)|(vv<<5)|(bb<<10);
 			}
 		}
@@ -466,7 +577,7 @@ static void Draw_Char_Hankaku_shadow(int x, int y, unsigned char c,
 	unsigned char  pt;
 	unsigned char ch;
 	unsigned char buffer[14*8];
-	int x1,y1;	
+	int x1,y1;
 	int rr,vv,bb,r,v,b,col;
 	int tot;
 
@@ -487,7 +598,7 @@ static void Draw_Char_Hankaku_shadow(int x, int y, unsigned char c,
 	if (vbuff) vr=&vbuff[y*pitch+x];
 	else {vr = (unsigned short *)pgGetVramAddr(x,y);	pitch=LINESIZE;}
 	memset(buffer,0,14*8);
-	
+
 	// draw
 	//vr = (unsigned short *)pgGetVramAddr(x,y);
 	for(y1=0;y1<12;y1++) {
@@ -495,13 +606,13 @@ static void Draw_Char_Hankaku_shadow(int x, int y, unsigned char c,
 		for(x1=0;x1<6;x1++) {
 			if (pt & 1) buffer[(y1+1)*8+x1+1] = 1;
 			pt = pt >> 1;
-		}		
+		}
 	}
-	
-	
+
+
 	if (pg_init_with_bg) {
 		for (y1=0;y1<12;y1++)
-		for (x1=0;x1<6;x1++) {		
+		for (x1=0;x1<6;x1++) {
 			if (buffer[(y1+1)*8+(x1+1)]) {
 				col=vr[y1*pitch + x1];
 				vr[y1*pitch + x1]=(((col>>11)&0xf)<<10)|(((col>>6)&0xf)<<5)|(((col>>1)&0xf)<<0);
@@ -510,16 +621,16 @@ static void Draw_Char_Hankaku_shadow(int x, int y, unsigned char c,
 	} else {
 		for (y1=0;y1<12;y1++)
 		for (x1=0;x1<6;x1++) {
-			
+
 			ANTIALIAS_CODE(x1,y1,8)
-			
-			if (tot) {			
+
+			if (tot) {
 				col=vr[y1*pitch + x1];
 				r=col&31; v=(col>>5)&31; b=(col>>10)&31;
 				rr=r-tot;if (rr<0) rr=0;
 				vv=v-tot;if (vv<0) vv=0;
 				bb=b-tot;if (bb<0) bb=0;
-				
+
 				vr[y1*pitch + x1]=(rr)|(vv<<5)|(bb<<10);
 			}
 		}
@@ -673,36 +784,36 @@ static void Draw_Char_Zenkaku(int x, int y, unsigned char u, unsigned char d,
 	// draw
 	if (vbuff) vr=&vbuff[y*pitch+x];
 	else {vr = (unsigned short *)pgGetVramAddr(x,y);	pitch=LINESIZE;}
-	memset(buffer,0,14*14);		
-	
+	memset(buffer,0,14*14);
+
 	for(y1=0;y1<12;y1++) {
 		pt = *fnt++;
 		for(x1=0;x1<12;x1++) {
-			if (pt & 1)	buffer[(y1+1)*14+x1+1] = 1;		
+			if (pt & 1)	buffer[(y1+1)*14+x1+1] = 1;
 			pt = pt >> 1;
-		}		
+		}
 	}
-	
+
 	r=col&31;
 	v=(col>>5)&31;
 	b=(col>>10)&31;
-		
+
 	if (pg_init_with_bg) {
 		for (y1=0;y1<12;y1++)
-		for (x1=0;x1<12;x1++) {		
+		for (x1=0;x1<12;x1++) {
 			if (buffer[(y1+1)*14+(x1+1)])
 				vr[y1*pitch + x1]=col;
 		}
 	} else {
 		for (y1=0;y1<12;y1++)
-		for (x1=0;x1<12;x1++) {		
+		for (x1=0;x1<12;x1++) {
 			ANTIALIAS_CODE(x1,y1,14)
-			
+
 			rr=r*tot/ANTIALIAS_FACTOR;
 			vv=v*tot/ANTIALIAS_FACTOR;
 			bb=b*tot/ANTIALIAS_FACTOR;
-			
-			if (rr||vv||bb) {			
+
+			if (rr||vv||bb) {
 				vr[y1*pitch + x1]=(rr)|(vv<<5)|(bb<<10);
 			}
 		}
@@ -743,8 +854,8 @@ static void Draw_Char_Zenkaku_shadow(int x, int y,
 	unsigned long n;
 	unsigned short code;
 	int j;
-	
-	unsigned char buffer[14*14];	
+
+	unsigned char buffer[14*14];
 	int rr,vv,bb,r,v,b,col;
 	int tot;
 
@@ -781,33 +892,33 @@ static void Draw_Char_Zenkaku_shadow(int x, int y,
 	if (vbuff) vr=&vbuff[y*pitch+x];
 	else {vr = (unsigned short *)pgGetVramAddr(x,y);	pitch=LINESIZE;}
 	memset(buffer,0,14*14);
-	
+
 	for(y1=0;y1<12;y1++) {
 		pt = *fnt++;
 		for(x1=0;x1<12;x1++) {
-			if (pt & 1)	buffer[(y1+1)*14+x1+1] = 1;		
+			if (pt & 1)	buffer[(y1+1)*14+x1+1] = 1;
 			pt = pt >> 1;
-		}		
+		}
 	}
-	
+
 	if (pg_init_with_bg) {
 		for (y1=0;y1<12;y1++)
-		for (x1=0;x1<12;x1++) {		
+		for (x1=0;x1<12;x1++) {
 			if (buffer[(y1+1)*14+(x1+1)])
 				vr[y1*pitch + x1]=0;
 		}
 	} else {
 		for (y1=0;y1<12;y1++)
-		for (x1=0;x1<12;x1++) {		
+		for (x1=0;x1<12;x1++) {
 			ANTIALIAS_CODE(x1,y1,14)
-			
-			if (tot) {			
+
+			if (tot) {
 				col=vr[y1*LINESIZE + x1];
 				r=col&31; v=(col>>5)&31; b=(col>>10)&31;
 				rr=r-tot;if (rr<0) rr=0;
 				vv=v-tot;if (vv<0) vv=0;
 				bb=b-tot;if (bb<0) bb=0;
-				
+
 				vr[y1*pitch + x1]=(rr)|(vv<<5)|(bb<<10);
 			}
 		}
@@ -817,9 +928,41 @@ static void Draw_Char_Zenkaku_shadow(int x, int y,
 // by kwn
 static int mh_print_buff(int x,int y,int Mx,int My,const char *str,int col,unsigned short *vbuff,int pitch) {
 	unsigned char ch = 0,bef = 0;
-	
+
 	while(*str != 0) {
-		ch = *str++;		 
+		ch = (unsigned char)*str++;
+		// UTF-8 (2 bytes) → Latin-1 (0x80–0xFF)
+		if ((ch == 0xC2 || ch == 0xC3) && (*str & 0xC0) == 0x80) {
+			unsigned char ch2 = (unsigned char)*str++;
+			unsigned char cp = (unsigned char)(((ch & 0x03) << 6) | (ch2 & 0x3F));
+			if ((x+6<=Mx)&&(y+12<=My)&&(x>=0)&&(y>=0)) {
+				if (pg_shadow) Draw_Char_Latin1_shadow(x+1,y+1,cp,vbuff,pitch,pg_init_with_bg);
+				Draw_Char_Latin1(x,y,cp,col,vbuff,pitch,pg_init_with_bg);
+			}
+			x+=6;
+			bef=0;
+			continue;
+		}
+    // UTF-8 (3 bytes) → SJIS
+		if ((ch >= 0xE0 && ch < 0xF0) && (*str & 0xC0) == 0x80) {
+			unsigned char ch2 = (unsigned char)str[0];
+			unsigned char ch3 = (str[1] != 0 && (str[1] & 0xC0) == 0x80) ? (unsigned char)str[1] : 0;
+			int utf8key = (ch << 16) | (ch2 << 8) | ch3;
+			int sjis = utf8_to_sjis(utf8key);
+			if (sjis >= 0x8000) {
+				str += (ch3 ? 2 : 1);
+				unsigned char u = (sjis >> 8) & 0xFF;
+				unsigned char d = sjis & 0xFF;
+				if ((x+12<=Mx)&&(y+12<=My)&&(x>=0)&&(y>=0)) {
+					if (pg_shadow) Draw_Char_Zenkaku_shadow(x+1,y+1,u,d,vbuff,pitch,pg_init_with_bg);
+					Draw_Char_Zenkaku(x,y,u,d,col,vbuff,pitch,pg_init_with_bg);
+				}
+				x+=12;
+				bef=0;
+				continue;
+			}
+		}
+
 		if (bef!=0) {
 			if ((x+12<=Mx)&&(y+12<=My)&&(x>=0)&&(y>=0)) {
 				if (pg_shadow) Draw_Char_Zenkaku_shadow(x+1,y+1,bef,ch,vbuff,pitch,pg_init_with_bg);
@@ -847,13 +990,13 @@ void mh_print_light(int x,int y,const char *str,int col,int smoothing) {
 	unsigned short buffer[480*24],buffer2[480*24];
 	int len;
 	int j,px,py,r,g,b,col1,col2,col3,col4,col0;
-	
+
 	memset(buffer,0,480*24*2);
 	memset(buffer2,0,480*24*2);
 	len=mh_print_buff(6,6,480,272,str,col,buffer,480);
 	len=len-6+12;
-	
-	
+
+
 	for (j=smoothing;j;j--) {
 		for (py=1;py<23;py++) {
 			for (px=1;px<len-1;px++) {
@@ -874,11 +1017,11 @@ void mh_print_light(int x,int y,const char *str,int col,int smoothing) {
 		}
 		for (py=0;py<24;py++) memcpy(&buffer[py*480],&buffer2[py*480],len*2);
 	}
-	
+
 	/*pg_shadow=0;
 	mh_print(x,y,str,col);
 	pg_shadow=1;*/
-															
+
 	for (py=0;py<24;py++)
 		for (px=0;px<len-1;px++) if (buffer[py*480+px]) {
 			col0=scr[LINESIZE*py+px];
@@ -893,16 +1036,16 @@ void mh_print_light(int x,int y,const char *str,int col,int smoothing) {
 				if (g>(31<<5)) g=31<<5;
 				if (b>(31<<10)) b=31<<10;
 				r&=31;g&=31<<5;b&=31<<10;
-				scr[LINESIZE*py+px]=r|g|b;						
+				scr[LINESIZE*py+px]=r|g|b;
 			}
 		}
-	
+
 	//pg_shadow=0;
 	pg_init_with_bg=1;
 	mh_print(x,y,str,col);
 	pg_init_with_bg=0;
 	//pg_shadow=1;
-	
+
 }
 
 void mh_print(int x,int y,const char *str,int col) {
@@ -914,7 +1057,7 @@ void mh_printLimit(int x,int y,int Mx,int My,const char *str,int col) {
 }
 
 
-void mh_printSel(int x,int y,const char *str,int col) {	
+void mh_printSel(int x,int y,const char *str,int col) {
 	pgFillBoxHalfer(4,y,456,y+8);
 	mh_print(x,y,str,col);
 }
@@ -927,53 +1070,59 @@ void mh_printSel_light(int x,int y,const char *str,int col,int smoothing) {
 
 //yoyovoid mh_print(int x,int y,const char *str,int col) {
 int mh_length(const char *str) {
-	unsigned char ch = 0,bef = 0;
+	unsigned char ch;
 	int len=0;
 	while(*str != 0) {
-		ch = *str++;
-		if (bef!=0) {		
+		ch = (unsigned char)*str++;
+		if ((ch == 0xC2 || ch == 0xC3) && (*str & 0xC0) == 0x80) {
+			str++;
+			len+=6;
+		} else if ((ch >= 0xE0 && ch < 0xF0) && (*str & 0xC0) == 0x80) {
+			str++;
+			if ((*str & 0xC0) == 0x80) str++;
 			len+=12;
-			bef=0;
+		} else if (((ch>=0x80) && (ch<0xa0)) || (ch>=0xe0)) {
+			if (*str != 0) str++;
+			len+=12;
 		} else {
-			if (((ch>=0x80) && (ch<0xa0)) || (ch>=0xe0)) {
-				bef = ch;
-			} else {			
-				len+=6;
-			}
+			len+=6;
 		}
 	}
 	return len;
 }
 
 int mh_trimlength(const char *str) {
-	char ch = 0,bef = 0;
+	unsigned char ch;
 	int len=0;
 	int old_pos=0,pos=0;
-	
+
 	while(*str != 0) {
-		ch = *str++;
+		ch = (unsigned char)*str++;
 		pos++;
-		if (bef!=0) {		
+
+		if ((ch == 0xC2 || ch == 0xC3) && (*str & 0xC0) == 0x80) {
+			str++; pos++;
+			len+=6;
+		} else if ((ch >= 0xE0 && ch < 0xF0) && (*str & 0xC0) == 0x80) {
+			str++; pos++;
+			if ((*str & 0xC0) == 0x80) { str++; pos++; }
 			len+=12;
-			if (len>480) return old_pos;
-			old_pos=pos;
-			bef=0;
+		} else if (((ch>=0x80) && (ch<0xa0)) || (ch>=0xe0)) {
+			if (*str != 0) { str++; pos++; }
+			len+=12;
 		} else {
-			if (((ch>=0x80) && (ch<0xa0)) || (ch>=0xe0)) {
-				bef = ch;
-			} else {			
-				len+=6;
-				if (len>480) return old_pos;
-				old_pos=pos;
-			}
-		}		
+			len+=6;
+		}
+
+		if (len>480) return old_pos;
+		old_pos=pos;
 	}
 	return len;
 }
 
 void mh_printCenter(unsigned long y,const char *str,unsigned long color){
 	unsigned long x=(480-mh_length(str))>>1;
-	mh_print(x,y,str,color);	
+	mh_print(x,y,str,color);
 }
 
 
@@ -1045,12 +1194,12 @@ void pgFillAllvram(unsigned long color)
 
 	vptr0=(u32*)((u8*)pg_vramtop+0x40000000);
 	for (i=0; i<2*FRAMESIZE/2; i++) {
-		*vptr0++=color;		
+		*vptr0++=color;
 	}
 }
 
 void pgScreenFrame(long mode,long frame)
-{	
+{
 	pg_screenmode=mode;
 	frame=(frame?1:0);
 	pg_showframe=frame;
@@ -1074,7 +1223,7 @@ void pgScreenFlip()
 {
 	pg_showframe=pg_drawframe;
 	pg_drawframe++;
-	pg_drawframe&=1;	
+	pg_drawframe&=1;
 	sceDisplaySetFrameBuf(pg_vramtop+pg_showframe*FRAMESIZE,LINESIZE,PIXELSIZE,0);
 }
 
@@ -1097,7 +1246,7 @@ int get_pad(void)
 	SceCtrlData paddata;
 
 	memset(&paddata,0,sizeof(paddata));
-	
+
 	//sceCtrlReadBufferPositive(&paddata, 1);
   sceCtrlPeekBufferPositive(&paddata, 1);
   // kmg
@@ -1106,10 +1255,10 @@ int get_pad(void)
   if (paddata.Ly <= 0x30) paddata.Buttons|=PSP_CTRL_UP;    // UP
   if (paddata.Lx <= 0x30) paddata.Buttons|=PSP_CTRL_LEFT;  // LEFT
   if (paddata.Lx >= 0xD0) paddata.Buttons|=PSP_CTRL_RIGHT; // RIGHT
-  	
+
   	paddata.Buttons&=ALL_PAD_BUTTONS;
-    
-	return paddata.Buttons;	
+
+	return paddata.Buttons;
 }
 
 int get_pad2(int *lx,int *ly)
@@ -1117,23 +1266,23 @@ int get_pad2(int *lx,int *ly)
 	SceCtrlData paddata;
 
 	memset(&paddata,0,sizeof(paddata));
-	
+
 	//sceCtrlReadBufferPositive(&paddata, 1);
   sceCtrlPeekBufferPositive(&paddata, 1);
   // kmg
   // Analog pad state
   if (lx) *lx=paddata.Lx;
   if (ly) *ly=paddata.Ly;
-    	
+
   paddata.Buttons&=ALL_PAD_BUTTONS;
-    
-	return paddata.Buttons;	
+
+	return paddata.Buttons;
 }
 
 
 
 void pgwaitPress(void){
-		
+
 		while (get_pad()&ALL_PAD_BUTTONS) ;
 		while (!get_pad()) ;
 		while (get_pad()&ALL_PAD_BUTTONS) ;
@@ -1167,15 +1316,15 @@ void image_put_mul(int x0,int y0,IMAGE* img,int mul,int add)
 	unsigned short* src16 = img->pixels;
 	unsigned short pal[256];
 	s32 r,g,b,aR,aG,aB,mulR,mulG,mulB;
-	int i;	
+	int i;
 	mulB=(mul>>0)&0xFF;
 	mulG=(mul>>8)&0xFF;
 	mulR=(mul>>16)&0xFF;
 	aB=(add>>0)&0xFF;
 	aG=(add>>8)&0xFF;
 	aR=(add>>16)&0xFF;
-	
-	if (img->bit==8) {	
+
+	if (img->bit==8) {
 		for(i=0;i<img->n_palette;i++){
 	  	r=(s32)(img->palette[i].r)+aR;
 	  	g=(s32)(img->palette[i].g)+aG;
@@ -1187,7 +1336,7 @@ void image_put_mul(int x0,int y0,IMAGE* img,int mul,int add)
 	  	if (g<0) g=0;if (g>255) g=255;
 	  	if (b<0) b=0;if (b>255) b=255;
 			pal[i] = RGB(r,g,b);
-		}	
+		}
 		int x,y;
 		for(y=0;y<img->height;y++) {
 			for(x=0;x<img->width;x++) {
@@ -1196,10 +1345,10 @@ void image_put_mul(int x0,int y0,IMAGE* img,int mul,int add)
 			dst += 512;
 		}
 	}
-	if (img->bit==24){		
+	if (img->bit==24){
 		int x,y;
 		for(y=0;y<img->height;y++) {
-			for(x=0;x<img->width;x++) {												
+			for(x=0;x<img->width;x++) {
 				r=*src++;g=*src++;b=*src++;
 				r+=aR;g+=aG;b+=aB;
 				r=r*mulR/255;
@@ -1207,7 +1356,7 @@ void image_put_mul(int x0,int y0,IMAGE* img,int mul,int add)
 	  		b=b*mulB/255;
 				if (r<0) r=0;if (r>255) r=255;
 				if (g<0) g=0;if (g>255) g=255;
-				if (b<0) b=0;if (b>255) b=255;				
+				if (b<0) b=0;if (b>255) b=255;
 				dst[x] = ((b>>3)<<10)|((g>>3)<<5)|(r>>3);
 			}
 			dst += 512;
@@ -1216,7 +1365,7 @@ void image_put_mul(int x0,int y0,IMAGE* img,int mul,int add)
 	if (img->bit==15){
 		int x,y;
 		for(y=0;y<img->height;y++) {
-			for(x=0;x<img->width;x++) {												
+			for(x=0;x<img->width;x++) {
 				r=*src16++;
 				b=(r>>10)<<3;g=((r>>5)&31)<<3;r=(r&31)<<3;
 				r+=aR;g+=aG;b+=aB;
@@ -1247,15 +1396,15 @@ void image_put_light(int x0,int y0,IMAGE* img,int fade,int add,int transp_col,in
 	aB=(add>>0)&0xFF;
 	aG=(add>>8)&0xFF;
 	aR=(add>>16)&0xFF;
-	
+
 	memset(buffer,0,64*64*2);
 	memset(buffer2,0,64*64*2);
-		
-	if (img->bit==24){		
+
+	if (img->bit==24){
 		int x,y;
-		for(y=0;y<48;y++) {						
+		for(y=0;y<48;y++) {
 			dst = &buffer[(y+8)*64+8];
-			for(x=0;x<48;x++) {												
+			for(x=0;x<48;x++) {
 				r=*src++;g=*src++;b=*src++;
 				if (((r<<16)|(g<<8)|b)!=transp_col) {
 					r+=aR-fadeR;g+=aG-fadeG;b+=aB-fadeB;
@@ -1264,21 +1413,21 @@ void image_put_light(int x0,int y0,IMAGE* img,int fade,int add,int transp_col,in
 					if (b<0) b=0;if (b>255) b=255;
 					dst[x] = ((b>>3)<<10)|((g>>3)<<5)|(r>>3);
 				}
-			}			
+			}
 		}
 		memcpy(buffer3,buffer,64*64*2);
-		
+
 		dst = (unsigned short *)pgGetVramAddr(x0,y0);
-		for (py=0+8;py<48+8;py++) 
+		for (py=0+8;py<48+8;py++)
 		for (px=0+8;px<48+8;px++){
 			if (buffer[py*64+px]) {
 				dst[py*LINESIZE+px]=buffer[py*64+px];
 				//buffer[py*64+px]=0xFFFF;
 			}
 		}
-		
-		
-		
+
+
+
 		for (j=smoothing;j;j--) {
 			for (py=1;py<63;py++) {
 				for (px=1;px<63;px++) {
@@ -1299,10 +1448,10 @@ void image_put_light(int x0,int y0,IMAGE* img,int fade,int add,int transp_col,in
 	 		}
 			memcpy(buffer,buffer2,64*64*2);
 	 	}
-	 	
-	 	
-		
-		
+
+
+
+
 		dst = (unsigned short *)pgGetVramAddr(x0,y0);
 		for (py=0;py<64;py++)
 		for (px=0;px<64;px++) if (buffer[py*64+px]) {
@@ -1318,20 +1467,20 @@ void image_put_light(int x0,int y0,IMAGE* img,int fade,int add,int transp_col,in
 				if (g>(31<<5)) g=31<<5;
 				if (b>(31<<10)) b=31<<10;
 				r&=31;g&=31<<5;b&=31<<10;
-				dst[LINESIZE*py+px]=r|g|b;						
+				dst[LINESIZE*py+px]=r|g|b;
 			}
 		}
-	
+
 		/*dst = pgGetVramAddr(x0,y0);
-		for (py=0+8;py<48+8;py++) 
+		for (py=0+8;py<48+8;py++)
 		for (px=0+8;px<48+8;px++){
 			if (buffer3[py*64+px]) dst[py*LINESIZE+px]=buffer3[py*64+px];
 		}*/
-	
-	}		
+
+	}
 }
 void image_put(int x0,int y0,IMAGE* img,int fade,int add,int transp_col,int sz)
-{	
+{
 	unsigned short *dst = (unsigned short *)pgGetVramAddr(x0,y0);
 	unsigned char* src = img->pixels;
 	unsigned short pal[256];
@@ -1343,14 +1492,14 @@ void image_put(int x0,int y0,IMAGE* img,int fade,int add,int transp_col,int sz)
 	aB=(add>>0)&0xFF;
 	aG=(add>>8)&0xFF;
 	aR=(add>>16)&0xFF;
-	
-	if (img->bit==8) {	
+
+	if (img->bit==8) {
 		for(i=0;i<img->n_palette;i++){
 	  	r=(s32)(img->palette[i].r)-fadeR+aR;if (r<0) r=0;if (r>255) r=255;
 	  	g=(s32)(img->palette[i].g)-fadeG+aG;if (g<0) g=0;if (g>255) g=255;
 	  	b=(s32)(img->palette[i].b)-fadeB+aB;if (b<0) b=0;if (b>255) b=255;
 			pal[i] = RGB(r,g,b);
-		}	
+		}
 		int x,y;
 		for(y=0;y<img->height;y++) {
 			for(x=0;x<img->width;x++) {
@@ -1360,11 +1509,11 @@ void image_put(int x0,int y0,IMAGE* img,int fade,int add,int transp_col,int sz)
 			dst += 512;
 		}
 	}
-	if (img->bit==24){		
+	if (img->bit==24){
 		u32 x,y;
 		for(y=0;y<img->height;y++) {
 			dst = (unsigned short *)pgGetVramAddr(x0,y0+y*sz/256);
-			for(x=0;x<img->width;x++) {												
+			for(x=0;x<img->width;x++) {
 				r=*src++;g=*src++;b=*src++;
 				if (((r<<16)|(g<<8)|b)!=transp_col) {
 					r+=aR-fadeR;g+=aG-fadeG;b+=aB-fadeB;

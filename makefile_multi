@@ -56,6 +56,7 @@ PSP_EBOOT_PIC0 = data/pic0.png
 PSP_EBOOT_SOUND = data/snd0.at3
 EBOOT_EXTRA += $(PSP_EBOOT_SOUND)
 
+
 # Object files
 PSP_OBJECTS = apu.o apudebug.o c4.o c4emu.o cheats.o cheats2.o clip.o \
 	cpu.o cpuexec.o cpuops.o data.o debug.o dma.o dsp1.o \
@@ -118,7 +119,12 @@ PSPSDK = $(shell psp-config --pspsdk-path)
 override EBOOT_OBJS =
 include $(PSPSDK)/lib/build.mak
 # Override the default EBOOT.PBP rule to include XMB sound
+ifdef BUILD_PRX
 EBOOT.PBP: $(TARGET).prx PARAM.SFO $(PSP_EBOOT_ICON) $(PSP_EBOOT_PIC0) $(PSP_EBOOT_PIC1) $(PSP_EBOOT_SOUND)
 	pack-pbp $@ PARAM.SFO $(PSP_EBOOT_ICON) NULL $(PSP_EBOOT_PIC0) $(PSP_EBOOT_PIC1) $(PSP_EBOOT_SOUND) $< NULL
+else
+EBOOT.PBP: $(TARGET).elf PARAM.SFO $(PSP_EBOOT_ICON) $(PSP_EBOOT_PIC0) $(PSP_EBOOT_PIC1) $(PSP_EBOOT_SOUND)
+	pack-pbp $@ PARAM.SFO $(PSP_EBOOT_ICON) NULL $(PSP_EBOOT_PIC0) $(PSP_EBOOT_PIC1) $(PSP_EBOOT_SOUND) $< NULL
+endif
 clean:
 OBJS += $(MEOBJ) $(NETOBJ) $(HOMEHOOKOBJ)

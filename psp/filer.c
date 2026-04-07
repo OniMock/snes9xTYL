@@ -27,10 +27,10 @@
 
 u32 new_pad,old_pad;
 
-enum { 
-    TYPE_DIR=0x10, 
-    TYPE_FILE=0x20 
-}; 
+enum {
+    TYPE_DIR=0x10,
+    TYPE_FILE=0x20
+};
 
 
 char jpeg_files[MAX_ENTRY];
@@ -102,7 +102,7 @@ static int cmpFile(SceIoDirent *a, SceIoDirent *b) {
 	unsigned char file1[0x108];
 	unsigned char file2[0x108];
 	unsigned char ca, cb;
-	int i, n, ret;	
+	int i, n, ret;
 	if(a->d_stat.st_attr==b->d_stat.st_attr) {
 		SJISCopy(a, (char *)file1);
 		SJISCopy(b, (char *)file2);
@@ -115,7 +115,7 @@ static int cmpFile(SceIoDirent *a, SceIoDirent *b) {
 		}
 		return 0;
 	}
-	
+
 	if(a->d_stat.st_attr & FIO_SO_IFDIR)	return -1;
 	else					return 1;
 }
@@ -123,7 +123,7 @@ static int cmpFile(SceIoDirent *a, SceIoDirent *b) {
 static void sort(SceIoDirent *a, int left, int right) {
 	SceIoDirent tmp, pivot;
 	int i, p;
-	
+
 	if (left < right) {
 		pivot = a[left];
 		p = left;
@@ -176,9 +176,9 @@ static void getDir(const char *path) {
 	int fd = 0;
 	int b = 0;
 //	char *p;
-	
+
 	nfiles = 0;
-			
+
 	if(path[5]) {
 		strcpy(files[nfiles].d_name,"..");
 	} else if (*path == 'm') {
@@ -194,18 +194,18 @@ static void getDir(const char *path) {
 		nfiles++;
 		b=1;
 	}
-		
+
 	fd = sceIoDopen(path);
 	if (fd<0){
 		msgBoxLines(s9xTYL_msg[ERR_READ_MEMSTICK], 60);
 		return ;
 	}
-	
+
 	while(nfiles<MAX_ENTRY){
 		if(sceIoDread(fd, &files[nfiles])<=0) break;
-				
+
 		if(files[nfiles].d_name[0] == '.') continue;
-				
+
 		if(files[nfiles].d_stat.st_attr == TYPE_DIR){
 			strcat(files[nfiles].d_name, "/");
 			nfiles++;
@@ -236,9 +236,9 @@ static void getDirJpeg() {
 
 	while(nfiles_jpeg<MAX_ENTRY){
 		if(sceIoDread(fd, &files_jpeg[nfiles_jpeg])<=0) break;
-				
+
 		if(files_jpeg[nfiles_jpeg].d_name[0] == '.') continue;
-				
+
 		if(files_jpeg[nfiles_jpeg].d_stat.st_attr == TYPE_DIR) {
 			continue;
 		}
@@ -272,18 +272,18 @@ static void getDirNoExt(const char *path) {
 		nfiles++;
 		b=1;
 	}
-		
+
 	fd = sceIoDopen(path);
 	if (fd<0){
 		msgBoxLines(s9xTYL_msg[ERR_READ_MEMSTICK], 60);
 		return ;
 	}
-	
+
 	while(nfiles<MAX_ENTRY){
 		if(sceIoDread(fd, &files[nfiles])<=0) break;
-				
+
 		if(files[nfiles].d_name[0] == '.') continue;
-				
+
 		if(files[nfiles].d_stat.st_attr == TYPE_DIR){
 			strcat(files[nfiles].d_name, "/");
 			nfiles++;
@@ -291,9 +291,9 @@ static void getDirNoExt(const char *path) {
 		}
 		/*if(getExtId(files[nfiles].d_name) != EXT_UNKNOWN)*/ nfiles++;
 	}
-		
+
 	sceIoDclose(fd);
-		
+
 	if (nfiles) {
 		if(b)
 			sort(files+1, 0, nfiles-2);
@@ -302,13 +302,37 @@ static void getDirNoExt(const char *path) {
 	}
 }
 
+// Validate path and update LastPath if needed
+static void validate_path(char *path, char *LastPath, const char *LaunchDir) {
+	if (path[0] != '\0' && path[strlen(path) - 1] != '/') {
+		strcat(path, "/");
+		strcpy(LastPath, path);
+	}
+
+	int test_fd = sceIoDopen(path);
+	if (test_fd < 0) {
+		strcpy(path, LaunchDir);
+		strcat(path, "/");
+		test_fd = sceIoDopen(path);
+		if (test_fd < 0) {
+			strncpy(path, LaunchDir, 5);
+			path[5] = '\0';
+		} else {
+			sceIoDclose(test_fd);
+		}
+		strcpy(LastPath, path);
+	} else {
+		sceIoDclose(test_fd);
+	}
+}
+
 static void filer_buildbg(int detailed) {
 	u16 *dst,*src;
 	int i;
 	if (detailed) {
-		show_background(bg_img_mul,(os9x_lowbat?0x600000:0)|(os9x_netplay?100:0));	
-		if (os9x_netplay) pgPrint4(4,4,28|(4<<5)|(16<<10),31|(28<<5)|(30<<10),"NETPLAY");			
-	} else show_background(bg_img_mul,(os9x_lowbat?0x600000:0));	
+		show_background(bg_img_mul,(os9x_lowbat?0x600000:0)|(os9x_netplay?100:0));
+		if (os9x_netplay) pgPrint4(4,4,28|(4<<5)|(16<<10),31|(28<<5)|(30<<10),"NETPLAY");
+	} else show_background(bg_img_mul,(os9x_lowbat?0x600000:0));
 	pgDrawFrame(0,12,479,12,(8<<10)|(8<<5)|8);
 	pgDrawFrame(0,13,479,13,(30<<10)|(30<<5)|30);
 	pgDrawFrame(0,14,479,14,(8<<10)|(8<<5)|8);
@@ -316,9 +340,9 @@ static void filer_buildbg(int detailed) {
 	pgDrawFrame(0,272-14,479,272-14,(30<<10)|(30<<5)|30);
 	pgDrawFrame(0,272-13,479,272-13,(8<<10)|(8<<5)|8);
 	pgFillBoxHalfer(0,0,479,11);
-	pgFillBoxHalfer(0,272-12,479,271);	
-	
-	if (detailed) {			
+	pgFillBoxHalfer(0,272-12,479,271);
+
+	if (detailed) {
 		pgFillBoxHalfer(260,170,479,272-15);
 		mh_print(270, 180, s9xTYL_msg[FILER_HELP_WINDOW1], INFOBAR_COL2);
 		mh_print(270, 195, s9xTYL_msg[FILER_HELP_WINDOW2], INFOBAR_COL2);
@@ -326,14 +350,14 @@ static void filer_buildbg(int detailed) {
 		mh_print(270, 225, s9xTYL_msg[FILER_HELP_WINDOW4], INFOBAR_COL4);
 		mh_print(270, 240, s9xTYL_msg[FILER_HELP_WINDOW5], INFOBAR_COL4);
 	}
-		
+
 	dst=filer_bg;
 	for (i=0;i<272;i++) {
 		src = (u16*)pgGetVramAddr(0,i);
 		memcpy(dst,src,480*2);
 		dst+=480;
-	}	
-	
+	}
+
 }
 
 int getFilePath(char *out,int can_exit) {
@@ -362,11 +386,12 @@ int getFilePath(char *out,int can_exit) {
 	filer_buildbg(1);
 
 	strcpy(path, LastPath);
+	validate_path(path, LastPath, LaunchDir);
 
 	if(FilerMsg[0])
 		bMsg=1;
 	getDir(path);
-	
+
 	//init jpeg stuff
 	getDirJpeg();
 	memset(jpeg_files,1,MAX_ENTRY);
@@ -382,27 +407,27 @@ int getFilePath(char *out,int can_exit) {
 
 	while (get_pad()) pgWaitV();
   old_pad=0;
-  
+
   sceKernelLibcGettimeofday( &filer_next, 0 );
   filer_next.tv_usec+=33*1000;
-  
+
 	for(;;){
-		
+
 		if (g_bSleep) {
-#ifdef ME_SOUND			
-			sceGuDisplay(0);		
+#ifdef ME_SOUND
+			sceGuDisplay(0);
 //20080420 //
 //			scePowerSetClockFrequency(66,66,33); //set to 66Mhz
-#endif			
+#endif
 			while(g_bSleep) pgWaitVn(10);			//wait 16*10 ms
 #ifdef ME_SOUND
 //20080420 //
 //			scePowerSetClockFrequency(222,222,111);
 			sceGuDisplay(1);
-#endif			
+#endif
 		}
 		if (!g_bLoop) {retval=0;break;}
-		
+
 		for (;;) {
 			sceKernelLibcGettimeofday( &filer_cur, 0 );
 			if ( timercmp( &filer_next, &filer_cur, < ) ){
@@ -488,20 +513,20 @@ int getFilePath(char *out,int can_exit) {
 					getDirJpeg();
 					memset(jpeg_files,1,MAX_ENTRY);
 					image_loaded=2;
-					
-					
+
+
 					sel=0;
-					while (get_pad()) pgWaitV();	
+					while (get_pad()) pgWaitV();
 				}
 			}else{
 						strcpy(out, path);
 						strcat(out, files[sel].d_name);
 						strcpy(LastPath,path);
-				
+
 						retval= (is_square?2:1);
 						break;
 			 }
-			}		
+			}
         else if(new_pad & os9x_btn_negative_code)   { if (can_exit) {retval= 0;break;} }
         else if(new_pad & PSP_CTRL_TRIANGLE){ up=1;     }
         else if(new_pad & PSP_CTRL_UP)      { sel--;image_loaded=2;os9x_beep1();    }
@@ -524,14 +549,14 @@ int getFilePath(char *out,int can_exit) {
         	}
         }
 #endif
-        else if(new_pad & PSP_CTRL_SELECT){ 
+        else if(new_pad & PSP_CTRL_SELECT){
         		if (inputBox(s9xTYL_msg[ASK_DELETE])) {
   						msgBoxLines(s9xTYL_msg[INFO_DELETING], 0);
   						strcpy(out, path);
 							strcat(out, files[sel].d_name);
 							strcpy(LastPath,path);
   						remove(out);
-  						sel--;image_loaded=2; 
+  						sel--;image_loaded=2;
   						reload_entries=2;
   					}
   			} else if (new_pad & PSP_CTRL_START) {
@@ -551,7 +576,7 @@ int getFilePath(char *out,int can_exit) {
         	}
 #endif
         }
-		
+
 		if(up){
 			up=0;
 			if(path[5]){
@@ -562,7 +587,7 @@ int getFilePath(char *out,int can_exit) {
 				strcpy(oldDir,p);
 				strcat(oldDir,"/");
 				*p=0;
-				reload_entries=1;				
+				reload_entries=1;
 			} else if (files[0].d_name[3] == ':') {
 				strcpy(oldDir, path);
 				strcpy(path, files[0].d_name);
@@ -575,12 +600,12 @@ int getFilePath(char *out,int can_exit) {
 				if (reload_entries==2) old_sel=sel;
 				reload_entries=0;
 				getDir(path);
-				
+
 				//init jpeg stuff
 				getDirJpeg();
 				memset(jpeg_files,1,MAX_ENTRY);
 				image_loaded=2;
-				
+
 				sel=0;
 				for(i=0; i<nfiles; i++) {
 					if(!strcmp(oldDir, files[i].d_name)) {
@@ -590,17 +615,17 @@ int getFilePath(char *out,int can_exit) {
 					}
 				}
 				if (old_sel!=-1) sel=old_sel;
-		}					
-		
-		
-		
+		}
+
+
+
 		if(top > nfiles-rows)	top=nfiles-rows;
 		if(top < 0)				top=0;
 		if(sel >= nfiles)		sel=0;
 		if(sel < 0)				sel=nfiles-1;
 		if(sel >= top+rows)		top=sel-rows+1;
 		if(sel < top)			top=sel;
-		
+
         if(bMsg) {
           mh_print(1,0,FilerMsg,TITLE_COL);
         }
@@ -616,7 +641,7 @@ int getFilePath(char *out,int can_exit) {
 			s9xTYL_msg[FILER_STATUS_NOEXIT1], os9x_btn_positive_str,
 				files[0].d_name[3] == ':' ? files[0].d_name : s9xTYL_msg[FILER_STATUS_PARDIR]);
         mh_print(4, 260, tmp, INFOBAR_COL);
-        	
+
 		if(nfiles > rows){
 			h = 219;
 			pgDrawFrame(461,25,462,243,(0xd<<0)|(0xd<<5)|(0x17<<10));
@@ -625,7 +650,7 @@ int getFilePath(char *out,int can_exit) {
 			pgFillBox(465+1, h*top/nfiles + 25+1,477-1, h*(top+rows)/nfiles + 25 -1,
 				(0x17<<0)|(0x17<<5)|(0x1f<<10));
 		}
-		
+
 		x=8; y=17;
 		for(i=0; i<rows; i++){
 			if(top+i >= nfiles) break;
@@ -635,11 +660,11 @@ int getFilePath(char *out,int can_exit) {
 				if (color==SEL_COL) color=SELDIR_COL;
 				else color = DIR_COL;
 			}
-			if ((color==SEL_COL)||(color==SELDIR_COL)) mh_printSel_light(x,y,files[top+i].d_name,color,current_smoothing);//pgPrintSel(x, y, color, files[top+i].d_name);		
+			if ((color==SEL_COL)||(color==SELDIR_COL)) mh_printSel_light(x,y,files[top+i].d_name,color,current_smoothing);//pgPrintSel(x, y, color, files[top+i].d_name);
 			else mh_print(x, y, files[top+i].d_name,color);//pgPrint(x, y, color, files[top+i].d_name);
 			y+=1*12;
 		}
-		
+
 		if (image_loaded==1) { //jpeg already loaded
 			int x,y,xmax=128,ymax=snesheight/2;
 			u16 *dst=(unsigned short*)pgGetVramAddr(0,0);
@@ -648,12 +673,12 @@ int getFilePath(char *out,int can_exit) {
 					int col2a=snes_image[(y*2)*256+(x*2)];
 					int col2b=snes_image[(y*2+1)*256+(x*2)];
 					int col2c=snes_image[(y*2)*256+(x*2+1)];
-					int col2d=snes_image[(y*2+1)*256+(x*2+1)];					
+					int col2d=snes_image[(y*2+1)*256+(x*2+1)];
 					int col2;
 					col2=((((((col2a>>10)&31)+((col2b>>10)&31)+((col2c>>10)&31)+((col2d>>10)&31))>>2)/**2/3*/)<<10);
 					col2|=((((((col2a>>5)&31)+((col2b>>5)&31)+((col2c>>5)&31)+((col2d>>5)&31))>>2)/**2/3*/)<<5);
 					col2|=((((((col2a>>0)&31)+((col2b>>0)&31)+((col2c>>0)&31)+((col2d>>0)&31))>>2)/**2/3*/)<<0);
-												
+
 					dst[(y+17/*272-ymax-12*/)*512+x+480-xmax-24]=col2;//(b1<<10)|(g1<<5)|(r1);
 				}
 			pgDrawFrame(480-xmax-24-2,17-2,480-24+2,17+ymax+2,12|(12<<5)|(12<<10));
@@ -663,11 +688,11 @@ int getFilePath(char *out,int can_exit) {
 		pgScreenFlipV2();
 		if(psp_ExitCheck()) {retval= -1;break;}
 	}
-	
-	while (get_pad()) pgWaitV();	
-	
+
+	while (get_pad()) pgWaitV();
+
 	free(filer_bg);
-	
+
 	return retval;
 }
 
@@ -692,6 +717,7 @@ int getNoExtFilePath(char *out,int can_exit) {
 	filer_buildbg(0);
 
 	strcpy(path, LastPath);
+	validate_path(path, LastPath, LaunchDir);
 
 	if(FilerMsg[0])
 		bMsg=1;
@@ -719,18 +745,18 @@ int getNoExtFilePath(char *out,int can_exit) {
 //			scePowerSetClockFrequency(66,66,33); //set to 66Mhz
 #endif
 			while(g_bSleep) pgWaitVn(10);			//wait 16*10 ms
-#ifdef ME_SOUND						
+#ifdef ME_SOUND
 //20080420
 //			scePowerSetClockFrequency(222,222,111);
 			sceGuDisplay(1);
-#endif			
+#endif
 		}
 		if (!g_bLoop) {retval=0;break;}
-		
+
 		for (;;) {
 			sceKernelLibcGettimeofday( &filer_cur, 0 );
 			if ( timercmp( &filer_next, &filer_cur, < ) ){
-				break;  		
+				break;
   		}
   	}
   	filer_next=filer_cur;
@@ -739,39 +765,39 @@ int getNoExtFilePath(char *out,int can_exit) {
 	  	filer_next.tv_sec += 1;
       filer_next.tv_usec -= 1000000;
 	  }
-		
+
 		if (!((cpt_lowbat++)&127)) os9x_lowbat=scePowerIsLowBattery();
-		
+
 		show_bg(filer_bg);
-  	
+
 		show_batteryinfo();
 		show_usbinfo();
-				                  		
+
 		new_pad=0;
-    if (!pad_cnt) {    	
-    	new_pad=get_pad();    	
+    if (!pad_cnt) {
+    	new_pad=get_pad();
     	if (!new_pad) pad_cnt_acc=0;
     }
     else pad_cnt--;
-    //pgWaitV();        
+    //pgWaitV();
 		if (new_pad) {
-			if (old_pad==new_pad) {				
+			if (old_pad==new_pad) {
 				if (pad_cnt_acc<6) {pad_cnt=1;pad_cnt_acc++;}
 				else pad_cnt=0;
 			}
 			else {pad_cnt_acc=0;pad_cnt=5;}
 		 	old_pad=new_pad;
 		}
-        				        
+
 		if(new_pad & os9x_btn_positive_code){
 			if(files[sel].d_stat.st_attr == TYPE_DIR){
 				if(!strcmp(files[sel].d_name,"..") || files[sel].d_name[3] == ':')
 					{  up=1; }
                 else{
 					strcat(path, files[sel].d_name);
-					getDirNoExt(path);					
+					getDirNoExt(path);
 					sel=0;
-					while (get_pad()) pgWaitV();	
+					while (get_pad()) pgWaitV();
 				}
 			}else{
 						strcpy(out, path);
@@ -780,7 +806,7 @@ int getNoExtFilePath(char *out,int can_exit) {
 						retval= 1;
 						break;
 			 }
-			}		
+			}
         else if(new_pad & os9x_btn_negative_code)   { if (can_exit) {retval= 0;break;} }
         else if(new_pad & PSP_CTRL_TRIANGLE){ up=1;os9x_beep1();}
         else if(new_pad & PSP_CTRL_UP)      { sel--;os9x_beep1();}
@@ -801,7 +827,7 @@ int getNoExtFilePath(char *out,int can_exit) {
         	else endUSBdrivers();
 #endif
         }
-		
+
 		if(up){
 			if(path[5]){
 				p=strrchr(path,'/');
@@ -812,7 +838,7 @@ int getNoExtFilePath(char *out,int can_exit) {
 				strcat(oldDir,"/");
 				*p=0;
 				getDirNoExt(path);
-				
+
 				sel=0;
 				for(i=0; i<nfiles; i++) {
 					if(!strcmp(oldDir, files[i].d_name)) {
@@ -829,16 +855,16 @@ int getNoExtFilePath(char *out,int can_exit) {
 			}
 			up=0;
 		}
-		
-		
-		
+
+
+
 		if(top > nfiles-rows)	top=nfiles-rows;
 		if(top < 0)				top=0;
 		if(sel >= nfiles)		sel=0;
 		if(sel < 0)				sel=nfiles-1;
 		if(sel >= top+rows)		top=sel-rows+1;
 		if(sel < top)			top=sel;
-		
+
         if(bMsg) {
           mh_print(1,0,FilerMsg,TITLE_COL);
         }
@@ -866,7 +892,7 @@ int getNoExtFilePath(char *out,int can_exit) {
 				(0x17<<0)|(0x17<<5)|(0x1f<<10));
 
 		}
-		
+
 		x=8; y=17;
 		for(i=0; i<rows; i++){
 			if(top+i >= nfiles) break;
@@ -876,27 +902,27 @@ int getNoExtFilePath(char *out,int can_exit) {
 				if (color==SEL_COL) color=SELDIR_COL;
 				else color = DIR_COL;
 			}
-			if ((color==SEL_COL)||(color==SELDIR_COL)) mh_printSel_light(x,y,files[top+i].d_name,color,current_smoothing);//pgPrintSel(x, y, color, files[top+i].d_name);		
+			if ((color==SEL_COL)||(color==SELDIR_COL)) mh_printSel_light(x,y,files[top+i].d_name,color,current_smoothing);//pgPrintSel(x, y, color, files[top+i].d_name);
 			else mh_print(x, y, files[top+i].d_name,color);//pgPrint(x, y, color, files[top+i].d_name);
 			y+=1*12;
 		}
-				
+
 		pgScreenFlipV2();
 		if(psp_ExitCheck()) {retval= -1;break;}
 	}
-	
-	while (get_pad()) pgWaitV();	
-	
+
+	while (get_pad()) pgWaitV();
+
 	free(filer_bg);
-	
-	
+
+
 	return retval;
 }
 
 
 int filer_init(const char *msg, const char *path)
 {
-    strcpy(FilerMsg,msg);            
+    strcpy(FilerMsg,msg);
     strcpy(LastPath,path);
     memset(files,0,sizeof(files));
     return 1;

@@ -33,7 +33,7 @@
 
 		[FILER_STATUS_PARDIR] = "Parent dir.",
 
-		[FILER_TITLE] = "[" EMUNAME_VERSION "] - Choose a file",
+		[FILER_TITLE] = "[" PROJECT_NAME "] - Choose a file",
 
 		[FILER_HELP_WINDOW1] = "Press START to switch between",
 		[FILER_HELP_WINDOW2] = "NORMAL and NETPLAY mode.",
@@ -183,7 +183,7 @@
 		[MENU_STATUS_CONTROLS_INPUT_HELP_2] = SJIS_STAR "    " SJIS_TRIANGLE "     Help     " SJIS_STAR "      " SJIS_UP "," SJIS_DOWN " Select " SJIS_LEFT "," SJIS_RIGHT " Change value",
 		[MENU_STATUS_CONTROLS_INPUT_HELP_3] = SJIS_STAR "   " SJIS_TRIANGLE "       Help    " SJIS_STAR "      " SJIS_UP "," SJIS_DOWN " Select " SJIS_LEFT "," SJIS_RIGHT " Change value",
 
-		[MENU_TITLE_CONTROLS_INPUT] = "[" EMUNAME_VERSION "] - Inputs Config",
+		[MENU_TITLE_CONTROLS_INPUT] = "[" PROJECT_NAME "] - Inputs Config",
 
 		// VIDEO OPTIONS
 		[MENU_ICONS_VIDEO] = "VIDEO",
@@ -278,7 +278,7 @@
 		[MENU_STATUS_MISC_HACKDEBUG_HELP_2] = SJIS_STAR "    " SJIS_TRIANGLE "     Help     " SJIS_STAR "      " SJIS_UP "," SJIS_DOWN " Select " SJIS_LEFT "," SJIS_RIGHT " Change value",
 		[MENU_STATUS_MISC_HACKDEBUG_HELP_3] = SJIS_STAR "   " SJIS_TRIANGLE "       Help    " SJIS_STAR "      " SJIS_UP "," SJIS_DOWN " Select " SJIS_LEFT "," SJIS_RIGHT " Change value",
 
-		[MENU_TITLE_MISC_HACKDEBUG] = "[" EMUNAME_VERSION "] - Menu",
+		[MENU_TITLE_MISC_HACKDEBUG] = "[" PROJECT_NAME "] - Menu",
 
 		// CHEATS
 		[MENU_ICONS_CHEATS] = "CHEATS",

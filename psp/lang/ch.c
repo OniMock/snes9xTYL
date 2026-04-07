@@ -33,7 +33,7 @@
 
 		[FILER_STATUS_PARDIR] = "上級目録",
 
-		[FILER_TITLE] = "[" EMUNAME_VERSION "] - 文件選擇",
+		[FILER_TITLE] = "[" PROJECT_NAME "] - 文件選擇",
 
 		[FILER_HELP_WINDOW1] = "按START鍵切換",
 		[FILER_HELP_WINDOW2] = "聯機模式",
@@ -183,7 +183,7 @@
 		[MENU_STATUS_CONTROLS_INPUT_HELP_2] = SJIS_STAR "    " SJIS_TRIANGLE "     幇助     " SJIS_STAR "      " SJIS_UP "," SJIS_DOWN " 選擇 " SJIS_LEFT "," SJIS_RIGHT " 更改",
 		[MENU_STATUS_CONTROLS_INPUT_HELP_3] = SJIS_STAR "   " SJIS_TRIANGLE "       幇助    " SJIS_STAR "      " SJIS_UP "," SJIS_DOWN " 選擇 " SJIS_LEFT "," SJIS_RIGHT " 更改",
 
-		[MENU_TITLE_CONTROLS_INPUT] = "[" EMUNAME_VERSION "] - 輸入控制",
+		[MENU_TITLE_CONTROLS_INPUT] = "[" PROJECT_NAME "] - 輸入控制",
 
 		// VIDEO OPTIONS
 		[MENU_ICONS_VIDEO] = "視頻",
@@ -278,7 +278,7 @@
 		[MENU_STATUS_MISC_HACKDEBUG_HELP_2] = SJIS_STAR "    " SJIS_TRIANGLE "     幇助     " SJIS_STAR "      " SJIS_UP "," SJIS_DOWN " 選擇 " SJIS_LEFT "," SJIS_RIGHT " 更改",
 		[MENU_STATUS_MISC_HACKDEBUG_HELP_3] = SJIS_STAR "   " SJIS_TRIANGLE "       幇助    " SJIS_STAR "      " SJIS_UP "," SJIS_DOWN " 選擇 " SJIS_LEFT "," SJIS_RIGHT " 更改",
 
-		[MENU_TITLE_MISC_HACKDEBUG] = "[" EMUNAME_VERSION "] - Hack/debug菜單",
+		[MENU_TITLE_MISC_HACKDEBUG] = "[" PROJECT_NAME "] - Hack/debug菜單",
 
 		// CHEATS
 		[MENU_ICONS_CHEATS] = "金手指",

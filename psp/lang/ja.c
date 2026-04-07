@@ -33,7 +33,7 @@
 
 		[FILER_STATUS_PARDIR] = "上へ",
 
-		[FILER_TITLE] = "[" EMUNAME_VERSION "] - ファイル選択",
+		[FILER_TITLE] = "[" PROJECT_NAME "] - ファイル選択",
 
 		[FILER_HELP_WINDOW1] = "標準と通信対戦モードを切り替える",
 		[FILER_HELP_WINDOW2] = "にはSTARTを押してください",
@@ -184,7 +184,7 @@
 		[MENU_STATUS_CONTROLS_INPUT_HELP_2] = SJIS_STAR "    " SJIS_TRIANGLE "     ヘルプ     " SJIS_STAR "      " SJIS_UP "," SJIS_DOWN " 選択 " SJIS_LEFT "," SJIS_RIGHT " 値を変更",
 		[MENU_STATUS_CONTROLS_INPUT_HELP_3] = SJIS_STAR "   " SJIS_TRIANGLE "       ヘルプ    " SJIS_STAR "      " SJIS_UP "," SJIS_DOWN " 選択 " SJIS_LEFT "," SJIS_RIGHT " 値を変更",
 
-		[MENU_TITLE_CONTROLS_INPUT] = "[" EMUNAME_VERSION "] - 入力設定",
+		[MENU_TITLE_CONTROLS_INPUT] = "[" PROJECT_NAME "] - 入力設定",
 
 		// VIDEO OPTIONS
 		[MENU_ICONS_VIDEO] = "ビデオ",
@@ -278,7 +278,7 @@
 		[MENU_STATUS_MISC_HACKDEBUG_HELP_2] = SJIS_STAR "    " SJIS_TRIANGLE "     ヘルプ     " SJIS_STAR "      " SJIS_UP "," SJIS_DOWN " 選択 " SJIS_LEFT "," SJIS_RIGHT " 値を変更",
 		[MENU_STATUS_MISC_HACKDEBUG_HELP_3] = SJIS_STAR "   " SJIS_TRIANGLE "       ヘルプ    " SJIS_STAR "      " SJIS_UP "," SJIS_DOWN " 選択 " SJIS_LEFT "," SJIS_RIGHT " 値を変更",
 
-		[MENU_TITLE_MISC_HACKDEBUG] = "[" EMUNAME_VERSION "] - メニュー",
+		[MENU_TITLE_MISC_HACKDEBUG] = "[" PROJECT_NAME "] - メニュー",
 
 		// CHEATS
 		[MENU_ICONS_CHEATS] = "チート",

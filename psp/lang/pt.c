@@ -48,7 +48,7 @@
 
     [FILER_STATUS_PARDIR] = "Pasta pai",
 
-    [FILER_TITLE] = "[" EMUNAME_VERSION "] - Escolha um arquivo",
+    [FILER_TITLE] = "[" PROJECT_NAME "] - Escolha um arquivo",
 
     [FILER_HELP_WINDOW1] = "Pressione:",
     [FILER_HELP_WINDOW2] = "START: Normal/Netplay",
@@ -229,7 +229,7 @@
     "," SJIS_DOWN " Selecionar " SJIS_LEFT "," SJIS_RIGHT " Alterar valor",
 
     [MENU_TITLE_CONTROLS_INPUT] =
-        "[" EMUNAME_VERSION "] - Configuração de Entradas",
+        "[" PROJECT_NAME "] - Configuração de Entradas",
 
     // OPÇÕES DE VÍDEO
     [MENU_ICONS_VIDEO] = "VÍDEO",
@@ -367,7 +367,7 @@
     "   " SJIS_TRIANGLE "       Ajuda    " SJIS_STAR "      " SJIS_UP
     "," SJIS_DOWN " Selecionar " SJIS_LEFT "," SJIS_RIGHT " Alterar valor",
 
-    [MENU_TITLE_MISC_HACKDEBUG] = "[" EMUNAME_VERSION "] - Menu",
+    [MENU_TITLE_MISC_HACKDEBUG] = "[" PROJECT_NAME "] - Menu",
 
     // TRAPACEAS
     [MENU_ICONS_CHEATS] = "TRAPAÇAS",

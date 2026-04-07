@@ -51,6 +51,10 @@ EXTRA_TARGETS = EBOOT.PBP
 # use my own target - thx to zelurker for pointing this to me in neocdpsp ;-)
 PSP_EBOOT_TITLE = $(EMUNAME_VERSION)
 PSP_EBOOT_ICON = data/icon0.png
+PSP_EBOOT_PIC1 = data/pic1.png
+PSP_EBOOT_PIC0 = data/pic0.png
+PSP_EBOOT_SOUND = data/snd0.at3
+EBOOT_EXTRA += $(PSP_EBOOT_SOUND)
 
 # Object files
 PSP_OBJECTS = apu.o apudebug.o c4.o c4emu.o cheats.o cheats2.o clip.o \
@@ -111,7 +115,10 @@ CFLAGS += -DNOKERNEL
 
 
 PSPSDK = $(shell psp-config --pspsdk-path)
+override EBOOT_OBJS =
 include $(PSPSDK)/lib/build.mak
-
+# Override the default EBOOT.PBP rule to include XMB sound
+EBOOT.PBP: $(TARGET).prx PARAM.SFO $(PSP_EBOOT_ICON) $(PSP_EBOOT_PIC0) $(PSP_EBOOT_PIC1) $(PSP_EBOOT_SOUND)
+	pack-pbp $@ PARAM.SFO $(PSP_EBOOT_ICON) NULL $(PSP_EBOOT_PIC0) $(PSP_EBOOT_PIC1) $(PSP_EBOOT_SOUND) $< NULL
 clean:
 OBJS += $(MEOBJ) $(NETOBJ) $(HOMEHOOKOBJ)

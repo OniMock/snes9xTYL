@@ -49,7 +49,7 @@
 #else
 		[FILER_HELP_WINDOW3] = "按L+R鍵退出",
 #endif
-		[FILER_HELP_WINDOW4 = "按R鍵連接/断開USB",
+		[FILER_HELP_WINDOW4] = "按R鍵連接/断開USB",
 #endif
 
 
@@ -345,7 +345,8 @@
 		[VIDEO_FSKIP_AUTO] = "跳幀: 自動",
 		[VIDEO_FSKIP_MANUAL] = "跳幀: %d",
 		// Scroll Message
-		[SCROLL_TITLE] = "   ,   移動 -  ,  快速模式",
+		[SCROLL_HELP_MOVE] = "移動",
+		[SCROLL_HELP_FAST] = "快速模式",
 		[SCROLL_STATUS_0] = "行 %d/%d  -  頁 %d/%d",
 		[SCROLL_STATUS_1] = "   退出,        幇助  ",
 		[SCROLL_HELP] = "Snes9xTYL - 文件査看器\n\n"

@@ -345,7 +345,8 @@
 		[VIDEO_FSKIP_AUTO] = "Frameskip : AUTO",
 		[VIDEO_FSKIP_MANUAL] = "Frameskip : %d",
 		// Scroll Message
-		[SCROLL_TITLE] = "   ,   to move -  ,  for fast mode",
+		[SCROLL_HELP_MOVE] = "to move",
+		[SCROLL_HELP_FAST] = "fast mode",
 		[SCROLL_STATUS_0] = "Line %d/%d  -  Page %d/%d",
 		[SCROLL_STATUS_1] = "   exit,        help  ",
 		[SCROLL_HELP] = "Snes9xTYL - fileviewer\n\n"

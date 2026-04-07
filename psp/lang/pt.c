@@ -2,9 +2,8 @@
     // português
     // erro
     [ERR_OUT_OF_MEM] = "Memória insuficiente",
-    [ERR_READ_MEMSTICK] =
-        "Erro ao ler o Memory Stick.\nPor favor, verifique-o (usando um leitor "
-        "de cartão no PC), pode estar corrompido.",
+    [ERR_READ_MEMSTICK] = "Erro ao ler Memory Stick.\n"
+                          "Verifique no PC, pode estar corrompido.",
 
     [ERR_INIT_SNES] = "Não foi possível iniciar o SNES, problema de memória",
     [ERR_LOADING_ROM] = "Erro ao carregar a ROM",
@@ -32,43 +31,42 @@
     [INFO_EXITING] = "Saindo, aguarde...",
     // filer
     [FILER_STATUS_CANEXIT1] =
-        "%s APERTAR " SJIS_SQUARE " EXECUTAR config. padrão " SJIS_STAR
-        " %s PARA O JOGO " SJIS_STAR " " SJIS_TRIANGLE " %s " SJIS_STAR
+        "%s Iniciar " SJIS_SQUARE " Usar config. padrão " SJIS_STAR
+        " %s Retomar jogo " SJIS_STAR " " SJIS_TRIANGLE " %s " SJIS_STAR
         " PAD NAVEGAR",
     [FILER_STATUS_NOEXIT1] =
-        "%s APERTAR " SJIS_SQUARE " EXECUTAR config. padrão  " SJIS_STAR
+        "%s Iniciar " SJIS_SQUARE " Usar config. padrão  " SJIS_STAR
         "  " SJIS_TRIANGLE " %s  " SJIS_UP "," SJIS_DOWN "," SJIS_LEFT
-        "," SJIS_RIGHT ", para navegar na lista",
+        "," SJIS_RIGHT ", Mover",
     [FILER_STATUS_CANEXIT2] =
-        "%s APERTAR %s VOLTAR AO JOGO " SJIS_TRIANGLE " %s  " SJIS_UP
-        "," SJIS_DOWN "," SJIS_LEFT "," SJIS_RIGHT ", para navegar na lista",
+        "%s Iniciar %s Retomar jogo " SJIS_TRIANGLE " %s  " SJIS_UP
+        "," SJIS_DOWN "," SJIS_LEFT "," SJIS_RIGHT ", Mover",
     [FILER_STATUS_NOEXIT2] =
-        "%s APERTAR " SJIS_TRIANGLE " %s                  " SJIS_UP
-        "," SJIS_DOWN "," SJIS_LEFT "," SJIS_RIGHT ", para navegar na lista",
+        "%s Iniciar " SJIS_TRIANGLE " %s                  " SJIS_UP
+        "," SJIS_DOWN "," SJIS_LEFT "," SJIS_RIGHT ", Mover",
 
-    [FILER_STATUS_PARDIR] = "Diretório pai.",
+    [FILER_STATUS_PARDIR] = "Pasta pai",
 
     [FILER_TITLE] = "[" EMUNAME_VERSION "] - Escolha um arquivo",
 
-    [FILER_HELP_WINDOW1] = "Pressione START para alternar entre",
-    [FILER_HELP_WINDOW2] = "modo NORMAL e modo NETPLAY.",
+    [FILER_HELP_WINDOW1] = "Pressione:",
+    [FILER_HELP_WINDOW2] = "START: Normal/Netplay",
 #ifdef FW3X
     [FILER_HELP_WINDOW3] = " ",
 #ifdef HOME_HOOK
-    [FILER_HELP_WINDOW4] = "Pressione HOME para sair.",
+    [FILER_HELP_WINDOW4] = "HOME: sair",
 #else
-    [FILER_HELP_WINDOW4] = "Pressione L+R para sair.",
+    [FILER_HELP_WINDOW4] = "L+R: sair",
 #endif
 #else
 #ifdef HOME_HOOK
-    [FILER_HELP_WINDOW3] = "Pressione HOME para sair.",
+    [FILER_HELP_WINDOW3] = "HOME: sair",
 #else
-    [FILER_HELP_WINDOW3] = "Pressione L+R para sair.",
+    [FILER_HELP_WINDOW3] = "L+R: sair",
 #endif
-    [FILER_HELP_WINDOW4] = "Pressione R para ligar/desligar USB.",
+    [FILER_HELP_WINDOW4] = "R: USB on/off",
 #endif
-
-    [FILER_HELP_WINDOW5] = "Pressione SELECT para excluir arquivo.",
+    [FILER_HELP_WINDOW5] = "SELECT: excluir arquivo",
 
     [FILE_IPS_APPLYING] =
         "Patch IPS encontrado: %s\nTamanho: %dKB\nAplicando...",
@@ -176,7 +174,7 @@
     [MENU_ICONS_LOADSAVE_EXPORTS9XSTATE_HELP] =
         "Exportar um progresso usando o\nformato SNES9X.",
 
-    [MENU_ICONS_LOADSAVE_AUTOSAVETIMER] = "Temporizador de auto-salvamento",
+    [MENU_ICONS_LOADSAVE_AUTOSAVETIMER] = "Tempo auto-save",
     [MENU_ICONS_LOADSAVE_AUTOSAVETIMER_HELP] =
         "Permite ter um auto-salvamento\nrealizado periodicamente.",
     [MENU_ICONS_LOADSAVE_AUTOSRAM] = "Auto-salvar SRAM atualizada",
@@ -443,7 +441,8 @@
     [VIDEO_FSKIP_AUTO] = "Pulo de quadros: AUTO",
     [VIDEO_FSKIP_MANUAL] = "Pulo de quadros: %d",
     // Mensagem de Rolagem
-    [SCROLL_TITLE] = "   ,   para mover -  ,  para modo rápido",
+    [SCROLL_HELP_MOVE] = "mover",
+    [SCROLL_HELP_FAST] = "rápido",
     [SCROLL_STATUS_0] = "Linha %d/%d  -  Página %d/%d",
     [SCROLL_STATUS_1] = "   sair,        ajuda  ",
     [SCROLL_HELP] =

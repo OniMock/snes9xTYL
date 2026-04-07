@@ -3023,10 +3023,14 @@ static int scroll_message_input(char *name,int limit) {
 
 		return 1;
 	}
+}
 
-	//os9x_menufx=oldmenufx;
-
-//	danzeff_free();
+// Helper function to print text at the right side of the screen
+static void mh_print_right_piece(int *x, int y, const char *str, u32 color) {
+	if (!str || !x) return;
+	int w = mh_length((char*)str);
+	*x -= w;
+	mh_print(*x, y, (char*)str, color);
 }
 
 int scroll_message(char **msg_lines, int lines, int start_pos, int intro_message, const char *title) {
@@ -3073,17 +3077,33 @@ int scroll_message(char **msg_lines, int lines, int start_pos, int intro_message
 		pgDrawFrame(0,261,479,261,(12<<10)|(8<<5)|5);
 
 
-		mh_print(0,0,title,31|(31<<5)|(31<<10));
-		strcpy(str_tmp, s9xTYL_msg[SCROLL_TITLE]);
-		mh_print(479-mh_length(str_tmp),0,(char*)str_tmp,31|(31<<5)|(31<<10));
-		sprintf(str_tmp,"  " SJIS_UP "  " SJIS_DOWN "           L R              ");
-		mh_print(479-mh_length(str_tmp),0,(char*)str_tmp,20|(31<<5)|(18<<10));
+		// HEADER: Title (Left) and Help (Right-aligned using helper)
+		mh_print(0,0,(char*)title,31|(31<<5)|(31<<10));
+
+		int x_ptr = 479;
+		u32 c_icon = 20|(31<<5)|(18<<10);
+		u32 c_text = 31|(31<<5)|(31<<10);
+
+		// Align right: FAST R, L - MOVE DOWN, UP
+		mh_print_right_piece(&x_ptr, 0, s9xTYL_msg[SCROLL_HELP_FAST], c_text);
+		mh_print_right_piece(&x_ptr, 0, " R ", c_icon);
+		mh_print_right_piece(&x_ptr, 0, ",", c_text);
+		mh_print_right_piece(&x_ptr, 0, " L ", c_icon);
+		mh_print_right_piece(&x_ptr, 0, " - ", c_text);
+		mh_print_right_piece(&x_ptr, 0, s9xTYL_msg[SCROLL_HELP_MOVE], c_text);
+		x_ptr -= 4; // micro-adjust
+		mh_print_right_piece(&x_ptr, 0, SJIS_DOWN, c_icon);
+		mh_print_right_piece(&x_ptr, 0, ",", c_text);
+		mh_print_right_piece(&x_ptr, 0, SJIS_UP, c_icon);
 
 		if (!intro_message) {
-			strcpy(str_tmp, s9xTYL_msg[SCROLL_STATUS_1]);
-			mh_print(479-mh_length(str_tmp),262,(char*)str_tmp,31|(31<<5)|(31<<10));
-			sprintf(str_tmp, "%s       SELECT       ", os9x_btn_negative_str);
-			mh_print(479-mh_length(str_tmp),262,(char*)str_tmp,20|(31<<5)|(18<<10));
+			// Footer Status
+			int status_x = 479;
+      mh_print_right_piece(&status_x, 262, s9xTYL_msg[SCROLL_STATUS_1], c_text);
+      mh_print_right_piece(&status_x, 262, " ", c_text);
+      mh_print_right_piece(&status_x, 262, "SELECT", c_icon);
+      mh_print_right_piece(&status_x, 262, " ", c_text);
+      mh_print_right_piece(&status_x, 262, os9x_btn_negative_str, c_icon);
 		}
 
 
@@ -3195,8 +3215,8 @@ int scroll_message(char **msg_lines, int lines, int start_pos, int intro_message
 			sceGuEnable(GU_TEXTURE_2D);
 			sceGuTexFilter(GU_NEAREST,GU_NEAREST);
 			sceGuDisable(GU_DEPTH_TEST);
-  		sceGuDisable(GU_ALPHA_TEST);
-  		//sceGuDepthMask(GU_TRUE);
+			sceGuDisable(GU_ALPHA_TEST);
+			//sceGuDepthMask(GU_TRUE);
 
 			sceGuTexMode(GU_PSM_5551,0,0,0); //16bit texture
 			sceGuScissor(0,0,480,272);
@@ -3205,33 +3225,33 @@ int scroll_message(char **msg_lines, int lines, int start_pos, int intro_message
 			sceGuTexFunc(GU_TFX_REPLACE,GU_TCC_RGBA);
 			sceGuTexImage(0,512,512,512,(u8*)scr_bg);
 
-  		vertices = (struct Vertex*)sceGuGetMemory(2 * sizeof(struct Vertex));
-  		vertices_ptr=vertices;
-		  vertices_ptr[0].u = 0; vertices_ptr[0].v = 0;
-		  vertices_ptr[0].x = 0; vertices_ptr[0].y = 0; vertices_ptr[0].z = 0;
-		  vertices_ptr[1].u = 480; vertices_ptr[1].v = 272;
-		  vertices_ptr[1].x = 480; vertices_ptr[1].y = 272; vertices_ptr[1].z = 0;
-		  sceGuDrawArray(GU_SPRITES,GU_TEXTURE_16BIT|GU_VERTEX_16BIT|GU_TRANSFORM_2D,2,0,vertices);
+			vertices = (struct Vertex*)sceGuGetMemory(2 * sizeof(struct Vertex));
+			vertices_ptr=vertices;
+			vertices_ptr[0].u = 0; vertices_ptr[0].v = 0;
+			vertices_ptr[0].x = 0; vertices_ptr[0].y = 0; vertices_ptr[0].z = 0;
+			vertices_ptr[1].u = 480; vertices_ptr[1].v = 272;
+			vertices_ptr[1].x = 480; vertices_ptr[1].y = 272; vertices_ptr[1].z = 0;
+			sceGuDrawArray(GU_SPRITES,GU_TEXTURE_16BIT|GU_VERTEX_16BIT|GU_TRANSFORM_2D,2,0,vertices);
 
-		  //sceGuTexFunc(GU_TFX_ADD,GU_TCC_RGBA);
-		  sceGuEnable(GU_ALPHA_TEST);
-		  sceGuAlphaFunc(GU_EQUAL,0,0x1);
+			//sceGuTexFunc(GU_TFX_ADD,GU_TCC_RGBA);
+			sceGuEnable(GU_ALPHA_TEST);
+			sceGuAlphaFunc(GU_EQUAL,0,0x1);
 
-		  sceGuScissor(0,12,480,259);
-		  srctxt=(u16*)(0x44000000+(512*(272*3+fakedpos))*2);
-		  sceGuTexImage(0,512,512,512,(u8*)srctxt);
-		  sceGuDrawArray(GU_SPRITES,GU_TEXTURE_16BIT|GU_VERTEX_16BIT|GU_TRANSFORM_2D,2,0,vertices);
+			sceGuScissor(0,12,480,259);
+			srctxt=(u16*)(0x44000000+(512*(272*3+fakedpos))*2);
+			sceGuTexImage(0,512,512,512,(u8*)srctxt);
+			sceGuDrawArray(GU_SPRITES,GU_TEXTURE_16BIT|GU_VERTEX_16BIT|GU_TRANSFORM_2D,2,0,vertices);
 
-		  sceGuFinish();
-  		sceGuSync(0,0);
+			sceGuFinish();
+			sceGuSync(0,0);
 
 
-  		//memset(pgGetVramAddr(0,272-10),0,512*10*2);
-		  sprintf(str_tmp, s9xTYL_msg[SCROLL_STATUS_0], pos / 10 + 26, lines, (pos / 10 + 26) / 27, lines / 27);
-		  mh_print(0,272-10,str_tmp,((31)|(28<<5)|(31<<10)));
+			//memset(pgGetVramAddr(0,272-10),0,512*10*2);
+			sprintf(str_tmp, s9xTYL_msg[SCROLL_STATUS_0], pos / 10 + 26, lines, (pos / 10 + 26) / 27, lines / 27);
+			mh_print(0,272-10,str_tmp,((31)|(28<<5)|(31<<10)));
 
-  		sceDisplayWaitVblankStart();
-  		sceGuSwapBuffers();
+			sceDisplayWaitVblankStart();
+			sceGuSwapBuffers();
 			pg_drawframe++;
 			pg_drawframe&=1;
 
@@ -3375,6 +3395,7 @@ int scroll_message(char **msg_lines, int lines, int start_pos, int intro_message
 		while (get_pad()) pgWaitV();
 		return pos;
 }
+
 ////////////////////////////////////////////////////////////////////////////////////////
 //
 ////////////////////////////////////////////////////////////////////////////////////////

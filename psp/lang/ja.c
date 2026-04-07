@@ -345,7 +345,8 @@
 		[VIDEO_FSKIP_AUTO] = "フレームスキップ : 自動",
 		[VIDEO_FSKIP_MANUAL] = "フレームスキップ : %d",
 		// Scroll Message
-		[SCROLL_TITLE] = "   ,    移動   -  ,  高速         ",
+		[SCROLL_HELP_MOVE] = "移動",
+		[SCROLL_HELP_FAST] = "高速",
 		[SCROLL_STATUS_0] = "%d/%d行目  -  %d/%dページ",
 		[SCROLL_STATUS_1] = "   終了,        ヘルプ",
 		[SCROLL_HELP] = "Snes9xTYL - ファイルビューワー\n\n"

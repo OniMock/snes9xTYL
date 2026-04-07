@@ -24,6 +24,7 @@
 		[INFO_USB_OFF] = "USBが無効化されました",
 		[INFO_DELETING] = "削除しています...",
 		[INFO_EXITING] = "終了しています。しばらくお待ちください...",
+		[INFO_LOADING_FILES] = "ファイルを読み込み中: %d...",
 		//filer
 		[FILER_STATUS_CANEXIT1] = "%s 実行 " SJIS_SQUARE " 標準設定で実行  " SJIS_STAR "  %s ゲームに戻る  "  SJIS_STAR "  " SJIS_TRIANGLE " %s  "  SJIS_STAR "  十\字 移動",
 		[FILER_STATUS_NOEXIT1] = "%s 実行 " SJIS_SQUARE " 標準設定で実行  "  SJIS_STAR "  " SJIS_TRIANGLE " %s          " SJIS_UP "," SJIS_DOWN "," SJIS_LEFT "," SJIS_RIGHT " リストを移動",

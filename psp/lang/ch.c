@@ -24,6 +24,7 @@
 		[INFO_USB_OFF] = "USB已断開",
 		[INFO_DELETING] = "刪除中...",
 		[INFO_EXITING] = "退出中，請稍等...",
+		[INFO_LOADING_FILES] = "加載文件中: %d...",
 		//filer
 		[FILER_STATUS_CANEXIT1] = "%s 運行 " SJIS_SQUARE " 用默認設置運行  " SJIS_STAR "  %s 返回遊戲  "  SJIS_STAR "  " SJIS_TRIANGLE " %s  "  SJIS_STAR "  " SJIS_UP "" SJIS_DOWN "" SJIS_LEFT "" SJIS_RIGHT " 移動",
 		[FILER_STATUS_NOEXIT1] = "%s 運行 " SJIS_SQUARE " 用默認設置運行  "  SJIS_STAR "  " SJIS_TRIANGLE " %s          " SJIS_UP "" SJIS_DOWN "" SJIS_LEFT "" SJIS_RIGHT " 移動",

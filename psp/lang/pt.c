@@ -29,6 +29,7 @@
     [INFO_USB_OFF] = "USB desativado",
     [INFO_DELETING] = "Excluindo...",
     [INFO_EXITING] = "Saindo, aguarde...",
+    [INFO_LOADING_FILES] = "Carregando arquivos: %d...",
     // filer
     [FILER_STATUS_CANEXIT1] =
         "%s Iniciar " SJIS_SQUARE " Usar config. padrão " SJIS_STAR

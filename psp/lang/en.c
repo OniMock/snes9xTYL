@@ -24,6 +24,7 @@
 		[INFO_USB_OFF] = "USB disabled",
 		[INFO_DELETING] = "Deleting...",
 		[INFO_EXITING] = "Exiting, please wait...",
+		[INFO_LOADING_FILES] = "Loading files: %d...",
 		//filer
 		[FILER_STATUS_CANEXIT1] = "%s RUN " SJIS_SQUARE " RUN default settings " SJIS_STAR " %s TO GAME "  SJIS_STAR " " SJIS_TRIANGLE " %s "  SJIS_STAR " PAD BROWSE",
 		[FILER_STATUS_NOEXIT1] = "%s RUN " SJIS_SQUARE " RUN default settings  "  SJIS_STAR "  " SJIS_TRIANGLE " %s  " SJIS_UP "," SJIS_DOWN "," SJIS_LEFT "," SJIS_RIGHT ", to browse list",

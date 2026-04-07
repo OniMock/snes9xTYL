@@ -81,24 +81,32 @@ extern void show_bg(u16 *bg);
 // クイックソート
 static void SJISCopy(struct SceIoDirent *a, char *file)
 {
-	char ca;
-	int i;
+	unsigned char ca;
+	int i = 0, j = 0;
 
-	for(i=0;i<=strlen(a->d_name);i++){
+	while (a->d_name[i] != '\0') {
 		ca = a->d_name[i];
 		if (((0x81 <= ca)&&(ca <= 0x9f))
 		|| ((0xe0 <= ca)&&(ca <= 0xef))){
-			file[i++] = ca;
-			file[i] = a->d_name[i];
+			file[j++] = ca;
+			i++;
+			if (a->d_name[i] != '\0') {
+				file[j++] = a->d_name[i];
+				i++;
+			}
 		}
 		else{
 			if(ca>='a' && ca<='z') ca-=0x20;
-			file[i] = ca;
+			file[j++] = ca;
+			i++;
 		}
 	}
+	file[j] = '\0';
 }
 //#include <curl\stdcheaders.h>
-static int cmpFile(SceIoDirent *a, SceIoDirent *b) {
+static int cmpDirent(const void *p1, const void *p2) {
+	SceIoDirent *a = (SceIoDirent *)p1;
+	SceIoDirent *b = (SceIoDirent *)p2;
 	unsigned char file1[0x108];
 	unsigned char file2[0x108];
 	unsigned char ca, cb;
@@ -118,28 +126,6 @@ static int cmpFile(SceIoDirent *a, SceIoDirent *b) {
 
 	if(a->d_stat.st_attr & FIO_SO_IFDIR)	return -1;
 	else					return 1;
-}
-
-static void sort(SceIoDirent *a, int left, int right) {
-	SceIoDirent tmp, pivot;
-	int i, p;
-
-	if (left < right) {
-		pivot = a[left];
-		p = left;
-		for (i=left+1; i<=right; i++) {
-			if (cmpFile(&a[i],&pivot)<0){
-				p=p+1;
-				tmp=a[p];
-				a[p]=a[i];
-				a[i]=tmp;
-			}
-		}
-		a[left] = a[p];
-		a[p] = pivot;
-		sort(a, left, p-1);
-		sort(a, p+1, right);
-	}
 }
 
 // 拡張子管理用
@@ -209,18 +195,25 @@ static void getDir(const char *path) {
 		if(files[nfiles].d_stat.st_attr == TYPE_DIR){
 			strcat(files[nfiles].d_name, "/");
 			nfiles++;
-			continue;
 		}
-		if(getExtId(files[nfiles].d_name) != EXT_UNKNOWN) nfiles++;
+		else if(getExtId(files[nfiles].d_name) != EXT_UNKNOWN) {
+			nfiles++;
+		}
+		
+		if (nfiles > 0 && (nfiles % 50) == 0) {
+			char loadingMsg[128];
+			sprintf(loadingMsg, s9xTYL_msg[INFO_LOADING_FILES], nfiles);
+			msgBoxLines(loadingMsg, 0);
+		}
 	}
 
 	sceIoDclose(fd);
 
 	if (nfiles) {
 		if(b)
-			sort(files+1, 0, nfiles-2);
+			qsort(files+1, nfiles-1, sizeof(SceIoDirent), cmpDirent);
 		else
-			sort(files, 0, nfiles-1);
+			qsort(files, nfiles, sizeof(SceIoDirent), cmpDirent);
 	}
 }
 
@@ -287,18 +280,25 @@ static void getDirNoExt(const char *path) {
 		if(files[nfiles].d_stat.st_attr == TYPE_DIR){
 			strcat(files[nfiles].d_name, "/");
 			nfiles++;
-			continue;
 		}
-		/*if(getExtId(files[nfiles].d_name) != EXT_UNKNOWN)*/ nfiles++;
+		else {
+			/*if(getExtId(files[nfiles].d_name) != EXT_UNKNOWN)*/ nfiles++;
+		}
+
+		if (nfiles > 0 && (nfiles % 50) == 0) {
+			char loadingMsg[128];
+			sprintf(loadingMsg, s9xTYL_msg[INFO_LOADING_FILES], nfiles);
+			msgBoxLines(loadingMsg, 0);
+		}
 	}
 
 	sceIoDclose(fd);
 
 	if (nfiles) {
 		if(b)
-			sort(files+1, 0, nfiles-2);
+			qsort(files+1, nfiles-1, sizeof(SceIoDirent), cmpDirent);
 		else
-			sort(files, 0, nfiles-1);
+			qsort(files, nfiles, sizeof(SceIoDirent), cmpDirent);
 	}
 }
 

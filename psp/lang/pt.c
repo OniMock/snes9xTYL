@@ -30,6 +30,8 @@
     [INFO_DELETING] = "Excluindo...",
     [INFO_EXITING] = "Saindo, aguarde...",
     [INFO_LOADING_FILES] = "Carregando arquivos: %d...",
+    [INFO_FAV_ADDED] = "Adicionado aos Favoritos",
+    [INFO_FAV_REMOVED] = "Removido dos Favoritos",
     // filer
     [FILER_STATUS_CANEXIT1] =
         "%s Iniciar " SJIS_SQUARE " Usar config. padrão " SJIS_STAR
@@ -151,6 +153,7 @@
     [MENU_ICONS_GAME] = "JOGO",
     [MENU_ICONS_GAME_RESET] = "Reiniciar SNES",
     [MENU_ICONS_GAME_NEW] = "Carregar novo jogo",
+    [MENU_ICONS_GAME_FAVORITES] = "Lista de favoritos",
     [MENU_ICONS_GAME_DEFAULTSETTINGS] = "Tornar Configurações PADRÃO",
     [MENU_ICONS_GAME_DEFAULTSETTINGS_HELP] = "Tornar config atual o padrão\n"
                                              "para todas as ROMs se não\n"

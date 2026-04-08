@@ -25,6 +25,8 @@
 		[INFO_DELETING] = "削除しています...",
 		[INFO_EXITING] = "終了しています。しばらくお待ちください...",
 		[INFO_LOADING_FILES] = "ファイルを読み込み中: %d...",
+    [INFO_FAV_ADDED] = "お気に入りに追加しました",
+		[INFO_FAV_REMOVED] = "お気に入りから削除しました",
 		//filer
 		[FILER_STATUS_CANEXIT1] = "%s 実行 " SJIS_SQUARE " 標準設定で実行  " SJIS_STAR "  %s ゲームに戻る  "  SJIS_STAR "  " SJIS_TRIANGLE " %s  "  SJIS_STAR "  十\字 移動",
 		[FILER_STATUS_NOEXIT1] = "%s 実行 " SJIS_SQUARE " 標準設定で実行  "  SJIS_STAR "  " SJIS_TRIANGLE " %s          " SJIS_UP "," SJIS_DOWN "," SJIS_LEFT "," SJIS_RIGHT " リストを移動",
@@ -131,6 +133,7 @@
 		[MENU_ICONS_GAME] = "ゲーム",
 		[MENU_ICONS_GAME_RESET] = "SFCをリセットする",
 		[MENU_ICONS_GAME_NEW] = "新しいゲームを読み込む",
+    [MENU_ICONS_GAME_FAVORITES] = "お気に入りリスト",
 		[MENU_ICONS_GAME_DEFAULTSETTINGS] = "標準設定を作成する",
 		[MENU_ICONS_GAME_DEFAULTSETTINGS_HELP] = "現在の設定を特別に設定ファイル\nがない全てのROMに使われる\n標準設定として保存します。",
 		[MENU_ICONS_GAME_EXIT] = "Snes9xTYLを終了する",

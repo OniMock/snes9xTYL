@@ -25,6 +25,8 @@
 		[INFO_DELETING] = "Deleting...",
 		[INFO_EXITING] = "Exiting, please wait...",
 		[INFO_LOADING_FILES] = "Loading files: %d...",
+		[INFO_FAV_ADDED] = "Added to Favorites",
+		[INFO_FAV_REMOVED] = "Removed from Favorites",
 		//filer
 		[FILER_STATUS_CANEXIT1] = "%s RUN " SJIS_SQUARE " RUN default settings " SJIS_STAR " %s TO GAME "  SJIS_STAR " " SJIS_TRIANGLE " %s "  SJIS_STAR " PAD BROWSE",
 		[FILER_STATUS_NOEXIT1] = "%s RUN " SJIS_SQUARE " RUN default settings  "  SJIS_STAR "  " SJIS_TRIANGLE " %s  " SJIS_UP "," SJIS_DOWN "," SJIS_LEFT "," SJIS_RIGHT ", to browse list",
@@ -131,6 +133,7 @@
 		[MENU_ICONS_GAME] = "GAME",
 		[MENU_ICONS_GAME_RESET] = "Reset SNES",
 		[MENU_ICONS_GAME_NEW] = "Load new game",
+		[MENU_ICONS_GAME_FAVORITES] = "Favorites list",
 		[MENU_ICONS_GAME_DEFAULTSETTINGS] = "Make Settings DEFAULT",
 		[MENU_ICONS_GAME_DEFAULTSETTINGS_HELP] = "Make current settings the\ndefault\nfor all roms when no\nspecific one exists",
 		[MENU_ICONS_GAME_EXIT] = "Exit Snes9xTYL",

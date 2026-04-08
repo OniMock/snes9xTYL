@@ -1338,7 +1338,7 @@ typedef struct {
 #define MENU_XMB_ICONS_NB 8
 #define MENU_XMB_CHEATS 6
 menu_xmb_icon_t menu_xmb_icons[MENU_XMB_ICONS_NB]={
-	{0,0,0,4,MENU_ICONS_GAME},
+	{0,0,0,5,MENU_ICONS_GAME},
 	{1,0,0,7,MENU_ICONS_LOADSAVE},
 	{2,0,0,2,MENU_ICONS_CONTROLS},
 	{3,0,0,11,MENU_ICONS_VIDEO},
@@ -1646,6 +1646,16 @@ static int menu_clockspeed(char *mode) {
 		pgScreenFlipV2();
 	}
 	return retval;
+}
+
+// Favorites menu
+static int menu_favorites(char *mode) {
+	extern int in_favorites_view;
+	extern int os9x_getnewfile;
+	if (mode) { mode[0] = 0; return 0; }
+	in_favorites_view = 1;
+	os9x_getnewfile = 1;
+	return 1;
 }
 
 #define MENU_ONOFF(label) \
@@ -3847,9 +3857,10 @@ static int menu_swapbg(char *mode) {
 menu_xmb_entry_t menu_xmb_entries[MENU_XMB_ENTRIES_NB]={
 	// GAME
 	{0,0,menu_browser,MENU_ICONS_GAME_NEW,0},
-	{0,1,menu_reset,MENU_ICONS_GAME_RESET,0},
-	{0,2,menu_savedefaultsetting,MENU_ICONS_GAME_DEFAULTSETTINGS,MENU_ICONS_GAME_DEFAULTSETTINGS_HELP},
-	{0,3,menu_exitemu,MENU_ICONS_GAME_EXIT,0},
+	{0,1,menu_favorites,MENU_ICONS_GAME_FAVORITES,0},
+	{0,2,menu_reset,MENU_ICONS_GAME_RESET,0},
+	{0,3,menu_savedefaultsetting,MENU_ICONS_GAME_DEFAULTSETTINGS,MENU_ICONS_GAME_DEFAULTSETTINGS_HELP},
+	{0,4,menu_exitemu,MENU_ICONS_GAME_EXIT,0},
 	// LOAD/SAVE
 	{1,0,menu_loadstate,MENU_ICONS_LOADSAVE_LOADSTATE,MENU_ICONS_LOADSAVE_LOADSTATE_HELP},
 	{1,1,menu_savestate,MENU_ICONS_LOADSAVE_SAVESTATE,MENU_ICONS_LOADSAVE_SAVESTATE_HELP},

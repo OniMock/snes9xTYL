@@ -25,6 +25,8 @@
 		[INFO_DELETING] = "刪除中...",
 		[INFO_EXITING] = "退出中，請稍等...",
 		[INFO_LOADING_FILES] = "加載文件中: %d...",
+    [INFO_FAV_ADDED] = "已添加到收藏夾",
+		[INFO_FAV_REMOVED] = "已從收藏夾中刪除",
 		//filer
 		[FILER_STATUS_CANEXIT1] = "%s 運行 " SJIS_SQUARE " 用默認設置運行  " SJIS_STAR "  %s 返回遊戲  "  SJIS_STAR "  " SJIS_TRIANGLE " %s  "  SJIS_STAR "  " SJIS_UP "" SJIS_DOWN "" SJIS_LEFT "" SJIS_RIGHT " 移動",
 		[FILER_STATUS_NOEXIT1] = "%s 運行 " SJIS_SQUARE " 用默認設置運行  "  SJIS_STAR "  " SJIS_TRIANGLE " %s          " SJIS_UP "" SJIS_DOWN "" SJIS_LEFT "" SJIS_RIGHT " 移動",
@@ -131,6 +133,7 @@
 		[MENU_ICONS_GAME] = "遊戲",
 		[MENU_ICONS_GAME_RESET] = "重啓SNES",
 		[MENU_ICONS_GAME_NEW] = "讀取新遊戲",
+    [MENU_ICONS_GAME_FAVORITES] = "收藏夾列表",
 		[MENU_ICONS_GAME_DEFAULTSETTINGS] = "作成默認設置",
 		[MENU_ICONS_GAME_DEFAULTSETTINGS_HELP] = "如果沒有特殊設置，将當前設置作\n為所有遊戲的默認設置。",
 		[MENU_ICONS_GAME_EXIT] = "退出Snes9xTYL",

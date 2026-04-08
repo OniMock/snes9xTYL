@@ -3,6 +3,7 @@
 #include "psp.h"
 #include "filer.h"
 #include "homehook.h"
+#include "psp_favorites.h"
 
 #define TITLE_COL ((31)|(26<<5)|(31<<10))
 #define PATH_COL ((31)|(24<<5)|(28<<10))
@@ -14,6 +15,11 @@
 #define SELDIR_COL ((28)|(31<<5)|(28<<10))
 
 #define NET_COL (28|(4<<5)|(16<<10))
+
+/* Gold/yellow colour for favourite ROM entries in the file browser. */
+#define FAV_COL     ((31)|(28<<5)|(0<<10))
+/* Highlighted favourite row (selected). */
+#define FAV_SEL_COL ((31)|(31<<5)|(4<<10))
 
 
 #define INFOBAR_COL ((31)|(24<<5)|(20<<10))
@@ -37,6 +43,9 @@ char jpeg_files[MAX_ENTRY];
 SceIoDirent file;
 int nfiles;
 SceIoDirent files[MAX_ENTRY];
+
+/* Set to 1 when the user is browsing the virtual Favorites folder. */
+int in_favorites_view = 0;
 
 int nfiles_jpeg;
 SceIoDirent files_jpeg[MAX_ENTRY];
@@ -111,21 +120,30 @@ static int cmpDirent(const void *p1, const void *p2) {
 	unsigned char file2[0x108];
 	unsigned char ca, cb;
 	int i, n, ret;
-	if(a->d_stat.st_attr==b->d_stat.st_attr) {
-		SJISCopy(a, (char *)file1);
-		SJISCopy(b, (char *)file2);
-		//return strcasecmp(file1,file2);
-		n=strlen((char *)file1);
-		for(i=0; i<=n; i++){
-			ca=file1[i]; cb=file2[i];
-			ret = ca-cb;
-			if(ret!=0) return ret;
-		}
-		return 0;
+
+	/* Dirs always come first. */
+	if(a->d_stat.st_attr != b->d_stat.st_attr) {
+		if(a->d_stat.st_attr & FIO_SO_IFDIR)	return -1;
+		else return 1;
 	}
 
-	if(a->d_stat.st_attr & FIO_SO_IFDIR)	return -1;
-	else					return 1;
+	/* Contextual Sorting: Favorites appear at the top of the folder.
+	 * (Disabled in global Favorites View where all are already favorites). */
+	if (!in_favorites_view) {
+		int fav_a = a->d_stat.st_private[0];
+		int fav_b = b->d_stat.st_private[0];
+		if (fav_a != fav_b) return fav_b - fav_a; /* 1 (fav) before 0 */
+	}
+
+	SJISCopy(a, (char *)file1);
+	SJISCopy(b, (char *)file2);
+	n=strlen((char *)file1);
+	for(i=0; i<=n; i++){
+		ca=file1[i]; cb=file2[i];
+		ret = ca-cb;
+		if(ret!=0) return ret;
+	}
+	return 0;
 }
 
 // 拡張子管理用
@@ -161,6 +179,8 @@ static int getExtId(const char *szFilePath) {
 static void getDir(const char *path) {
 	int fd = 0;
 	int b = 0;
+	/* Leading pinned entries that must not participate in alphabetical sort. */
+	int sort_offset = 0;
 //	char *p;
 
 	nfiles = 0;
@@ -197,9 +217,13 @@ static void getDir(const char *path) {
 			nfiles++;
 		}
 		else if(getExtId(files[nfiles].d_name) != EXT_UNKNOWN) {
+			/* Store favorite status in internal metadata for reliable sorting. */
+			char full_path[MAXPATH];
+			snprintf(full_path, sizeof(full_path), "%s%s", path, files[nfiles].d_name);
+			files[nfiles].d_stat.st_private[0] = fav_is_favorite(full_path);
 			nfiles++;
 		}
-		
+
 		if (nfiles > 0 && (nfiles % 50) == 0) {
 			char loadingMsg[128];
 			sprintf(loadingMsg, s9xTYL_msg[INFO_LOADING_FILES], nfiles);
@@ -209,13 +233,15 @@ static void getDir(const char *path) {
 
 	sceIoDclose(fd);
 
-	if (nfiles) {
-		if(b)
-			qsort(files+1, nfiles-1, sizeof(SceIoDirent), cmpDirent);
-		else
-			qsort(files, nfiles, sizeof(SceIoDirent), cmpDirent);
+	/* Sort only entries after the pinned virtual + drive entries. */
+	if (nfiles > sort_offset) {
+		int real_start = sort_offset + (b ? 1 : 0);
+		int real_count  = nfiles - real_start;
+		if (real_count > 0)
+			qsort(files + real_start, real_count, sizeof(SceIoDirent), cmpDirent);
 	}
 }
+
 
 static void getDirJpeg() {
 	int fd;
@@ -241,6 +267,7 @@ static void getDirJpeg() {
 
 	sceIoDclose(fd);
 }
+
 
 
 static void getDirNoExt(const char *path) {
@@ -360,6 +387,26 @@ static void filer_buildbg(int detailed) {
 
 }
 
+// Get files from favorites
+static void getFilesFromFavorites() {
+	int i;
+	nfiles = 0;
+	/* No ".." directory in global favorites view as requested. */
+	for (i = 0; i < fav_get_count(); i++) {
+		const char *fpath = fav_get_path(i);
+		if (fpath) {
+			/* In favorites mode, d_name stores the full path of the ROM. */
+			strncpy(files[nfiles].d_name, fpath, MAXPATH - 1);
+			files[nfiles].d_name[MAXPATH - 1] = '\0';
+			files[nfiles].d_stat.st_attr = TYPE_FILE;
+			nfiles++;
+		}
+	}
+	/* Sort favorites alphabetically. */
+	if (nfiles > 0)
+		qsort(files, nfiles, sizeof(SceIoDirent), cmpDirent);
+}
+
 int getFilePath(char *out,int can_exit) {
 	static int cpt_lowbat=0;
   int counter=0;
@@ -390,7 +437,14 @@ int getFilePath(char *out,int can_exit) {
 
 	if(FilerMsg[0])
 		bMsg=1;
-	getDir(path);
+	fav_init(LaunchDir);
+	/* If we entered from the "Favorites List" menu, show only favorites.
+	 * Otherwise, show the normal directory listing. */
+	if (in_favorites_view) {
+		getFilesFromFavorites();
+	} else {
+		getDir(path);
+	}
 
 	//init jpeg stuff
 	getDirJpeg();
@@ -501,30 +555,73 @@ int getFilePath(char *out,int can_exit) {
 		show_usbinfo();
 
 
-		if(new_pad & (os9x_btn_positive_code|PSP_CTRL_SQUARE)){
+        /* L-Trigger Favorites Toggle: Independent of navigation buttons
+         * to ensure it always fires when pressed. */
+        if((new_pad & PSP_CTRL_LTRIGGER) && !(new_pad & PSP_CTRL_RTRIGGER)) {
+        	if (files[sel].d_stat.st_attr == TYPE_FILE) {
+        		/* L alone: toggle the current ROM as a favourite. */
+        		char fav_path[MAXPATH];
+        		if (in_favorites_view) {
+        			/* d_name already holds the full path in favourites view. */
+        			int res = fav_toggle(files[sel].d_name);
+        			if (res == 0) {
+        				/* Removed: refresh the list immediately. */
+        				msgBoxLines(s9xTYL_msg[INFO_FAV_REMOVED], 20);
+        				getFilesFromFavorites();
+        				if (sel >= nfiles) sel = (nfiles > 0 ? nfiles - 1 : 0);
+        				image_loaded = 2;
+        			}
+        		} else {
+        			snprintf(fav_path, sizeof(fav_path), "%s%s",
+        			         path, files[sel].d_name);
+        			int res = fav_toggle(fav_path);
+        			if (res == 1) msgBoxLines(s9xTYL_msg[INFO_FAV_ADDED], 20);
+        			else if (res == 0) msgBoxLines(s9xTYL_msg[INFO_FAV_REMOVED], 20);
+        		}
+        		pad_cnt = 10;
+        	}
+        }
+
+        if(new_pad & (os9x_btn_positive_code|PSP_CTRL_SQUARE)){
 			int is_square=new_pad & PSP_CTRL_SQUARE;
 			if(files[sel].d_stat.st_attr == TYPE_DIR){
 				if(!strcmp(files[sel].d_name,"..") || files[sel].d_name[3] == ':')
 					{  up=1; }
-				else {
+				else if (strcmp(files[sel].d_name, FAV_VIRTUAL_DIR_NAME) == 0) {
+					/* User entered the virtual Favorites folder. */
+					in_favorites_view = 1;
+					getFilesFromFavorites();
+					memset(jpeg_files,1,MAX_ENTRY);
+					image_loaded=2;
+					sel=0;
+					while (get_pad()) pgWaitV();
+				} else {
 					strcat(path,files[sel].d_name);
 					getDir(path);
 					//init jpeg stuff
 					getDirJpeg();
 					memset(jpeg_files,1,MAX_ENTRY);
 					image_loaded=2;
-
-
 					sel=0;
 					while (get_pad()) pgWaitV();
 				}
 			}else{
-						strcpy(out, path);
-						strcat(out, files[sel].d_name);
-						strcpy(LastPath,path);
-
-						retval= (is_square?2:1);
-						break;
+					if (in_favorites_view) {
+						/* In favorites view d_name is already the full path. */
+						strcpy(out, files[sel].d_name);
+						strcpy(LastPath, path);
+					} else {
+						if (in_favorites_view) {
+							/* In favorites mode, d_name contains the full absolute path. */
+							strcpy(out, files[sel].d_name);
+						} else {
+							strcpy(out, path);
+							strcat(out, files[sel].d_name);
+							strcpy(LastPath, path);
+						}
+					}
+					retval= (is_square?2:1);
+					break;
 			 }
 			}
         else if(new_pad & os9x_btn_negative_code)   { if (can_exit) {retval= 0;break;} }
@@ -541,13 +638,6 @@ int getFilePath(char *out,int can_exit) {
         		}
         }
 #else
-        else if(new_pad & PSP_CTRL_LTRIGGER) {
-        	if (new_pad & PSP_CTRL_RTRIGGER) {
-        		if (inputBox(s9xTYL_msg[ASK_EXIT])) {
-        			S9xExit();
-        		}
-        	}
-        }
 #endif
         else if(new_pad & PSP_CTRL_SELECT){
         		if (inputBox(s9xTYL_msg[ASK_DELETE])) {
@@ -579,7 +669,14 @@ int getFilePath(char *out,int can_exit) {
 
 		if(up){
 			up=0;
-			if(path[5]){
+			if (in_favorites_view) {
+				/* Exiting virtual favorites folder -> return to root. */
+				in_favorites_view = 0;
+				getDir(path);
+				memset(jpeg_files, 1, MAX_ENTRY);
+				image_loaded = 2;
+				sel = 0;
+			} else if(path[5]){
 				p=strrchr(path,'/');
 				*p=0;
 				p=strrchr(path,'/');
@@ -654,16 +751,46 @@ int getFilePath(char *out,int can_exit) {
 		x=8; y=17;
 		for(i=0; i<rows; i++){
 			if(top+i >= nfiles) break;
-			if(top+i == sel) color = SEL_COL;
-			else			 color = FILE_COL;
+
+			char display_name[MAXPATH+4];
+			int favorite = 0;
+
+			if (in_favorites_view) {
+				favorite = 1;
+				const char *pFilename = strrchr(files[top+i].d_name, '/');
+				if (pFilename) pFilename++;
+				else pFilename = files[top+i].d_name;
+				snprintf(display_name, sizeof(display_name), SJIS_STAR " %s", pFilename);
+			} else {
+				char full_path[MAXPATH];
+				if (files[top+i].d_stat.st_attr == TYPE_FILE) {
+					snprintf(full_path, sizeof(full_path), "%s%s", path, files[top+i].d_name);
+					favorite = fav_is_favorite(full_path);
+				}
+
+				if (favorite) {
+					snprintf(display_name, sizeof(display_name), SJIS_STAR " %s", files[top+i].d_name);
+				} else {
+					strncpy(display_name, files[top+i].d_name, sizeof(display_name)-1);
+					display_name[sizeof(display_name)-1] = '\0';
+				}
+			}
+
+			if(top+i == sel) color = favorite ? FAV_SEL_COL : SEL_COL;
+			else			 color = favorite ? FAV_COL : FILE_COL;
+
 			if (files[top+i].d_stat.st_attr==TYPE_DIR){
-				if (color==SEL_COL) color=SELDIR_COL;
+				if (color == SEL_COL || color == FAV_SEL_COL) color=SELDIR_COL;
 				else color = DIR_COL;
 			}
-			if ((color==SEL_COL)||(color==SELDIR_COL)) mh_printSel_light(x,y,files[top+i].d_name,color,current_smoothing);//pgPrintSel(x, y, color, files[top+i].d_name);
-			else mh_print(x, y, files[top+i].d_name,color);//pgPrint(x, y, color, files[top+i].d_name);
+
+			if (color == SEL_COL || color == SELDIR_COL || color == FAV_SEL_COL)
+				mh_printSel_light(x,y,display_name,color,current_smoothing);
+			else
+				mh_print(x, y, display_name,color);
 			y+=1*12;
 		}
+
 
 		if (image_loaded==1) { //jpeg already loaded
 			int x,y,xmax=128,ymax=snesheight/2;
@@ -913,9 +1040,7 @@ int getNoExtFilePath(char *out,int can_exit) {
 
 	while (get_pad()) pgWaitV();
 
-	free(filer_bg);
-
-
+	in_favorites_view = 0;
 	return retval;
 }
 

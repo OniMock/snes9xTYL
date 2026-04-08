@@ -41,7 +41,7 @@
 		[FILER_HELP_WINDOW1] = "Press START to switch between",
 		[FILER_HELP_WINDOW2] = "NORMAL and NETPLAY mode.",
 #ifdef FW3X
-		[FILER_HELP_WINDOW3] = " ",
+		[FILER_HELP_WINDOW3] = "L: Add to Favorites",
 #ifdef HOME_HOOK
 		[FILER_HELP_WINDOW4] = "Press HOME to exit.",
 #else

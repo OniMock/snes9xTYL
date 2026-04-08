@@ -56,7 +56,7 @@
     [FILER_HELP_WINDOW1] = "Pressione:",
     [FILER_HELP_WINDOW2] = "START: Normal/Netplay",
 #ifdef FW3X
-    [FILER_HELP_WINDOW3] = " ",
+    [FILER_HELP_WINDOW3] = "L: Favoritar jogo",
 #ifdef HOME_HOOK
     [FILER_HELP_WINDOW4] = "HOME: sair",
 #else

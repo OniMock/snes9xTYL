@@ -40,7 +40,7 @@
 		[FILER_HELP_WINDOW1] = "按START鍵切換",
 		[FILER_HELP_WINDOW2] = "聯機模式",
 #ifdef FW3X
-		[FILER_HELP_WINDOW3] = " ",
+		[FILER_HELP_WINDOW3] = "L: 添加到收藏",
 #ifdef HOME_HOOK
 		[FILER_HELP_WINDOW4] = "按HOME鍵退出",
 #else

@@ -41,7 +41,7 @@
 		[FILER_HELP_WINDOW1] = "標準と通信対戦モードを切り替える",
 		[FILER_HELP_WINDOW2] = "にはSTARTを押してください",
 #ifdef FW3X
-		[FILER_HELP_WINDOW3] = " ",
+		[FILER_HELP_WINDOW3] = "L: お気に入りに追加",
 #ifdef HOME_HOOK
 		[FILER_HELP_WINDOW4] = "終了するにはHOMEを押してください",
 #else

@@ -4,6 +4,7 @@
 #include "filer.h"
 #include "homehook.h"
 #include "psp_favorites.h"
+#include <stdlib.h>
 
 #define TITLE_COL ((31)|(26<<5)|(31<<10))
 #define PATH_COL ((31)|(24<<5)|(28<<10))
@@ -30,6 +31,7 @@
 
 #define MAXPATH 256		//temp, not confirmed
 #define MAX_ENTRY 1024
+#define ALLOC_STEP 1024
 
 u32 new_pad,old_pad;
 
@@ -39,16 +41,18 @@ enum {
 };
 
 
-char jpeg_files[MAX_ENTRY];
+char *jpeg_files = NULL;
 SceIoDirent file;
 int nfiles;
-SceIoDirent files[MAX_ENTRY];
+SceIoDirent *files = NULL;
+int max_allocated_files = 0;
 
 /* Set to 1 when the user is browsing the virtual Favorites folder. */
 int in_favorites_view = 0;
 
 int nfiles_jpeg;
-SceIoDirent files_jpeg[MAX_ENTRY];
+SceIoDirent *files_jpeg = NULL;
+int max_allocated_jpeg = 0;
 
 extern volatile int g_bSleep,g_bLoop;
 
@@ -184,6 +188,11 @@ static void getDir(const char *path) {
 //	char *p;
 
 	nfiles = 0;
+	if (max_allocated_files == 0) {
+		max_allocated_files = ALLOC_STEP;
+		files = (SceIoDirent *)malloc(max_allocated_files * sizeof(SceIoDirent));
+		jpeg_files = (char *)malloc(max_allocated_files);
+	}
 
 	if(path[5]) {
 		strcpy(files[nfiles].d_name,"..");
@@ -207,7 +216,17 @@ static void getDir(const char *path) {
 		return ;
 	}
 
-	while(nfiles<MAX_ENTRY){
+	while(1){
+		if (nfiles >= max_allocated_files) {
+			max_allocated_files += ALLOC_STEP;
+			files = (SceIoDirent *)realloc(files, max_allocated_files * sizeof(SceIoDirent));
+			jpeg_files = (char *)realloc(jpeg_files, max_allocated_files);
+			if (!files || !jpeg_files) {
+				msgBoxLines(s9xTYL_msg[ERR_OUT_OF_MEM], 60);
+				break;
+			}
+		}
+
 		if(sceIoDread(fd, &files[nfiles])<=0) break;
 
 		if(files[nfiles].d_name[0] == '.') continue;
@@ -246,6 +265,10 @@ static void getDir(const char *path) {
 static void getDirJpeg() {
 	int fd;
 	nfiles_jpeg = 0;
+	if (max_allocated_jpeg == 0) {
+		max_allocated_jpeg = ALLOC_STEP;
+		files_jpeg = (SceIoDirent *)malloc(max_allocated_jpeg * sizeof(SceIoDirent));
+	}
 
 	fd = sceIoDopen(SaveDir);
 	if (fd<0){
@@ -253,7 +276,16 @@ static void getDirJpeg() {
 		return ;
 	}
 
-	while(nfiles_jpeg<MAX_ENTRY){
+	while(1){
+		if (nfiles_jpeg >= max_allocated_jpeg) {
+			max_allocated_jpeg += ALLOC_STEP;
+			files_jpeg = (SceIoDirent *)realloc(files_jpeg, max_allocated_jpeg * sizeof(SceIoDirent));
+			if (!files_jpeg) {
+				msgBoxLines(s9xTYL_msg[ERR_OUT_OF_MEM], 60);
+				break;
+			}
+		}
+
 		if(sceIoDread(fd, &files_jpeg[nfiles_jpeg])<=0) break;
 
 		if(files_jpeg[nfiles_jpeg].d_name[0] == '.') continue;
@@ -276,6 +308,11 @@ static void getDirNoExt(const char *path) {
 //	char *p;
 
 	nfiles = 0;
+	if (max_allocated_files == 0) {
+		max_allocated_files = ALLOC_STEP;
+		files = (SceIoDirent *)malloc(max_allocated_files * sizeof(SceIoDirent));
+		jpeg_files = (char *)malloc(max_allocated_files);
+	}
 
 	if(path[5]) {
 		strcpy(files[nfiles].d_name,"..");
@@ -299,7 +336,17 @@ static void getDirNoExt(const char *path) {
 		return ;
 	}
 
-	while(nfiles<MAX_ENTRY){
+	while(1){
+		if (nfiles >= max_allocated_files) {
+			max_allocated_files += ALLOC_STEP;
+			files = (SceIoDirent *)realloc(files, max_allocated_files * sizeof(SceIoDirent));
+			jpeg_files = (char *)realloc(jpeg_files, max_allocated_files);
+			if (!files || !jpeg_files) {
+				msgBoxLines(s9xTYL_msg[ERR_OUT_OF_MEM], 60);
+				break;
+			}
+		}
+
 		if(sceIoDread(fd, &files[nfiles])<=0) break;
 
 		if(files[nfiles].d_name[0] == '.') continue;
@@ -391,8 +438,20 @@ static void filer_buildbg(int detailed) {
 static void getFilesFromFavorites() {
 	int i;
 	nfiles = 0;
+	if (max_allocated_files == 0) {
+		max_allocated_files = ALLOC_STEP;
+		files = (SceIoDirent *)malloc(max_allocated_files * sizeof(SceIoDirent));
+		jpeg_files = (char *)malloc(max_allocated_files);
+	}
+
 	/* No ".." directory in global favorites view as requested. */
 	for (i = 0; i < fav_get_count(); i++) {
+		if (nfiles >= max_allocated_files) {
+			max_allocated_files += ALLOC_STEP;
+			files = (SceIoDirent *)realloc(files, max_allocated_files * sizeof(SceIoDirent));
+			jpeg_files = (char *)realloc(jpeg_files, max_allocated_files);
+		}
+
 		const char *fpath = fav_get_path(i);
 		if (fpath) {
 			/* In favorites mode, d_name stores the full path of the ROM. */
@@ -597,7 +656,8 @@ int getFilePath(char *out,int can_exit) {
 					/* User entered the virtual Favorites folder. */
 					in_favorites_view = 1;
 					getFilesFromFavorites();
-					memset(jpeg_files,1,MAX_ENTRY);
+					if (jpeg_files && max_allocated_files > 0)
+						memset(jpeg_files, 1, max_allocated_files);
 					image_loaded=2;
 					sel=0;
 					while (get_pad()) pgWaitV();
@@ -606,7 +666,8 @@ int getFilePath(char *out,int can_exit) {
 					getDir(path);
 					//init jpeg stuff
 					getDirJpeg();
-					memset(jpeg_files,1,MAX_ENTRY);
+					if (jpeg_files && max_allocated_files > 0)
+						memset(jpeg_files, 1, max_allocated_files);
 					image_loaded=2;
 					sel=0;
 					while (get_pad()) pgWaitV();
@@ -679,7 +740,8 @@ int getFilePath(char *out,int can_exit) {
 				/* Exiting virtual favorites folder -> return to root. */
 				in_favorites_view = 0;
 				getDir(path);
-				memset(jpeg_files, 1, MAX_ENTRY);
+				if (jpeg_files && max_allocated_files > 0)
+					memset(jpeg_files, 1, max_allocated_files);
 				image_loaded = 2;
 				sel = 0;
 			} else if(path[5]){
@@ -706,7 +768,8 @@ int getFilePath(char *out,int can_exit) {
 
 				//init jpeg stuff
 				getDirJpeg();
-				memset(jpeg_files,1,MAX_ENTRY);
+				if (jpeg_files && max_allocated_files > 0)
+					memset(jpeg_files, 1, max_allocated_files);
 				image_loaded=2;
 
 				sel=0;
@@ -834,6 +897,12 @@ int getFilePath(char *out,int can_exit) {
 	while (get_pad()) pgWaitV();
 
 	free(filer_bg);
+
+	if (files) { free(files); files = NULL; }
+	if (files_jpeg) { free(files_jpeg); files_jpeg = NULL; }
+	if (jpeg_files) { free(jpeg_files); jpeg_files = NULL; }
+	max_allocated_files = 0;
+	max_allocated_jpeg = 0;
 
 	return retval;
 }
@@ -1055,6 +1124,12 @@ int getNoExtFilePath(char *out,int can_exit) {
 
 	while (get_pad()) pgWaitV();
 
+	if (files) { free(files); files = NULL; }
+	if (files_jpeg) { free(files_jpeg); files_jpeg = NULL; }
+	if (jpeg_files) { free(jpeg_files); jpeg_files = NULL; }
+	max_allocated_files = 0;
+	max_allocated_jpeg = 0;
+
 	in_favorites_view = 0;
 	return retval;
 }
@@ -1064,6 +1139,8 @@ int filer_init(const char *msg, const char *path)
 {
     strcpy(FilerMsg,msg);
     strcpy(LastPath,path);
-    memset(files,0,sizeof(files));
+    if (files)     { free(files);      files = NULL;      max_allocated_files = 0; }
+    if (files_jpeg){ free(files_jpeg); files_jpeg = NULL; max_allocated_jpeg  = 0; }
+    if (jpeg_files){ free(jpeg_files); jpeg_files = NULL; }
     return 1;
 }

@@ -3489,6 +3489,7 @@ static void welcome_message(){
 //
 ////////////////////////////////////////////////////////////////////////////////////////
 static int os9x_getfile() {
+	filer_init(s9xTYL_msg[FILER_TITLE], romPath);
 #ifdef __DEBUG_SNES_
 	sprintf(rom_filename,__DEBUG__ROM__);
 	strcpy(LastPath,"ms0:/PSP/GAME/snes9xTYL/");

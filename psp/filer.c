@@ -1323,7 +1323,9 @@ int getNoExtFilePath(char *out, int can_exit)
  */
 int filer_init(const char *msg, const char *path)
 {
-    strcpy(FilerMsg, msg);
+    if (msg) strcpy(FilerMsg, msg);
+    else FilerMsg[0] = '\0';
+
     strcpy(LastPath, path);
     /* Zero-initialise the directory list but do not allocate yet */
     memset(&g_dir, 0, sizeof(g_dir));

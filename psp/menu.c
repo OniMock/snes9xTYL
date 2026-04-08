@@ -393,6 +393,7 @@ static int menu_importstate(char *mode) {
 	char statefilename[256];
 	if (mode) {mode[0]=0;return 0;}
 
+	filer_init(s9xTYL_msg[MENU_ICONS_LOADSAVE_IMPORTSTATE], LastPath);
 	if (getNoExtFilePath(statefilename,1)==1) {
 		debug_log(statefilename);
 		if (!inputBox(s9xTYL_msg[MENU_STATE_CONFIRMLOAD])) return 0;
@@ -428,6 +429,7 @@ static int menu_viewfile(char *mode) {
 
 	strncpy(lastpath_save,LastPath,255);
 	strncpy(LastPath,os9x_viewfile_path,255);
+	filer_init(s9xTYL_msg[MENU_ICONS_MISC_FILEVIEWER], LastPath);
 	if (getNoExtFilePath(filename,1)==1) {
 
 		if((pszExt = strrchr(filename, '.'))) {

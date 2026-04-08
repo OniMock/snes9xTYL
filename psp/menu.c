@@ -3864,7 +3864,7 @@ static int menu_swapbg(char *mode) {
 	return retval;
 }
 
-#define MENU_XMB_ENTRIES_NB (4+7+2+11+4+11+10+2)
+#define MENU_XMB_ENTRIES_NB (5+7+2+11+4+11+10+2)
 menu_xmb_entry_t menu_xmb_entries[MENU_XMB_ENTRIES_NB]={
 	// GAME
 	{0,0,menu_browser,MENU_ICONS_GAME_NEW,0},

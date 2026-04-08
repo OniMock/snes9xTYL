@@ -308,6 +308,13 @@
 		// ABOUT
 		[MENU_ICONS_ABOUT] = "關於",
 		[MENU_ICONS_ABOUT_CREDITS] = "開發人員",
+		[MENU_ICONS_ABOUT_SUPPORT] = "支持",
+		[MENU_ABOUT_SUPPORT_FOLLOW] = "关注项目:",
+		[MENU_ABOUT_SUPPORT_URL] = "github.com/OniMock/snes9xTYL",
+		[MENU_ABOUT_SUPPORT_TITLE] = "支持与捐赠:",
+		[MENU_ABOUT_SUPPORT_MSG1] = "如果你喜欢我的工作，",
+		[MENU_ABOUT_SUPPORT_MSG2] = "请考虑支持该项目！",
+
 		[MENU_ICONS_ABOUT_VERSION] = "版本信息",
 
 		[MENU_ABOUT_VERSION_TIMESTAMP] = "創建日期 %s",

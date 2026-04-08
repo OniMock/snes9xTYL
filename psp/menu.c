@@ -1348,7 +1348,7 @@ menu_xmb_icon_t menu_xmb_icons[MENU_XMB_ICONS_NB]={
 	{4,0,0,4,MENU_ICONS_SOUND},
 	{5,0,0,11,MENU_ICONS_MISC},
 	{6,0,0,10,MENU_ICONS_CHEATS},
-	{7,0,0,2,MENU_ICONS_ABOUT},
+	{7,0,0,3,MENU_ICONS_ABOUT},
 };
 
 
@@ -1657,7 +1657,7 @@ static int menu_favorites(char *mode) {
 	extern int os9x_getnewfile;
 	extern char LaunchDir[256];
 	if (mode) { mode[0] = 0; return 0; }
-	
+
 	fav_init(LaunchDir);
 	if (fav_get_count() == 0) {
 		msgBoxLines(s9xTYL_msg[INFO_NO_FAV_GAMES], 30);
@@ -3545,6 +3545,41 @@ static int menu_credits(char *mode) {
 	return retval;
 }
 
+static int menu_support(char *mode) {
+	int retval=0;
+	int to_exit=0;
+	if (mode) {mode[0]=0;return 0;}
+
+	menu_panel_pos=479;
+	menu_cnt2=0;
+
+	for (;;) {
+		menu_basic(2+to_exit);
+		if (!g_bLoop) {retval=1;break;}
+
+		mh_printLimit(menu_panel_pos+5,15,479,272,s9xTYL_msg[MENU_ABOUT_SUPPORT_FOLLOW],CODE_COL);
+		mh_printLimit(menu_panel_pos+5,25,479,272,s9xTYL_msg[MENU_ABOUT_SUPPORT_URL],GFX_COL);
+
+		mh_printLimit(menu_panel_pos+5,50,479,272,s9xTYL_msg[MENU_ABOUT_SUPPORT_TITLE],GREETINGS0_COL);
+		mh_printLimit(menu_panel_pos+5,65,479,272,s9xTYL_msg[MENU_ABOUT_SUPPORT_MSG1],GREETINGS_COL);
+		mh_printLimit(menu_panel_pos+5,75,479,272,s9xTYL_msg[MENU_ABOUT_SUPPORT_MSG2],GREETINGS_COL);
+
+    if (to_exit) {
+    	if (menu_panel_pos>=479) break;
+    } else {
+    	if (new_pad&(os9x_btn_negative_code|PSP_CTRL_LEFT)) {
+    		os9x_beep1();
+    		to_exit=1;
+    		menu_cnt2=0;
+    	} SNAPSHOT_CODE()
+    }
+    //swap screen
+		pgScreenFlipV2();
+	}
+
+	return retval;
+}
+
 static int menu_versioninfos(char *mode) {
 	int to_exit=0;
 	int retval=0;
@@ -3864,7 +3899,7 @@ static int menu_swapbg(char *mode) {
 	return retval;
 }
 
-#define MENU_XMB_ENTRIES_NB (5+7+2+11+4+11+10+2)
+#define MENU_XMB_ENTRIES_NB (5+7+2+11+4+11+10+3)
 menu_xmb_entry_t menu_xmb_entries[MENU_XMB_ENTRIES_NB]={
 	// GAME
 	{0,0,menu_browser,MENU_ICONS_GAME_NEW,0},
@@ -3926,7 +3961,8 @@ menu_xmb_entry_t menu_xmb_entries[MENU_XMB_ENTRIES_NB]={
 	{6,9,menu_removeallcodes,MENU_ICONS_CHEATS_REMOVEALL,MENU_ICONS_CHEATS_REMOVEALL_HELP},
 	// ABOUT
 	{7,0,menu_credits,MENU_ICONS_ABOUT_CREDITS,0},
-	{7,1,menu_versioninfos,MENU_ICONS_ABOUT_VERSION,0},
+	{7,1,menu_support,MENU_ICONS_ABOUT_SUPPORT,0},
+	{7,2,menu_versioninfos,MENU_ICONS_ABOUT_VERSION,0},
 };
 
 

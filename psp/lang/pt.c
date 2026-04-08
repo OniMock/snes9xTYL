@@ -398,6 +398,12 @@
     // SOBRE
     [MENU_ICONS_ABOUT] = "SOBRE",
     [MENU_ICONS_ABOUT_CREDITS] = "Créditos",
+    [MENU_ICONS_ABOUT_SUPPORT] = "Suporte",
+    [MENU_ABOUT_SUPPORT_FOLLOW] = "Acompanhe o projeto em:",
+    [MENU_ABOUT_SUPPORT_URL] = "github.com/OniMock/snes9xTYL",
+    [MENU_ABOUT_SUPPORT_TITLE] = "Suporte & Doações:",
+    [MENU_ABOUT_SUPPORT_MSG1] = "Se você gosta do meu trabalho,",
+    [MENU_ABOUT_SUPPORT_MSG2] = "considere apoiar o projeto!",
     [MENU_ICONS_ABOUT_VERSION] = "Informações da versão",
 
     [MENU_ABOUT_VERSION_TIMESTAMP] = "Compilado em %s",

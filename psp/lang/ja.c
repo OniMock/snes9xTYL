@@ -309,6 +309,13 @@
 		// ABOUT
 		[MENU_ICONS_ABOUT] = "このソ\フトについて",
 		[MENU_ICONS_ABOUT_CREDITS] = "クレジット",
+		[MENU_ICONS_ABOUT_SUPPORT] = "サポート",
+		[MENU_ABOUT_SUPPORT_FOLLOW] = "プロジェクトをフォローする:",
+		[MENU_ABOUT_SUPPORT_URL] = "github.com/OniMock/snes9xTYL",
+		[MENU_ABOUT_SUPPORT_TITLE] = "サポート＆寄付:",
+		[MENU_ABOUT_SUPPORT_MSG1] = "私の仕事が気に入ったら、",
+		[MENU_ABOUT_SUPPORT_MSG2] = "プロジェクトのサポートを検討してください！",
+
 		[MENU_ICONS_ABOUT_VERSION] = "バージョン情報",
 
 		[MENU_ABOUT_VERSION_TIMESTAMP] = "ビルド日時 : %s",

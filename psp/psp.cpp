@@ -142,7 +142,7 @@ PSP_MAIN_THREAD_STACK_SIZE_KB(256); /* smaller stack for kernel thread */
 //28000x
 //PSP_HEAP_SIZE_MAX();
 #ifdef FAT_SUPPORT
-PSP_HEAP_SIZE_KB(-256);
+PSP_HEAP_SIZE_KB(12000);
 #else
 PSP_HEAP_SIZE_KB(12000);
 #endif

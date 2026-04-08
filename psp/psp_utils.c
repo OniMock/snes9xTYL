@@ -706,19 +706,56 @@ static void getsysparam(){
 		//get nick name
 		//now convert to sjis
 		int i=0,j=0;
-		int utf8;
-		while (sVal[i]) {
-			utf8=(int)sVal[i++];
-			utf8=(utf8<<8)|(int)sVal[i++];
-			utf8=(utf8<<8)|(int)sVal[i++];
+		while (sVal[i] && j < 254) {
+			unsigned char c = (unsigned char)sVal[i];
+			int bytes = 0;
+			int utf8 = 0;
 
-			for (int k=0;k<sjis_xlate_entries;k++) {
-				if (utf8==sjis_xlate[k].utf8) {
-					os9x_nickname[j++]=sjis_xlate[k].sjis>>8;
-					os9x_nickname[j++]=sjis_xlate[k].sjis&0xFF;
-					break;
-				}
+			if ((c & 0x80) == 0x00) {
+				utf8 = c;
+				bytes = 1;
+			} else if ((c & 0xE0) == 0xC0) {
+				utf8 = (c << 8) | (unsigned char)sVal[i+1];
+				bytes = 2;
+			} else if ((c & 0xF0) == 0xE0) {
+				utf8 = (c << 16) | ((unsigned char)sVal[i+1] << 8) | (unsigned char)sVal[i+2];
+				bytes = 3;
+			} else if ((c & 0xF8) == 0xF0) {
+				bytes = 4;
+			} else {
+				bytes = 1;
 			}
+
+			// protect against malformed UTF-8 bypassing null terminator
+			int valid = 1;
+			for (int b = 1; b < bytes; b++) {
+				if (sVal[i+b] == '\0') { valid = 0; break; }
+			}
+
+			if (valid) {
+				if (bytes == 1) {
+					os9x_nickname[j++] = utf8;
+				} else if (bytes > 1 && bytes <= 3) {
+					int found = 0;
+					int k;
+					for (k = 0; k < sjis_xlate_entries; k++) {
+						if (utf8 == sjis_xlate[k].utf8) {
+							if (sjis_xlate[k].sjis > 0xFF) {
+								os9x_nickname[j++] = sjis_xlate[k].sjis >> 8;
+								os9x_nickname[j++] = sjis_xlate[k].sjis & 0xFF;
+							} else {
+								os9x_nickname[j++] = sjis_xlate[k].sjis & 0xFF;
+							}
+							found = 1;
+							break;
+						}
+					}
+					if (!found) os9x_nickname[j++] = '?';
+				}
+			} else {
+				break; // malformed at end of string
+			}
+			i += bytes;
 		}
 		os9x_nickname[j]=0;
 	}

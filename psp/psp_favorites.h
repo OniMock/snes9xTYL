@@ -11,7 +11,7 @@
  * ============================================================ */
 
 /* Maximum number of favorite ROMs that can be stored. */
-#define FAV_MAX_ENTRIES  30
+#define FAV_MAX_ENTRIES  1000
 
 /* Maximum length for a single ROM path (matches MAXPATH in filer.c). */
 #define FAV_PATH_MAX     256

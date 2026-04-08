@@ -46,6 +46,7 @@
 #include "homehook.h"
 
 #include "cptbl.h"
+#include "psp_favorites.h"
 
 #define TITLE_COL ((31)|(26<<5)|(31<<10))
 #define PATH_COL ((31)|(24<<5)|(28<<10))
@@ -1652,7 +1653,15 @@ static int menu_clockspeed(char *mode) {
 static int menu_favorites(char *mode) {
 	extern int in_favorites_view;
 	extern int os9x_getnewfile;
+	extern char LaunchDir[256];
 	if (mode) { mode[0] = 0; return 0; }
+	
+	fav_init(LaunchDir);
+	if (fav_get_count() == 0) {
+		msgBoxLines(s9xTYL_msg[INFO_NO_FAV_GAMES], 30);
+		return 0;
+	}
+
 	in_favorites_view = 1;
 	os9x_getnewfile = 1;
 	return 1;

@@ -403,8 +403,14 @@ static void getFilesFromFavorites() {
 		}
 	}
 	/* Sort favorites alphabetically. */
-	if (nfiles > 0)
+	if (nfiles > 0) {
 		qsort(files, nfiles, sizeof(SceIoDirent), cmpDirent);
+	} else {
+		/* If there are no favorites, add a parent dir entry to avoid crash */
+		strcpy(files[0].d_name, "..");
+		files[0].d_stat.st_attr = TYPE_DIR;
+		nfiles = 1;
+	}
 }
 
 int getFilePath(char *out,int can_exit) {
@@ -716,12 +722,17 @@ int getFilePath(char *out,int can_exit) {
 
 
 
-		if(top > nfiles-rows)	top=nfiles-rows;
-		if(top < 0)				top=0;
-		if(sel >= nfiles)		sel=0;
-		if(sel < 0)				sel=nfiles-1;
-		if(sel >= top+rows)		top=sel-rows+1;
-		if(sel < top)			top=sel;
+		if (nfiles > 0) {
+			if(top > nfiles-rows)	top=nfiles-rows;
+			if(top < 0)				top=0;
+			if(sel >= nfiles)		sel=0;
+			if(sel < 0)				sel=nfiles-1;
+			if(sel >= top+rows)		top=sel-rows+1;
+			if(sel < top)			top=sel;
+		} else {
+			sel = 0;
+			top = 0;
+		}
 
         if(bMsg) {
           mh_print(1,0,FilerMsg,TITLE_COL);
@@ -756,11 +767,15 @@ int getFilePath(char *out,int can_exit) {
 			int favorite = 0;
 
 			if (in_favorites_view) {
-				favorite = 1;
-				const char *pFilename = strrchr(files[top+i].d_name, '/');
-				if (pFilename) pFilename++;
-				else pFilename = files[top+i].d_name;
-				snprintf(display_name, sizeof(display_name), SJIS_STAR " %s", pFilename);
+				favorite = (strcmp(files[top+i].d_name, "..") == 0) ? 0 : 1;
+				if (!favorite) {
+					snprintf(display_name, sizeof(display_name), "  %s", s9xTYL_msg[FILER_STATUS_PARDIR]);
+				} else {
+					const char *pFilename = strrchr(files[top+i].d_name, '/');
+					if (pFilename) pFilename++;
+					else pFilename = files[top+i].d_name;
+					snprintf(display_name, sizeof(display_name), SJIS_STAR " %s", pFilename);
+				}
 			} else {
 				char full_path[MAXPATH];
 				if (files[top+i].d_stat.st_attr == TYPE_FILE) {

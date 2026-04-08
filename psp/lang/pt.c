@@ -32,6 +32,7 @@
     [INFO_LOADING_FILES] = "Carregando arquivos: %d...",
     [INFO_FAV_ADDED] = "Adicionado aos Favoritos",
     [INFO_FAV_REMOVED] = "Removido dos Favoritos",
+    [INFO_NO_FAV_GAMES] = "Nenhum jogo favoritado ainda!",
     // filer
     [FILER_STATUS_CANEXIT1] =
         "%s Iniciar " SJIS_SQUARE " Usar config. padrão " SJIS_STAR

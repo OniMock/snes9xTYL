@@ -93,8 +93,38 @@
 #include <string.h>
 #include "snes9x.h"
 #include "memmap.h"
-#include "debug.h"
-#include "cpuexec.h"
+#include "imageio.h"
+static IMAGE* g_imgCoffeeScroll = NULL;
+static int g_qr_line_start = -1;
+#include "psp_msg.h"
+#include "homehook.h"
+
+// Helper to draw a slice of an image for the scroller
+void image_put_slice(int x0, int y0, IMAGE* img, int slice_y, int slice_h, int sz) {
+	if (!img || !img->pixels) return;
+	unsigned short *dst;
+	unsigned char* src = (unsigned char*)img->pixels;
+	int r, g, b;
+	int x, y;
+
+	// Jump to the start of the slice in the source image
+	// Assuming 24-bit (3 bytes per pixel)
+	int row_size = img->width * 3;
+	src += (slice_y * row_size);
+
+	for (y = 0; y < slice_h; y++) {
+		if (slice_y + y >= img->height) break;
+		dst = (unsigned short *)pgGetVramAddr(x0, y0 + y * sz / 256);
+		unsigned char* current_src = src + (y * row_size);
+		for (x = 0; x < img->width; x++) {
+			r = *current_src++; g = *current_src++; b = *current_src++;
+			// S9x font style background is transparent (index 0)
+			dst[x * sz / 256] = ((b >> 3) << 10) | ((g >> 3) << 5) | (r >> 3);
+		}
+	}
+}
+
+extern const unsigned char support_qr_coffee[];
 #include "ppu.h"
 #include "snapshot.h"
 #include "apu.h"
@@ -3046,7 +3076,7 @@ int scroll_message(char **msg_lines, int lines, int start_pos, int intro_message
 		//cheap scroller, using 3 screens
 
 		srctxt=(u16*)(0x44000000+(512*272*3)*2);
-		memset(srctxt,0x0,272*512*2*2);
+		memset(srctxt,0x0,297*512*2*2);
 		for (i=0;(i<lines)&&(i<27);i++) if (msg_lines[i]) {
 			if (intro_message) {
 				if (i<(lines-2)) col1=0xffff;
@@ -3054,9 +3084,9 @@ int scroll_message(char **msg_lines, int lines, int start_pos, int intro_message
 				else col1=31|(10<<5)|(10<<10);
 			} else col1=31|(31<<5)|(31<<10);
 
-			mh_printLimit(0,i*10+272*3,480,272*5,msg_lines[i],col1);
+			mh_printLimit(0,i*11+272*3,480,272*5,msg_lines[i],col1);
 		}
-		for (i=0;i<270*512*2;i++) {
+		for (i=0;i<297*512*2;i++) {
 			if (!(srctxt[i])) srctxt[i]=0xFFFF;
 		}
 
@@ -3124,32 +3154,33 @@ int scroll_message(char **msg_lines, int lines, int start_pos, int intro_message
 		scroll_accel=0;
 		scroll_speed=1;
 		pad_val=0;
-		end_pos=(lines-26)*10;
+		end_pos=(lines-24)*11;
 		if (end_pos<0) end_pos=0;
 
 		while (!exit_message) {
 
-			fakedpos=pos%270;
+			fakedpos=pos%297;
 
 			if (oldpos!=pos) {
 				//scroll down / scroll down
-				if (abs(oldpos-pos)>9) {
-					pos=(pos/10)*10;
-					fakedpos=pos%270;
-					i=pos/10;
-					j=fakedpos/10;
-					srctxt=(u16*)(0x44000000+(512*(272*3+ j*10) )*2);
-					memset(srctxt,0x0,272*512*2);
+				if (abs(oldpos-pos)>10) {
+					pos=(pos/11)*11;
+					fakedpos=pos%297;
+					i=pos/11;
+					j=fakedpos/11;
+					srctxt=(u16*)(0x44000000+(512*(272*3+ j*11) )*2);
+					memset(srctxt,0x0,297*512*2);
 
 					savedf=pg_drawframe;
 					pg_drawframe=0;
-					for (l=i;(l<lines)&&(l<i+27);l++,j++) if (msg_lines[l]) {
+					for (l=i;(l<i+27);l++,j++) if (l < lines && msg_lines[l]) {
+						col1 = 31|(31<<5)|(31<<10);
 						if (intro_message) {
-							if (l<(lines-2)) col1=0xffff;
-							else if (l==(lines-2)) col1=10|(31<<5)|(10<<10);
-							else col1=31|(10<<5)|(10<<10);
-						} else col1=31|(31<<5)|(31<<10);
-						mh_printLimit(0,j*10+272*3,480,272*5,msg_lines[l],col1);
+							if (strstr(msg_lines[l], "Yes:")) col1 = (0|(31<<5)|(0<<10));
+							else if (strstr(msg_lines[l], "No:")) col1 = (31|(0<<5)|(0<<10));
+							else col1 = 0xffff;
+						}
+						mh_printLimit(0,j*11+272*3,480,272*5,msg_lines[l],col1);
 						//highlight searched string by drawing over a string with non searched part blanked
 						if (found==l) {
 							char *p,*q;
@@ -3161,52 +3192,55 @@ int scroll_message(char **msg_lines, int lines, int start_pos, int intro_message
 							}
 							while (*p) *p++=' ';
 							col1=10|(10<<5)|(31<<10);
-							mh_printLimit(0,j*10+272*3,480,272*5,str_tmp,col1);
+							mh_printLimit(0,j*11+272*3,480,272*5,str_tmp,col1);
 						}
 					}
 					pg_drawframe=savedf;
-					for (i=0;i<270*512;i++) {
+					for (i=0;i<297*512;i++) {
 						if (!(srctxt[i])) srctxt[i]=0xFFFF;
 					}
 					if (fakedpos) {
 						srctxt=(u16*)(0x44000000+(512*(272*3+ fakedpos) )*2);
-						srctxt2=(u16*)(0x44000000+(512*(272*3+ 270+fakedpos) )*2);
-						memcpy(srctxt2,srctxt,(270-fakedpos)*512*2);
+						srctxt2=(u16*)(0x44000000+(512*(272*3+ 297+fakedpos) )*2);
+						memcpy(srctxt2,srctxt,(297-fakedpos)*512*2);
 
-						srctxt=(u16*)(0x44000000+(512*(272*3+ 270) )*2);
+						srctxt=(u16*)(0x44000000+(512*(272*3+ 297) )*2);
 						srctxt2=(u16*)(0x44000000+(512*(272*3+ 0) )*2);
-						memcpy(srctxt2,srctxt,(270-fakedpos)*512*2);
+						memcpy(srctxt2,srctxt,(297-fakedpos)*512*2);
 					} else {
 						srctxt=(u16*)(0x44000000+(512*(272*3)*2));
-						srctxt2=(u16*)(0x44000000+(512*(272*3+ 270) )*2);
-						memcpy(srctxt2,srctxt,270*512*2);
+						srctxt2=(u16*)(0x44000000+(512*(272*3+ 297) )*2);
+						memcpy(srctxt2,srctxt,297*512*2);
 					}
 				}
-				i=pos/10+(oldpos>pos?0:27);
-				j=fakedpos/10+(oldpos>pos?0:27);
-				l=fakedpos/10+(oldpos>pos?27:0);
+				i=pos/11+(oldpos>pos?0:27);
+				j=fakedpos/11+(oldpos>pos?0:27);
+				l=fakedpos/11+(oldpos>pos?27:0);
+				srctxt=(u16*)(0x44000000+(512*(272*3+ j*11) )*2);
+				srctxt2=(u16*)(0x44000000+(512*(272*3+l*11 ))*2);
+				memset(srctxt,0x00,512*11*2); // Clear exactly 11px (to match descenders)
+
 				if (i<lines) {
 					if (intro_message) {
-						if (i<(lines-2)) col1=0xffff;
-						else if (i==(lines-2)) col1=10|(31<<5)|(10<<10);
-						else col1=31|(10<<5)|(10<<10);
-					} else col1=31|(31<<5)|(31<<10);
+						if (msg_lines[i]) {
+							if (strstr(msg_lines[i], "Yes:")) col1 = (0|(31<<5)|(0<<10)); // Green
+							else if (strstr(msg_lines[i], "No:")) col1 = (31|(0<<5)|(0<<10)); // Red
+							else col1 = 0xffff; // White
+						} else col1 = 31|(31<<5)|(31<<10);
+					} else col1 = 31|(31<<5)|(31<<10);
 
-					srctxt=(u16*)(0x44000000+(512*(272*3+ j*10) )*2);
-					srctxt2=(u16*)(0x44000000+(512*(272*3+l*10 ))*2);
-					memset(srctxt,0x00,512*11*2);
 					if (msg_lines[i]) {
-						savedf=pg_drawframe;
-						pg_drawframe=0;
-						mh_printLimit(0,j*10+272*3,480,272*5,msg_lines[i],col1);
-						pg_drawframe=savedf;
+						savedf = pg_drawframe;
+						pg_drawframe = 0;
+						mh_printLimit(0, j * 11 + 272 * 3, 480, 272 * 5, msg_lines[i], col1);
+						pg_drawframe = savedf;
 					}
-					for (j=0;j<11*512;j++) {
-						if (!(srctxt[j])) srctxt[j]=0xFFFF;
-						//if (!(srctxt2[j])) srctxt2[j]=0xFFFF;
-					}
-					memcpy(srctxt2,srctxt,512*11*2);
 				}
+
+				for (int _j=0;_j<11*512;_j++) {
+					if (!(srctxt[_j])) srctxt[_j]=0xFFFF;
+				}
+				memcpy(srctxt2,srctxt,512*11*2);
 			}
 
 			oldpos=pos;
@@ -3237,7 +3271,7 @@ int scroll_message(char **msg_lines, int lines, int start_pos, int intro_message
 			sceGuEnable(GU_ALPHA_TEST);
 			sceGuAlphaFunc(GU_EQUAL,0,0x1);
 
-			sceGuScissor(0,12,480,259);
+			sceGuScissor(0,12,480,247); // Correctly sets height so text stops drawing before hitting the y=259 bottom bezel
 			srctxt=(u16*)(0x44000000+(512*(272*3+fakedpos))*2);
 			sceGuTexImage(0,512,512,512,(u8*)srctxt);
 			sceGuDrawArray(GU_SPRITES,GU_TEXTURE_16BIT|GU_VERTEX_16BIT|GU_TRANSFORM_2D,2,0,vertices);
@@ -3245,9 +3279,30 @@ int scroll_message(char **msg_lines, int lines, int start_pos, int intro_message
 			sceGuFinish();
 			sceGuSync(0,0);
 
+			if (g_imgCoffeeScroll && g_qr_line_start != -1) {
+				int qr_y = 12 + (g_qr_line_start * 11) - pos;
+				int screen_y_min = 12;
+				int screen_y_max = 247 - 1; 
+				
+				int slice_y_start = 0;
+				int slice_h = g_imgCoffeeScroll->height;
+				
+				if (qr_y < screen_y_min) {
+					slice_y_start = screen_y_min - qr_y;
+					slice_h -= slice_y_start;
+					qr_y = screen_y_min;
+				}
+				if (qr_y + slice_h > screen_y_max) {
+					slice_h = screen_y_max - qr_y;
+				}
+				
+				if (slice_h > 0 && qr_y < screen_y_max) {
+					image_put_slice(176, qr_y, g_imgCoffeeScroll, slice_y_start, slice_h, 256);
+				}
+			}
 
 			//memset(pgGetVramAddr(0,272-10),0,512*10*2);
-			sprintf(str_tmp, s9xTYL_msg[SCROLL_STATUS_0], pos / 10 + 26, lines, (pos / 10 + 26) / 27, lines / 27);
+			sprintf(str_tmp, s9xTYL_msg[SCROLL_STATUS_0], pos / 11 + 24, lines, (pos / 11 + 24) / 27, lines / 27);
 			mh_print(0,272-10,str_tmp,((31)|(28<<5)|(31<<10)));
 
 			sceDisplayWaitVblankStart();
@@ -3272,7 +3327,7 @@ int scroll_message(char **msg_lines, int lines, int start_pos, int intro_message
 					} else {
 						scroll_speed=0;scroll_accel=0;
 					}
-					pos+=5*27*scroll_speed;
+					pos+=5*24*scroll_speed;
 					if (pos>=end_pos) pos=end_pos;
 					break;
 				} else if ((pad_val&PSP_CTRL_LTRIGGER)&&(pos>0)) {
@@ -3284,7 +3339,7 @@ int scroll_message(char **msg_lines, int lines, int start_pos, int intro_message
 					} else {
 						scroll_speed=0;scroll_accel=0;
 					}
-					pos-=5*27*scroll_speed;
+					pos-=5*24*scroll_speed;
 					if (pos<0) pos=0;
 					break;
 				} else if ((pad_val&PSP_CTRL_DOWN)&&(pos<end_pos)) {
@@ -3314,13 +3369,13 @@ int scroll_message(char **msg_lines, int lines, int start_pos, int intro_message
 				} else if ((ly>=128+40)&&(pos<end_pos)) {
 					int r=ly-128;
 					if (r<127) pos+= r/16;
-					else pos += 270;
+					else pos += 264;
 					if (pos>end_pos) pos=end_pos;
 					break;
 				} else if ((ly<=128-20)&&(pos>0)) {
 					int r=128-ly;
 					if (r<127) pos-= r/16;
-					else pos -= 270;
+					else pos -= 264;
 					if (pos<0) pos=0;
 					break;
 				}
@@ -3350,11 +3405,11 @@ int scroll_message(char **msg_lines, int lines, int start_pos, int intro_message
 							if (tofind[0]) {
 								msgBoxLines(s9xTYL_msg[SCROLL_SEARCHING], 0);
 								strcpy(tofind,strupr(tofind));
-								j=pos/10-1;
+								j=pos/11-1;
 								if (j<0) j=0;
 								for (i=j;i<lines;i++)
 									if (msg_lines[i]) {
-										if (strstr(strupr(msg_lines[i]),tofind)) {found=i;pos=(i-2)*10;if (pos<0) pos=0;break;}
+										if (strstr(strupr(msg_lines[i]),tofind)) {found=i;pos=(i-2)*11;if (pos<0) pos=0;break;}
 									}
 							}
 							if (!found) msgBoxLines(s9xTYL_msg[SCROLL_STRNOTFOUND], 30);
@@ -3362,7 +3417,7 @@ int scroll_message(char **msg_lines, int lines, int start_pos, int intro_message
 						break;
 					}	else if ((pad_val&os9x_btn_positive_code)&&found) { //search again from position & loop if needed
 						msgBoxLines(s9xTYL_msg[SCROLL_SEARCHING], 0);
-						i=pos/10+2;
+						i=pos/11+2;
 						if (i>=lines) i=0;
 						j=i; //just to be safe, should not be needed
 						for (;;) {
@@ -3370,7 +3425,7 @@ int scroll_message(char **msg_lines, int lines, int start_pos, int intro_message
 							if (i>=lines) i=0;
 							if (i==j) break; //just to be safe, should not be needed
 							if (msg_lines[i]) {
-								if (strstr(strupr(msg_lines[i]),tofind))  {found=i;pos=(i-2)*10;if (pos<0) pos=0;break;}
+								if (strstr(strupr(msg_lines[i]),tofind))  {found=i;pos=(i-2)*11;if (pos<0) pos=0;break;}
 							}
 						}
 						break;
@@ -3400,57 +3455,96 @@ int scroll_message(char **msg_lines, int lines, int start_pos, int intro_message
 //
 ////////////////////////////////////////////////////////////////////////////////////////
 static void show_message() {
-#define BLANK_LINES 18
+#define BLANK_LINES 2
 		char *decrypted_message,*p;
 		int message_size;
 		char password[32];
 		char **msg_lines;
 		int i,lines;
 
-
 		strcpy(password,PASSWORD_XORED);
 		message_size=sizeof(message);
 		decrypted_message=(char*)malloc(message_size+1);
 		decrypt((char*)message,decrypted_message,message_size,password);
 
-		//pgFillBox(240-150+1,136-60+1,240+150-1,136+50-1,(16<<10)|(10<<5)|7);
-		//pgDrawFrame(240-150,136-60,240+150,136+50,(12<<10)|(8<<5)|5);
+		// Strip trailing padding from encrypted data to prevent gibberish
+		while (message_size > 0 && 
+			   ((unsigned char)decrypted_message[message_size - 1] < 32) &&
+			   decrypted_message[message_size - 1] != '\n' &&
+			   decrypted_message[message_size - 1] != '\r') {
+			decrypted_message[message_size - 1] = 0;
+			message_size--;
+		}
 
-		//prepare message to be diplayed
-
-		//decrypt
 		p=decrypted_message;
 		p[message_size]=0;
+		
+		g_imgCoffeeScroll = load_bmp_buffer((unsigned char*)support_qr_coffee);
+		int qr_space_lines = g_imgCoffeeScroll ? ((g_imgCoffeeScroll->height / 10) + 2) : 15;
+
 		// 'lineify' it
 		lines=0;
+		g_qr_line_start = -1;
 		while (*p) {
 			i=0;
-			//get new line
-			while ((p[i]!=0x0D)&&(p[i])) i++;
-			//if line carriage return, skip it & put a '0' / end of string
-			if (p[i]==0x0D) {
-				p[i]=0;p[i+1]=0; //0x0D 0x0A
-				i+=2;
+			while ((p[i]!=0x0D)&&(p[i]!=0x0A)&&(p[i])) i++;
+			
+			if (strncmp(p, "[QR_COFFEE]", 11) == 0) {
+				lines += qr_space_lines; 
+			} else {
+				lines++;
 			}
-			lines++;
+
+			if (p[i]==0x0D && p[i+1]==0x0A) {
+				p[i]=0;p[i+1]=0; i+=2;
+			} else if (p[i]==0x0D || p[i]==0x0A) {
+				p[i]=0; i+=1;
+			}
 			p=p+i;
 		}
 
 		lines+=BLANK_LINES;
-		msg_lines=(char**)malloc(sizeof(char*)*lines);
-		for (i=0;i<BLANK_LINES ;i++) {
+		
+		msg_lines=(char**)malloc(sizeof(char*)*(lines + 1)); 
+		for (i=0;i<lines + 1 ;i++) {
 			msg_lines[i]=NULL;
 		}
+		
 		p=decrypted_message;
-		for (i=BLANK_LINES ;i<lines;i++){
-			msg_lines[i]=(char*)malloc(strlen(p)+1);
-			strcpy(msg_lines[i],p);
-			p=p+strlen(p)+2;
+		char* decrypted_message_end = decrypted_message + message_size;
+		for (i = BLANK_LINES; i < lines; i++) {
+			if (p >= decrypted_message_end) break;
+			
+			int len = strlen(p);
+			if (len > 0) {
+				if (strcmp(p, "[QR_COFFEE]") == 0) {
+					msg_lines[i] = (char*)malloc(1);
+					msg_lines[i][0] = 0; 
+					g_qr_line_start = i; 
+					i += (qr_space_lines - 1); 
+				} else {
+					msg_lines[i] = (char*)malloc(len + 1);
+					strcpy(msg_lines[i], p);
+				}
+			} else {
+				msg_lines[i] = NULL;
+			}
+			
+			p += len;
+			if (p + 2 <= decrypted_message_end && p[0] == 0 && p[1] == 0) {
+				p += 2;
+			} else if (p + 1 <= decrypted_message_end && p[0] == 0) {
+				p += 1;
+			}
 		}
+		
 		//free decrypted raw message
 		free(decrypted_message);
-
+		
 		scroll_message(msg_lines, lines, 0, 1, s9xTYL_msg[SCROLL_DISCLAIMER]);
+
+		if (g_imgCoffeeScroll) image_free(g_imgCoffeeScroll);
+		g_imgCoffeeScroll = NULL;
 
 		//free 'linified' message
 		for (i=0;i<lines;i++) if (msg_lines[i]) free(msg_lines[i]);

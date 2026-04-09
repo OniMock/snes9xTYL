@@ -6,6 +6,13 @@ Maintained & Modified by:
 OniMock
 
 -----------------------------------------------
+IMPORTANT:
+-----------------------------------------------
+
+Please read this message entirely.
+Use UP/DOWN to scroll through all sections.
+
+-----------------------------------------------
 Proper Credits:
 -----------------------------------------------
 - Original Snes9x Team
@@ -19,15 +26,53 @@ Proper Credits:
 - Previous contributors & donators
 
 -----------------------------------------------
+License Notice:
+-----------------------------------------------
+Snes9x is freeware for PERSONAL USE only.
+
+Permission to use, copy, modify and distribute
+this software for non-commercial purposes is
+granted, provided that this notice and credits
+are preserved.
+
+This software is provided "as-is", without any
+warranty. The authors are not responsible for
+any damages arising from its use.
+
+-----------------------------------------------
 About this version:
 -----------------------------------------------
 This version is FREEWARE.
-It includes optimizations, UI improvements,
-and bug fixes while keeping all original features.
+It includes optimizations, UI improvements, and
+bug fixes while keeping all original features.
 
-Support development (optional):
-https://buymeacoffee.com/onimock
+-----------------------------------------------
+Notice:
+-----------------------------------------------
+Bugs, glitches or crashes may occur.
+If you encounter any issue, please report it to:
+OniMock
+Include details so it can be investigated.
+https://github.com/OniMock/snes9xTYL
 
 -----------------------------------------------
 Official homepage of original project:
+http://www.snes9x.com
 http://yoyofr92.free.fr/
+
+-----------------------------------------------
+Support development (optional):
+This project is completely free.
+Donations are optional and do not unlock features.
+
+https://buymeacoffee.com/onimock
+
+[QR_COFFEE]
+
+-----------------------------------------------
+
+
+DO YOU AGREE?
+Yes: press X or O.
+No: press any other buttons.
+

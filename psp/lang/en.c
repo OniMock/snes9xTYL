@@ -315,6 +315,8 @@
 		[MENU_ABOUT_SUPPORT_TITLE] = "Support & Donations:",
 		[MENU_ABOUT_SUPPORT_MSG1] = "If you like my work,",
 		[MENU_ABOUT_SUPPORT_MSG2] = "consider supporting the project!",
+		[MENU_ABOUT_SUPPORT_QR_COFFEE] = "Buy Me a Coffee",
+		[MENU_ABOUT_SUPPORT_QR_WALLET] = "EVM Wallet",
 		[MENU_ICONS_ABOUT_VERSION] = "Version infos",
 
 		[MENU_ABOUT_VERSION_TIMESTAMP] = "Build on %s",

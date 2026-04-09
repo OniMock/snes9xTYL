@@ -1125,6 +1125,12 @@ void mh_printCenter(unsigned long y,const char *str,unsigned long color){
 	mh_print(x,y,str,color);
 }
 
+void mh_printCenterLimit(unsigned long y,const char *str,unsigned long x1,unsigned long x2,unsigned long color){
+	unsigned long len = mh_length(str);
+	unsigned long x = x1 + (x2 - x1 - len) / 2;
+	mh_printLimit(x, y, x2, 272, str, color);
+}
+
 
 
 void pgDrawFrame(unsigned long x1, unsigned long y1, unsigned long x2, unsigned long y2, unsigned long color)

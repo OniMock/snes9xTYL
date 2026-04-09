@@ -404,6 +404,8 @@
     [MENU_ABOUT_SUPPORT_TITLE] = "Suporte & Doações:",
     [MENU_ABOUT_SUPPORT_MSG1] = "Se você gosta do meu trabalho,",
     [MENU_ABOUT_SUPPORT_MSG2] = "considere apoiar o projeto!",
+    [MENU_ABOUT_SUPPORT_QR_COFFEE] = "Pague-me um Café",
+    [MENU_ABOUT_SUPPORT_QR_WALLET] = "Carteira EVM",
     [MENU_ICONS_ABOUT_VERSION] = "Informações da versão",
 
     [MENU_ABOUT_VERSION_TIMESTAMP] = "Compilado em %s",

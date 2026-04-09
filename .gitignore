@@ -21,3 +21,6 @@ log
 
 #Agent
 .agents
+
+#Assets
+/assets

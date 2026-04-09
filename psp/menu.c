@@ -38,6 +38,8 @@
 #include "os9xZ_openspc.h"
 
 #include "img_jpeg.h"
+#include "imageio.h"
+
 
 #include "help_data.c"
 
@@ -3492,6 +3494,12 @@ static int menu_credits(char *mode) {
 	if (!menu_music) menu_startmusic();
 	for (;;) {
 		menu_basic(2+to_exit);
+		if (menu_panel_pos < 479) {
+			// Add 3 extra passes to make it ~94% dark (90% of 50% logic)
+			pgFillBoxHalfer(menu_panel_pos, 14, 479, 272 - 15);
+			pgFillBoxHalfer(menu_panel_pos, 14, 479, 272 - 15);
+			pgFillBoxHalfer(menu_panel_pos, 14, 479, 272 - 15);
+		}
 		if (!g_bLoop) {retval=1;break;}
 
 		mh_printLimit(menu_panel_pos+5,15,479,272,"Code: YoyoFR, Laxer3a",CODE_COL);
@@ -3544,37 +3552,103 @@ static int menu_credits(char *mode) {
 	return retval;
 }
 
+#include "support_res.c"
+
 static int menu_support(char *mode) {
 	int retval=0;
 	int to_exit=0;
+	IMAGE *imgCoffee = NULL, *imgWallet = NULL;
+	int target_pos = 120; // 1.8x wider than standard 280
+	int text_len;
+
 	if (mode) {mode[0]=0;return 0;}
 
-	menu_panel_pos=479;
-	menu_cnt2=0;
+	// Load assets from embedded C arrays
+	imgCoffee = load_bmp_buffer((unsigned char *)support_qr_coffee);
+	imgWallet = load_bmp_buffer((unsigned char *)support_qr_wallet);
+
+	menu_panel_pos = 479;
+	menu_cnt2 = 0;
 
 	for (;;) {
-		menu_basic(2+to_exit);
+		// menu_basic(1) handles logic/bg/input without standard side panel
+		menu_basic(1);
 		if (!g_bLoop) {retval=1;break;}
 
-		mh_printLimit(menu_panel_pos+5,15,479,272,s9xTYL_msg[MENU_ABOUT_SUPPORT_FOLLOW],CODE_COL);
-		mh_printLimit(menu_panel_pos+5,25,479,272,s9xTYL_msg[MENU_ABOUT_SUPPORT_URL],GFX_COL);
+		// Manual animation override for wider panel
+		if (to_exit) {
+			if (menu_panel_pos < 479) {
+				menu_panel_pos = 479 - roundf((479 - target_pos) * powf(cosf(3.14159 * menu_cnt2 / 12), 3));
+				if (menu_panel_pos > 479) menu_panel_pos = 479;
+			} else break;
+		} else {
+			if (menu_panel_pos > target_pos) {
+				menu_panel_pos = 479 - roundf((479 - target_pos + 10) * powf(sinf(3.14159 * menu_cnt2 / 12), 3));
+				if (menu_panel_pos < target_pos) menu_panel_pos = target_pos;
+			}
+		}
 
-		mh_printLimit(menu_panel_pos+5,50,479,272,s9xTYL_msg[MENU_ABOUT_SUPPORT_TITLE],GREETINGS0_COL);
-		mh_printLimit(menu_panel_pos+5,65,479,272,s9xTYL_msg[MENU_ABOUT_SUPPORT_MSG1],GREETINGS_COL);
-		mh_printLimit(menu_panel_pos+5,75,479,272,s9xTYL_msg[MENU_ABOUT_SUPPORT_MSG2],GREETINGS_COL);
+		if (menu_panel_pos < 479) {
+			// Apply 4 passes of pgFillBoxHalfer for premium dark overlay (~94% dark)
+			pgFillBoxHalfer(menu_panel_pos, 14, 479, 272 - 15);
+			pgFillBoxHalfer(menu_panel_pos, 14, 479, 272 - 15);
+			pgFillBoxHalfer(menu_panel_pos, 14, 479, 272 - 15);
+			pgFillBoxHalfer(menu_panel_pos, 14, 479, 272 - 15);
+			
+			// Draw panel border frames
+			pgDrawFrame(menu_panel_pos - 1, 14, menu_panel_pos - 1, 272 - 15, 12 | (12 << 5) | (12 << 10));
+			pgDrawFrame(menu_panel_pos - 2, 14, menu_panel_pos - 2, 272 - 15, 24 | (24 << 5) | (24 << 10));
+			pgDrawFrame(menu_panel_pos - 3, 14, menu_panel_pos - 3, 272 - 15, 31 | (31 << 5) | (31 << 10));
 
-    if (to_exit) {
-    	if (menu_panel_pos>=479) break;
-    } else {
-    	if (new_pad&(os9x_btn_negative_code|PSP_CTRL_LEFT)) {
-    		os9x_beep1();
-    		to_exit=1;
-    		menu_cnt2=0;
-    	} SNAPSHOT_CODE()
-    }
-    //swap screen
+			// Top descriptive text
+			mh_printLimit(menu_panel_pos + 10, 20, 470, 272, s9xTYL_msg[MENU_ABOUT_SUPPORT_FOLLOW], CODE_COL);
+			mh_printLimit(menu_panel_pos + 10, 32, 470, 272, s9xTYL_msg[MENU_ABOUT_SUPPORT_URL], GFX_COL);
+			mh_printLimit(menu_panel_pos + 10, 50, 470, 272, s9xTYL_msg[MENU_ABOUT_SUPPORT_TITLE], GREETINGS0_COL);
+			mh_printLimit(menu_panel_pos + 10, 65, 470, 272, s9xTYL_msg[MENU_ABOUT_SUPPORT_MSG1], GREETINGS_COL);
+			mh_printLimit(menu_panel_pos + 10, 77, 470, 272, s9xTYL_msg[MENU_ABOUT_SUPPORT_MSG2], GREETINGS_COL);
+
+			int panel_mid = (menu_panel_pos + 480) / 2;
+			// Vertical Divisor at panel center
+			if (panel_mid > menu_panel_pos + 40) {
+				pgDrawFrame(panel_mid, 100, panel_mid, 240, 15 | (15 << 5) | (15 << 10));
+			}
+
+			// Column 1 Layout: Buy Me a Coffee
+			text_len = mh_length(s9xTYL_msg[MENU_ABOUT_SUPPORT_QR_COFFEE]);
+			mh_printLimit(menu_panel_pos + (panel_mid - menu_panel_pos - text_len) / 2, 105, panel_mid, 272, s9xTYL_msg[MENU_ABOUT_SUPPORT_QR_COFFEE], GREETINGS0_COL);
+			if (imgCoffee) {
+				image_put(menu_panel_pos + (panel_mid - menu_panel_pos - imgCoffee->width) / 2, 125, imgCoffee, 0, 0, -1, 256);
+			} else {
+				text_len = mh_length("[ERR: EMBEDDED NULL]");
+				mh_printLimit(menu_panel_pos + (panel_mid - menu_panel_pos - text_len) / 2, 160, panel_mid, 272, "[ERR: EMBEDDED NULL]", (31 << 0));
+			}
+
+			// Column 2 Layout: EVM Wallet
+			text_len = mh_length(s9xTYL_msg[MENU_ABOUT_SUPPORT_QR_WALLET]);
+			mh_printLimit(panel_mid + (480 - panel_mid - text_len) / 2, 105, 480, 272, s9xTYL_msg[MENU_ABOUT_SUPPORT_QR_WALLET], GREETINGS0_COL);
+			if (imgWallet) {
+				image_put(panel_mid + (480 - panel_mid - imgWallet->width) / 2, 125, imgWallet, 0, 0, -1, 256);
+			} else {
+				text_len = mh_length("[ERR: EMBEDDED NULL]");
+				mh_printLimit(panel_mid + (480 - panel_mid - text_len) / 2, 160, 480, 272, "[ERR: EMBEDDED NULL]", (31 << 0));
+			}
+		}
+
+		if (!to_exit) {
+			if (new_pad & (os9x_btn_negative_code | PSP_CTRL_LEFT)) {
+				os9x_beep1();
+				to_exit = 1;
+				menu_cnt2 = 0;
+			}
+			SNAPSHOT_CODE()
+		}
+
 		pgScreenFlipV2();
 	}
+
+	// Dynamic memory cleanup
+	if (imgCoffee) image_free(imgCoffee);
+	if (imgWallet) image_free(imgWallet);
 
 	return retval;
 }

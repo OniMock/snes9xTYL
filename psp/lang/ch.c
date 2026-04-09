@@ -314,6 +314,8 @@
 		[MENU_ABOUT_SUPPORT_TITLE] = "支持与捐赠:",
 		[MENU_ABOUT_SUPPORT_MSG1] = "如果你喜欢我的工作，",
 		[MENU_ABOUT_SUPPORT_MSG2] = "请考虑支持该项目！",
+    [MENU_ABOUT_SUPPORT_QR_COFFEE] = "Buy Me a Coffee",
+		[MENU_ABOUT_SUPPORT_QR_WALLET] = "EVM Wallet",
 
 		[MENU_ICONS_ABOUT_VERSION] = "版本信息",
 

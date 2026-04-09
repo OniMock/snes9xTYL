@@ -3608,29 +3608,30 @@ static int menu_support(char *mode) {
 			mh_printLimit(menu_panel_pos + 10, 77, 470, 272, s9xTYL_msg[MENU_ABOUT_SUPPORT_MSG2], GREETINGS_COL);
 
 			int panel_mid = (menu_panel_pos + 480) / 2;
-			// Vertical Divisor at panel center
-			if (panel_mid > menu_panel_pos + 40) {
+			// Vertical Divisor and QR contents appear only after animation finishes
+			if (menu_panel_pos == target_pos) {
+				// Vertical Divisor at panel center
 				pgDrawFrame(panel_mid, 100, panel_mid, 240, 15 | (15 << 5) | (15 << 10));
-			}
 
-			// Column 1 Layout: Buy Me a Coffee
-			text_len = mh_length(s9xTYL_msg[MENU_ABOUT_SUPPORT_QR_COFFEE]);
-			mh_printLimit(menu_panel_pos + (panel_mid - menu_panel_pos - text_len) / 2, 105, panel_mid, 272, s9xTYL_msg[MENU_ABOUT_SUPPORT_QR_COFFEE], GREETINGS0_COL);
-			if (imgCoffee) {
-				image_put(menu_panel_pos + (panel_mid - menu_panel_pos - imgCoffee->width) / 2, 125, imgCoffee, 0, 0, -1, 256);
-			} else {
-				text_len = mh_length("[ERR: EMBEDDED NULL]");
-				mh_printLimit(menu_panel_pos + (panel_mid - menu_panel_pos - text_len) / 2, 160, panel_mid, 272, "[ERR: EMBEDDED NULL]", (31 << 0));
-			}
+				// Column 1 Layout: Buy Me a Coffee
+				text_len = mh_length(s9xTYL_msg[MENU_ABOUT_SUPPORT_QR_COFFEE]);
+				mh_printLimit(menu_panel_pos + (panel_mid - menu_panel_pos - text_len) / 2, 105, panel_mid, 272, s9xTYL_msg[MENU_ABOUT_SUPPORT_QR_COFFEE], GREETINGS0_COL);
+				if (imgCoffee) {
+					image_put(menu_panel_pos + (panel_mid - menu_panel_pos - imgCoffee->width) / 2, 125, imgCoffee, 0, 0, -1, 256);
+				} else {
+					text_len = mh_length("[ERR: EMBEDDED NULL]");
+					mh_printLimit(menu_panel_pos + (panel_mid - menu_panel_pos - text_len) / 2, 160, panel_mid, 272, "[ERR: EMBEDDED NULL]", (31 << 0));
+				}
 
-			// Column 2 Layout: EVM Wallet
-			text_len = mh_length(s9xTYL_msg[MENU_ABOUT_SUPPORT_QR_WALLET]);
-			mh_printLimit(panel_mid + (480 - panel_mid - text_len) / 2, 105, 480, 272, s9xTYL_msg[MENU_ABOUT_SUPPORT_QR_WALLET], GREETINGS0_COL);
-			if (imgWallet) {
-				image_put(panel_mid + (480 - panel_mid - imgWallet->width) / 2, 125, imgWallet, 0, 0, -1, 256);
-			} else {
-				text_len = mh_length("[ERR: EMBEDDED NULL]");
-				mh_printLimit(panel_mid + (480 - panel_mid - text_len) / 2, 160, 480, 272, "[ERR: EMBEDDED NULL]", (31 << 0));
+				// Column 2 Layout: EVM Wallet
+				text_len = mh_length(s9xTYL_msg[MENU_ABOUT_SUPPORT_QR_WALLET]);
+				mh_printLimit(panel_mid + (480 - panel_mid - text_len) / 2, 105, 480, 272, s9xTYL_msg[MENU_ABOUT_SUPPORT_QR_WALLET], GREETINGS0_COL);
+				if (imgWallet) {
+					image_put(panel_mid + (480 - panel_mid - imgWallet->width) / 2, 125, imgWallet, 0, 0, -1, 256);
+				} else {
+					text_len = mh_length("[ERR: EMBEDDED NULL]");
+					mh_printLimit(panel_mid + (480 - panel_mid - text_len) / 2, 160, 480, 272, "[ERR: EMBEDDED NULL]", (31 << 0));
+				}
 			}
 		}
 

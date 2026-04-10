@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: pspdev/pspdev:latest
-    
+
     strategy:
       fail-fast: false
       matrix:
@@ -28,7 +28,7 @@ jobs:
             artifact_name: snes9xTYLcm_mod
             needs_me_prx: false
             needs_homehook_prx: false
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -108,7 +108,7 @@ jobs:
         run: |
           DEST="artifact/${{ matrix.artifact_name }}"
           mkdir -p "$DEST/DATA"
-          
+
           # === EBOOT.PBP ===
           EBOOT_PATH=$(find . -name "EBOOT.PBP" -type f | head -1)
           if [ -n "$EBOOT_PATH" ]; then
@@ -129,7 +129,7 @@ jobs:
                 "$SFO_PATH" data/icon0.png NULL NULL NULL NULL "$DATA_FILE" NULL
             fi
           fi
-          
+
           # === mediaengine.prx (ME variant only) ===
           if [ "${{ matrix.needs_me_prx }}" = "true" ]; then
             ME_PRX=$(find . -name "mediaengine.prx" -type f | head -1)
@@ -141,7 +141,7 @@ jobs:
               exit 1
             fi
           fi
-          
+
           # === homehook.prx ===
           if [ "${{ matrix.needs_homehook_prx }}" = "true" ]; then
             HH_PRX=$(find . -name "homehook.prx" -type f | head -1)
@@ -153,7 +153,7 @@ jobs:
               exit 1
             fi
           fi
-          
+
           # === DATA/snesadvance.dat (speed hacks database) ===
           if [ -f "data/snesadvance.dat" ]; then
             echo "✓ Copying snesadvance.dat"
@@ -161,7 +161,7 @@ jobs:
           else
             echo "⚠ WARNING: data/snesadvance.dat not found (speed hacks won't work)"
           fi
-          
+
           # === Final artifact contents ===
           echo ""
           echo "========================================="
@@ -176,3 +176,119 @@ jobs:
           name: ${{ matrix.artifact_name }}
           path: artifact/${{ matrix.artifact_name }}/
           if-no-files-found: warn
+
+  release:
+    name: Create GitHub Release
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # ----------------------------------------
+      # 🔢 Get version from makefile_multi
+      # ----------------------------------------
+      - name: Get project version
+        id: get_version
+        run: |
+          VERSION=$(grep -E '^PROJECT_VERSION' makefile_multi | cut -d '=' -f2 | xargs)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=v$VERSION" >> $GITHUB_OUTPUT
+          echo "Tag to be used: v$VERSION"
+
+      # ----------------------------------------
+      # 🏷️ Check if tag exists
+      # ----------------------------------------
+      - name: Check if tag exists
+        id: check_tag
+        run: |
+          git fetch --tags
+          if git tag -l "${{ steps.get_version.outputs.tag }}" | grep -q .; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "Tag already exists. Skipping release."
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      # ----------------------------------------
+      # 📦 Install zip
+      # ----------------------------------------
+      - name: Install zip
+        if: steps.check_tag.outputs.exists == 'false'
+        run: sudo apt-get update && sudo apt-get install -y zip
+
+      # ----------------------------------------
+      # 📥 Download artifacts
+      # ----------------------------------------
+      - name: Download all artifacts
+        if: steps.check_tag.outputs.exists == 'false'
+        uses: actions/download-artifact@v4
+        with:
+          path: release_assets/
+
+      # ----------------------------------------
+      # 📦 Package artifacts
+      # ----------------------------------------
+      - name: Package artifacts into ZIPs
+        if: steps.check_tag.outputs.exists == 'false'
+        run: |
+          cd release_assets
+          for dir in */; do
+            zipname="${dir%/}.zip"
+            echo "Packaging $dir into $zipname"
+            (cd "$dir" && zip -r "../../$zipname" .)
+          done
+          cd ..
+          ls -la *.zip
+
+      # ----------------------------------------
+      # 📝 Generate changelog
+      # ----------------------------------------
+      - name: Generate Changelog
+        if: steps.check_tag.outputs.exists == 'false'
+        uses: orhun/git-cliff-action@v4
+        id: git-cliff
+        with:
+          config: .github/scripts/cliff.toml
+          args: --latest --strip header --tag ${{ steps.get_version.outputs.tag }}
+        env:
+          OUTPUT: CHANGELOG.md
+
+      # ----------------------------------------
+      # 🏷️ Create tag)
+      # ----------------------------------------
+      - name: Create tag
+        if: steps.check_tag.outputs.exists == 'false'
+        run: |
+          git config user.name "onimock-actions"
+          git config user.email "onimock-actions@github.com"
+          git tag ${{ steps.get_version.outputs.tag }}
+          git push origin ${{ steps.get_version.outputs.tag }}
+
+      # ----------------------------------------
+      # 🚀 Create Release
+      # ----------------------------------------
+      - name: Create Release
+        if: steps.check_tag.outputs.exists == 'false'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.get_version.outputs.tag }}
+          name: Snes9xTYL ${{ steps.get_version.outputs.tag }}
+          body: |
+            Snes9xTYL ${{ steps.get_version.outputs.version }}
+
+            Improvements and fixes for stability and performance.
+
+            ${{ steps.git-cliff.outputs.content }}
+          files: |
+            *.zip
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

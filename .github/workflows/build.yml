@@ -35,7 +35,11 @@ jobs:
 
       - name: Install dependencies
         run: |
-          apk add --no-cache build-base zlib-dev
+          apk add --no-cache build-base zlib-dev python3
+
+      - name: Validate Language Keys
+        run: |
+          python3 .github/scripts/check_lang_keys.py
 
       # ---------------------------------------------------------------
       # Build kernel PRX modules BEFORE the main EBOOT

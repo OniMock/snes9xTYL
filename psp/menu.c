@@ -41,7 +41,7 @@
 #include "imageio.h"
 
 
-#include "help_data.c"
+
 
 #include "menu_fx.h"
 
@@ -594,56 +594,76 @@ static int menu_savedefaultsetting(char *mode){
 
 
 typedef struct {
-		char label[64];
+		s32  label_id;           // ID in s9xTYL_msg
+		const char *fallback;    // Static string fallback (e.g. "--------")
 		s32	help_index;
 		int (*menu_func)(char *mode);
 		int	*value_int;
 		int	values_list_size;
 		int values_list[30];
 		int value_index;
-		char *values_list_label[30];
+		const char *values_list_label[30];
 } menu_time_t;
+
+#define GET_LABEL(item) ((item).label_id >= 0 ? s9xTYL_msg[(item).label_id] : ((item).fallback ? (item).fallback : ""))
+
+/** Returns the display label for a menu value (custom, YES/NO, or OFF/ON). */
+static const char* menu_get_value_label(menu_time_t *item, int index) {
+    if (item->values_list_label[index]) return item->values_list_label[index];
+    if (item->values_list_size == 2) {
+        if (item->label_id == INPUT_MENU_ANALOG_MAPPED) {
+             return (index == 0) ? s9xTYL_msg[MENU_YES] : s9xTYL_msg[MENU_NO];
+        }
+        return (index == 0) ? s9xTYL_msg[MENU_OFF] : s9xTYL_msg[MENU_ON];
+    }
+    return NULL;
+}
+
 
 
 int os9x_ignore_fixcol,os9x_ignore_winclip,os9x_ignore_addsub,os9x_ignore_palwrite,
 	os9x_gfx_fastmode7,os9x_fix_hires,os9x_apufix,os9x_old_accel;
 extern int os9x_SFX_overclock;
-#define DEBUGMENU_ITEMS 20
+#define DEBUGMENU_ITEMS 19
 
+/** Debug menu items: toggles and settings for graphics, speed hacks, and rendering options. */
 menu_time_t os9xpsp_debugmenu[DEBUGMENU_ITEMS]={
-	{"Show rendering passes : ", HELP_SHOWPASS, NULL, &os9x_showpass, 2, {0, 1}, 0, {"Off", "On"}},
-	{"--------",-1,NULL,NULL,0,{0},0,{NULL}},
-	{"Speed hacks : ", HELP_APPLYHACKS, NULL, &os9x_applyhacks, 2, {0, 1}, 0, {"Off", "On"}},
-	{"--------",-1,NULL,NULL,0,{0},0,{NULL}},
-	{"Ignore Fixed Colour : ", HELP_IGNORE_FIXCOL, NULL, &os9x_ignore_fixcol, 2, {0, 1}, 0, {"Off", "On"}},
-	{"Ignore Windows clipping : ", HELP_IGNORE_WINCLIP, NULL, &os9x_ignore_winclip, 2, {0, 1}, 0, {"Off", "On"}},
-	{"Ignore Add/Sub modes : ", HELP_IGNORE_ADDSUB, NULL, &os9x_ignore_addsub, 2, {0, 1}, 0, {"Off", "On"}},
-	{"Ignore Palette writes : ", HELP_IGNORE_PALWRITE, NULL, &os9x_ignore_palwrite, 2, {0, 1}, 0, {"Off", "On"}},
-	{"Simple Palette writes : ",-1,NULL,&os9x_fix_hires,2,{0,1},0,{"Off","On"}},
-	{"Old PSP accel.: ", -1, NULL, &os9x_old_accel, 2, {0, 1}, 0, {"Off", "On"}},
-	{"--------",-1,NULL,NULL,0,{0},0,{NULL}},
-	{"No Transparency : ", HELP_EASY, NULL, &os9x_easy, 2, {0, 1}, 0,{"Off", "On"}},
-	{"Fast sprites : ", HELP_FASTSPRITE, NULL, &os9x_fastsprite, 2, {0, 1}, 0, {"Off", "On"}},
-	{"--------",-1,NULL,NULL,0,{0},0,{NULL}},
-	{"OBJ : ", HELP_OBJ, NULL, &os9x_OBJ, 2, {0, 1}, 0, {"Off", "On"}},
-	{"BG0 : ", HELP_BG0, NULL, &os9x_BG0, 2, {0, 1}, 0, {"Off", "On"}},
-	{"BG1 : ", HELP_BG1, NULL, &os9x_BG1, 2, {0, 1}, 0, {"Off", "On"}},
-	{"BG2 : ", HELP_BG2, NULL, &os9x_BG2, 2, {0, 1}, 0, {"Off", "On"}},
-	{"BG3 : ", HELP_BG3, NULL, &os9x_BG3, 2, {0, 1}, 0, {"Off", "On"}},
-	{"SFX Overclock : ",-1,NULL,&os9x_SFX_overclock,10,{10,20,30,40,50,60,70,80,90,100},9,{"10","20","30","40","50","60","70","80","90","100"}}
+	{DEBUG_MENU_SHOW_PASS, NULL, HELP_SHOWPASS, NULL, &os9x_showpass, 2, {0, 1}, 0, {NULL}},
+	{DEBUG_MENU_SPEED_HACKS, NULL, HELP_APPLYHACKS, NULL, &os9x_applyhacks, 2, {0, 1}, 0, {NULL}},
+	{-1, "--------", -1, NULL, NULL, 0, {0}, 0, {NULL}},
+	{DEBUG_MENU_IGNORE_FIXED_COL, NULL, HELP_IGNORE_FIXCOL, NULL, &os9x_ignore_fixcol, 2, {0, 1}, 0, {NULL}},
+	{DEBUG_MENU_IGNORE_WINDOW, NULL, HELP_IGNORE_WINCLIP, NULL, &os9x_ignore_winclip, 2, {0, 1}, 0, {NULL}},
+	{DEBUG_MENU_IGNORE_ADDSUB, NULL, HELP_IGNORE_ADDSUB, NULL, &os9x_ignore_addsub, 2, {0, 1}, 0, {NULL}},
+	{DEBUG_MENU_IGNORE_PALETTE, NULL, HELP_IGNORE_PALWRITE, NULL, &os9x_ignore_palwrite, 2, {0, 1}, 0, {NULL}},
+	{DEBUG_MENU_SIMPLE_PALETTE, NULL, -1, NULL, &os9x_fix_hires, 2, {0, 1}, 0, {NULL}},
+	{DEBUG_MENU_OLD_ACCEL, NULL, -1, NULL, &os9x_old_accel, 2, {0, 1}, 0, {NULL}},
+	{-1, "--------", -1, NULL, NULL, 0, {0}, 0, {NULL}},
+	{DEBUG_MENU_NO_TRANSPARENCY, NULL, HELP_EASY, NULL, &os9x_easy, 2, {0, 1}, 0, {NULL}},
+	{DEBUG_MENU_FAST_SPRITES, NULL, HELP_FASTSPRITE, NULL, &os9x_fastsprite, 2, {0, 1}, 0, {NULL}},
+	{-1, "--------", -1, NULL, NULL, 0, {0}, 0, {NULL}},
+	{DEBUG_MENU_OBJ, NULL, HELP_OBJ, NULL, &os9x_OBJ, 2, {0, 1}, 0, {NULL}},
+	{DEBUG_MENU_BG0, NULL, HELP_BG0, NULL, &os9x_BG0, 2, {0, 1}, 0, {NULL}},
+	{DEBUG_MENU_BG1, NULL, HELP_BG1, NULL, &os9x_BG1, 2, {0, 1}, 0, {NULL}},
+	{DEBUG_MENU_BG2, NULL, HELP_BG2, NULL, &os9x_BG2, 2, {0, 1}, 0, {NULL}},
+	{DEBUG_MENU_BG3, NULL, HELP_BG3, NULL, &os9x_BG3, 2, {0, 1}, 0, {NULL}},
+	{DEBUG_MENU_SFX_OVERCLOCK, NULL, -1, NULL, &os9x_SFX_overclock, 10, {10, 20, 30, 40, 50, 60, 70, 80, 90, 100}, 9, {NULL}}
 };
+
+
+
 
 
 static int show_debugmenu(char *mode) {
 	//int counter=0;
 	unsigned long color=RGB_WHITE;
-	static const char **help_data;
 	static int sel=0;
 	int rows=28,x, y, h, i,j,top=0;
 	int cpt;
 	int retval;
 
 	if (mode) {mode[0]=0; return 0;}
+
+
 
 	while (get_pad()) pgWaitV();
 
@@ -670,21 +690,7 @@ static int show_debugmenu(char *mode) {
     }
 	}
 
-	switch (os9x_language) {
-		case PSP_SYSTEMPARAM_LANGUAGE_JAPANESE:
-			i = HELP_JA;
-			break;
-		case PSP_SYSTEMPARAM_LANGUAGE_CHINESE_SIMPLIFIED:
-			i = HELP_CH;
-			break;
-		case PSP_SYSTEMPARAM_LANGUAGE_CHINESE_TRADITIONAL:
-			i = HELP_CH;
-			break;
-		default:
-			i = HELP_EN;
-			break;
-	}
-	help_data = help_data_ml[i];
+
 
 	old_pad=0;
 	cpt=0;
@@ -708,12 +714,30 @@ static int show_debugmenu(char *mode) {
 				if ((*os9xpsp_debugmenu[sel].menu_func)(0)) {retval=0;break;}
 		} else if(new_pad & PSP_CTRL_TRIANGLE)   {
 			if (os9xpsp_debugmenu[sel].help_index>=0)
-				inputBoxOK(help_data[os9xpsp_debugmenu[sel].help_index]);
+				inputBoxOK(s9xTYL_msg[os9xpsp_debugmenu[sel].help_index]);
 		} else if(new_pad & os9x_btn_negative_code)   { retval= 0;break; }
-    else if(new_pad & PSP_CTRL_UP)      { sel--;os9x_beep1();    }
-    else if(new_pad & PSP_CTRL_DOWN)    { sel++;os9x_beep1();    }
-    else if(new_pad & PSP_CTRL_LTRIGGER)      { sel-=10;if (sel<0) sel=0;os9x_beep1();    }
-    else if(new_pad & PSP_CTRL_RTRIGGER)    { sel+=10;if (sel>=DEBUGMENU_ITEMS) sel=DEBUGMENU_ITEMS-1;os9x_beep1();    }
+    else if(new_pad & PSP_CTRL_UP)      {
+		do {
+			sel = (sel > 0) ? sel - 1 : DEBUGMENU_ITEMS - 1;
+		} while (os9xpsp_debugmenu[sel].label_id == -1);
+		os9x_beep1();
+	}
+    else if(new_pad & PSP_CTRL_DOWN)    {
+		do {
+			sel = (sel < DEBUGMENU_ITEMS - 1) ? sel + 1 : 0;
+		} while (os9xpsp_debugmenu[sel].label_id == -1);
+		os9x_beep1();
+	}
+    else if(new_pad & PSP_CTRL_LTRIGGER)      {
+		sel-=10; if (sel<0) sel=0;
+		while (os9xpsp_debugmenu[sel].label_id == -1 && sel < DEBUGMENU_ITEMS - 1) sel++;
+		os9x_beep1();
+	}
+    else if(new_pad & PSP_CTRL_RTRIGGER)    {
+		sel+=10; if (sel>=DEBUGMENU_ITEMS) sel=DEBUGMENU_ITEMS-1;
+		while (os9xpsp_debugmenu[sel].label_id == -1 && sel > 0) sel--;
+		os9x_beep1();
+	}
     else if(new_pad & PSP_CTRL_LEFT)    {
     	if (os9xpsp_debugmenu[sel].value_int){
     		MENU_CHGVAL();
@@ -785,32 +809,48 @@ static int show_debugmenu(char *mode) {
 		x=4; y=3;
 		for(i=0; i<rows; i++){
 			if(top+i >= DEBUGMENU_ITEMS) break;
-			if(top+i == sel) color = SEL_COL;
-			else			 color = FILE_COL;
 
-			if (color==SEL_COL) {
+			int x_pix = 10;
+			int y_pix = 25 + (i * 12);
+			int current_color = (top+i == sel) ? SEL_COL : FILE_COL;
 
+			const char *label = GET_LABEL(os9xpsp_debugmenu[top+i]);
+			int is_sel = (top+i == sel);
+
+			if (is_sel) {
 				if (os9xpsp_debugmenu[top+i].value_int) {
-					pgPrintSel(x, y, ((30)|(30<<5)|(31<<10)), os9xpsp_debugmenu[top+i].label);
-					if (os9xpsp_debugmenu[top+i].values_list_label[0]) {
-						int ind=os9xpsp_debugmenu[top+i].value_index;
-						pgPrint(x+strlen(os9xpsp_debugmenu[top+i].label), y, ((31)|(29<<5)|(30<<10)), os9xpsp_debugmenu[top+i].values_list_label[ind]);
-					}	else pgPrintDec(x+strlen(os9xpsp_debugmenu[top+i].label), y, ((31)|(29<<5)|(30<<10)), *(os9xpsp_debugmenu[top+i].value_int));
-				} else if (os9xpsp_debugmenu[top+i].menu_func) pgPrintSel(x, y, ((28)|(31<<5)|(28<<10)), os9xpsp_debugmenu[top+i].label);
-				else pgPrintSel(x, y, ((24)|(24<<5)|(24<<10)), os9xpsp_debugmenu[top+i].label);
-
+					mh_printSel(x_pix, y_pix, label, current_color);
+					const char *val_label = menu_get_value_label(&os9xpsp_debugmenu[top+i], os9xpsp_debugmenu[top+i].value_index);
+					if (val_label) {
+						mh_print(x_pix + mh_length(label), y_pix, val_label, ((31)|(29<<5)|(30<<10)));
+					}	else {
+						char tmp_dec[16];
+						sprintf(tmp_dec, "%d", *(os9xpsp_debugmenu[top+i].value_int));
+						mh_print(x_pix + mh_length(label), y_pix, tmp_dec, ((31)|(29<<5)|(30<<10)));
+					}
+				} else if (os9xpsp_debugmenu[top+i].menu_func) {
+					mh_printSel(x_pix, y_pix, label, ((28)|(31<<5)|(28<<10)));
+				} else {
+					mh_printSel(x_pix, y_pix, label, ((24)|(24<<5)|(24<<10)));
+				}
 			}
 			else {
 				if (os9xpsp_debugmenu[top+i].value_int) {
-					pgPrint(x, y, ((20)|(20<<5)|(31<<10)), os9xpsp_debugmenu[top+i].label);
-					if (os9xpsp_debugmenu[top+i].values_list_label[0]) {
-						int ind=os9xpsp_debugmenu[top+i].value_index;
-						pgPrint(x+strlen(os9xpsp_debugmenu[top+i].label), y, ((31)|(24<<5)|(24<<10)), os9xpsp_debugmenu[top+i].values_list_label[ind]);
-					}	else pgPrintDec(x+strlen(os9xpsp_debugmenu[top+i].label), y, ((31)|(24<<5)|(24<<10)), *(os9xpsp_debugmenu[top+i].value_int));
-				} else if (os9xpsp_debugmenu[top+i].menu_func) pgPrint(x, y, ((16)|(24<<5)|(16<<10)), os9xpsp_debugmenu[top+i].label);
-				else pgPrint(x, y, ((20)|(20<<5)|(20<<10)), os9xpsp_debugmenu[top+i].label);
+					mh_print(x_pix, y_pix, label, current_color);
+					const char *val_label = menu_get_value_label(&os9xpsp_debugmenu[top+i], os9xpsp_debugmenu[top+i].value_index);
+					if (val_label) {
+						mh_print(x_pix + mh_length(label), y_pix, val_label, ((31)|(24<<5)|(24<<10)));
+					}	else {
+						char tmp_dec[16];
+						sprintf(tmp_dec, "%d", *(os9xpsp_debugmenu[top+i].value_int));
+						mh_print(x_pix + mh_length(label), y_pix, tmp_dec, ((31)|(24<<5)|(24<<10)));
+					}
+				} else if (os9xpsp_debugmenu[top+i].menu_func) {
+					mh_print(x_pix, y_pix, label, ((16)|(24<<5)|(16<<10)));
+				} else {
+					mh_print(x_pix, y_pix, label, ((20)|(20<<5)|(20<<10)));
+				}
 			}
-			y+=1;
 		}
 
 		pgScreenFlipV2();
@@ -837,27 +877,29 @@ int inputs_up,inputs_down,inputs_left,inputs_right,inputs_A,inputs_B,inputs_X,in
 int inputs_TL,inputs_TR,inputs_START,inputs_SELECT,inputs_MENU,inputs_TURBO;
 int inputs_FSKIPINC,inputs_FSKIPDEC,inputs_GFXENGINE;
 int inputs_SAVE_STATE,inputs_LOAD_STATE;
+
+/** Inputs menu items: button mappings for directional controls, face buttons, triggers, and special functions. */
 menu_time_t os9xpsp_inputsmenu[INPUTSMENU_ITEMS]={
-	{"Analog stick mapped to pad : ",-1,NULL,&os9x_inputs_analog,2,{0,1},0,{"Yes","No"}},
-	{"UP : ",-1,NULL,&inputs_up,23,{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22},0,{"UP(pad)","DOWN(pad)","LEFT(pad)","RIGHT(pad)","TRIANGLE","CIRCLE","CROSS","SQUARE","START","SELECT","LTrg","RTrg","UP(analog)","DOWN(analog)","LEFT(analog)","RIGHT(analog)","LTrg+RTrg","LTrg+START","RTrg+START","LTrg+SELECT","RTrg+SELECT","START+SELECT","None"}},
-	{"DOWN : ",-1,NULL,&inputs_down,23,{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22},0,{"UP(pad)","DOWN(pad)","LEFT(pad)","RIGHT(pad)","TRIANGLE","CIRCLE","CROSS","SQUARE","START","SELECT","LTrg","RTrg","UP(analog)","DOWN(analog)","LEFT(analog)","RIGHT(analog)","LTrg+RTrg","LTrg+START","RTrg+START","LTrg+SELECT","RTrg+SELECT","START+SELECT","None"}},
-	{"LEFT : ",-1,NULL,&inputs_left,23,{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22},0,{"UP(pad)","DOWN(pad)","LEFT(pad)","RIGHT(pad)","TRIANGLE","CIRCLE","CROSS","SQUARE","START","SELECT","LTrg","RTrg","UP(analog)","DOWN(analog)","LEFT(analog)","RIGHT(analog)","LTrg+RTrg","LTrg+START","RTrg+START","LTrg+SELECT","RTrg+SELECT","START+SELECT","None"}},
-	{"RIGHT : ",-1,NULL,&inputs_right,23,{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22},0,{"UP(pad)","DOWN(pad)","LEFT(pad)","RIGHT(pad)","TRIANGLE","CIRCLE","CROSS","SQUARE","START","SELECT","LTrg","RTrg","UP(analog)","DOWN(analog)","LEFT(analog)","RIGHT(analog)","LTrg+RTrg","LTrg+START","RTrg+START","LTrg+SELECT","RTrg+SELECT","START+SELECT","None"}},
-	{"A : ",-1,NULL,&inputs_A,23,{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22},0,{"UP(pad)","DOWN(pad)","LEFT(pad)","RIGHT(pad)","TRIANGLE","CIRCLE","CROSS","SQUARE","START","SELECT","LTrg","RTrg","UP(analog)","DOWN(analog)","LEFT(analog)","RIGHT(analog)","LTrg+RTrg","LTrg+START","RTrg+START","LTrg+SELECT","RTrg+SELECT","START+SELECT","None"}},
-	{"B : ",-1,NULL,&inputs_B,23,{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22},0,{"UP(pad)","DOWN(pad)","LEFT(pad)","RIGHT(pad)","TRIANGLE","CIRCLE","CROSS","SQUARE","START","SELECT","LTrg","RTrg","UP(analog)","DOWN(analog)","LEFT(analog)","RIGHT(analog)","LTrg+RTrg","LTrg+START","RTrg+START","LTrg+SELECT","RTrg+SELECT","START+SELECT","None"}},
-	{"X : ",-1,NULL,&inputs_X,23,{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22},0,{"UP(pad)","DOWN(pad)","LEFT(pad)","RIGHT(pad)","TRIANGLE","CIRCLE","CROSS","SQUARE","START","SELECT","LTrg","RTrg","UP(analog)","DOWN(analog)","LEFT(analog)","RIGHT(analog)","LTrg+RTrg","LTrg+START","RTrg+START","LTrg+SELECT","RTrg+SELECT","START+SELECT","None"}},
-	{"Y : ",-1,NULL,&inputs_Y,23,{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22},0,{"UP(pad)","DOWN(pad)","LEFT(pad)","RIGHT(pad)","TRIANGLE","CIRCLE","CROSS","SQUARE","START","SELECT","LTrg","RTrg","UP(analog)","DOWN(analog)","LEFT(analog)","RIGHT(analog)","LTrg+RTrg","LTrg+START","RTrg+START","LTrg+SELECT","RTrg+SELECT","START+SELECT","None"}},
-	{"L : ",-1,NULL,&inputs_TL,23,{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22},0,{"UP(pad)","DOWN(pad)","LEFT(pad)","RIGHT(pad)","TRIANGLE","CIRCLE","CROSS","SQUARE","START","SELECT","LTrg","RTrg","UP(analog)","DOWN(analog)","LEFT(analog)","RIGHT(analog)","LTrg+RTrg","LTrg+START","RTrg+START","LTrg+SELECT","RTrg+SELECT","START+SELECT","None"}},
-	{"R : ",-1,NULL,&inputs_TR,23,{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22},0,{"UP(pad)","DOWN(pad)","LEFT(pad)","RIGHT(pad)","TRIANGLE","CIRCLE","CROSS","SQUARE","START","SELECT","LTrg","RTrg","UP(analog)","DOWN(analog)","LEFT(analog)","RIGHT(analog)","LTrg+RTrg","LTrg+START","RTrg+START","LTrg+SELECT","RTrg+SELECT","START+SELECT","None"}},
-	{"START : ",-1,NULL,&inputs_START,23,{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22},0,{"UP(pad)","DOWN(pad)","LEFT(pad)","RIGHT(pad)","TRIANGLE","CIRCLE","CROSS","SQUARE","START","SELECT","LTrg","RTrg","UP(analog)","DOWN(analog)","LEFT(analog)","RIGHT(analog)","LTrg+RTrg","LTrg+START","RTrg+START","LTrg+SELECT","RTrg+SELECT","START+SELECT","None"}},
-	{"SELECT : ",-1,NULL,&inputs_SELECT,23,{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22},0,{"UP(pad)","DOWN(pad)","LEFT(pad)","RIGHT(pad)","TRIANGLE","CIRCLE","CROSS","SQUARE","START","SELECT","LTrg","RTrg","UP(analog)","DOWN(analog)","LEFT(analog)","RIGHT(analog)","LTrg+RTrg","LTrg+START","RTrg+START","LTrg+SELECT","RTrg+SELECT","START+SELECT","None"}},
-	{"MENU : ",-1,NULL,&inputs_MENU,23,{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22},0,{"UP(pad)","DOWN(pad)","LEFT(pad)","RIGHT(pad)","TRIANGLE","CIRCLE","CROSS","SQUARE","START","SELECT","LTrg","RTrg","UP(analog)","DOWN(analog)","LEFT(analog)","RIGHT(analog)","LTrg+RTrg","LTrg+START","RTrg+START","LTrg+SELECT","RTrg+SELECT","START+SELECT","None"}},
-	{"TURBO : ",-1,NULL,&inputs_TURBO,23,{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22},0,{"UP(pad)","DOWN(pad)","LEFT(pad)","RIGHT(pad)","TRIANGLE","CIRCLE","CROSS","SQUARE","START","SELECT","LTrg","RTrg","UP(analog)","DOWN(analog)","LEFT(analog)","RIGHT(analog)","LTrg+RTrg","LTrg+START","RTrg+START","LTrg+SELECT","RTrg+SELECT","START+SELECT","None"}},
-	{"FRAMESKIP + : ",-1,NULL,&inputs_FSKIPINC,23,{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22},0,{"UP(pad)","DOWN(pad)","LEFT(pad)","RIGHT(pad)","TRIANGLE","CIRCLE","CROSS","SQUARE","START","SELECT","LTrg","RTrg","UP(analog)","DOWN(analog)","LEFT(analog)","RIGHT(analog)","LTrg+RTrg","LTrg+START","RTrg+START","LTrg+SELECT","RTrg+SELECT","START+SELECT","None"}},
-	{"FRAMESKIP - : ",-1,NULL,&inputs_FSKIPDEC,23,{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22},0,{"UP(pad)","DOWN(pad)","LEFT(pad)","RIGHT(pad)","TRIANGLE","CIRCLE","CROSS","SQUARE","START","SELECT","LTrg","RTrg","UP(analog)","DOWN(analog)","LEFT(analog)","RIGHT(analog)","LTrg+RTrg","LTrg+START","RTrg+START","LTrg+SELECT","RTrg+SELECT","START+SELECT","None"}},
-	{"CHANGE GPUPack.GFX ENGINE : ",-1,NULL,&inputs_GFXENGINE,23,{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22},0,{"UP(pad)","DOWN(pad)","LEFT(pad)","RIGHT(pad)","TRIANGLE","CIRCLE","CROSS","SQUARE","START","SELECT","LTrg","RTrg","UP(analog)","DOWN(analog)","LEFT(analog)","RIGHT(analog)","LTrg+RTrg","LTrg+START","RTrg+START","LTrg+SELECT","RTrg+SELECT","START+SELECT","None"}},
-	{"SAVE STATE : ",-1,NULL,&inputs_SAVE_STATE,23,{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22},0,{"UP(pad)","DOWN(pad)","LEFT(pad)","RIGHT(pad)","TRIANGLE","CIRCLE","CROSS","SQUARE","START","SELECT","LTrg","RTrg","UP(analog)","DOWN(analog)","LEFT(analog)","RIGHT(analog)","LTrg+RTrg","LTrg+START","RTrg+START","LTrg+SELECT","RTrg+SELECT","START+SELECT","None"}},
-	{"LOAD STATE : ",-1,NULL,&inputs_LOAD_STATE,23,{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22},0,{"UP(pad)","DOWN(pad)","LEFT(pad)","RIGHT(pad)","TRIANGLE","CIRCLE","CROSS","SQUARE","START","SELECT","LTrg","RTrg","UP(analog)","DOWN(analog)","LEFT(analog)","RIGHT(analog)","LTrg+RTrg","LTrg+START","RTrg+START","LTrg+SELECT","RTrg+SELECT","START+SELECT","None"}}
+	{INPUT_MENU_ANALOG_MAPPED, NULL, -1, NULL, &os9x_inputs_analog, 2, {0, 1}, 0, {NULL}},
+	{INPUT_MENU_UP, NULL, -1, NULL, &inputs_up, 23, {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22}, 0, {"UP(pad)","DOWN(pad)","LEFT(pad)","RIGHT(pad)","TRIANGLE","CIRCLE","CROSS","SQUARE","START","SELECT","LTrg","RTrg","UP(analog)","DOWN(analog)","LEFT(analog)","RIGHT(analog)","LTrg+RTrg","LTrg+START","RTrg+START","LTrg+SELECT","RTrg+SELECT","START+SELECT","None"}},
+	{INPUT_MENU_DOWN, NULL, -1, NULL, &inputs_down, 23, {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22}, 0, {"UP(pad)","DOWN(pad)","LEFT(pad)","RIGHT(pad)","TRIANGLE","CIRCLE","CROSS","SQUARE","START","SELECT","LTrg","RTrg","UP(analog)","DOWN(analog)","LEFT(analog)","RIGHT(analog)","LTrg+RTrg","LTrg+START","RTrg+START","LTrg+SELECT","RTrg+SELECT","START+SELECT","None"}},
+	{INPUT_MENU_LEFT, NULL, -1, NULL, &inputs_left, 23, {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22}, 0, {"UP(pad)","DOWN(pad)","LEFT(pad)","RIGHT(pad)","TRIANGLE","CIRCLE","CROSS","SQUARE","START","SELECT","LTrg","RTrg","UP(analog)","DOWN(analog)","LEFT(analog)","RIGHT(analog)","LTrg+RTrg","LTrg+START","RTrg+START","LTrg+SELECT","RTrg+SELECT","START+SELECT","None"}},
+	{INPUT_MENU_RIGHT, NULL, -1, NULL, &inputs_right, 23, {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22}, 0, {"UP(pad)","DOWN(pad)","LEFT(pad)","RIGHT(pad)","TRIANGLE","CIRCLE","CROSS","SQUARE","START","SELECT","LTrg","RTrg","UP(analog)","DOWN(analog)","LEFT(analog)","RIGHT(analog)","LTrg+RTrg","LTrg+START","RTrg+START","LTrg+SELECT","RTrg+SELECT","START+SELECT","None"}},
+	{INPUT_MENU_A, NULL, -1, NULL, &inputs_A, 23, {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22}, 0, {"UP(pad)","DOWN(pad)","LEFT(pad)","RIGHT(pad)","TRIANGLE","CIRCLE","CROSS","SQUARE","START","SELECT","LTrg","RTrg","UP(analog)","DOWN(analog)","LEFT(analog)","RIGHT(analog)","LTrg+RTrg","LTrg+START","RTrg+START","LTrg+SELECT","RTrg+SELECT","START+SELECT","None"}},
+	{INPUT_MENU_B, NULL, -1, NULL, &inputs_B, 23, {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22}, 0, {"UP(pad)","DOWN(pad)","LEFT(pad)","RIGHT(pad)","TRIANGLE","CIRCLE","CROSS","SQUARE","START","SELECT","LTrg","RTrg","UP(analog)","DOWN(analog)","LEFT(analog)","RIGHT(analog)","LTrg+RTrg","LTrg+START","RTrg+START","LTrg+SELECT","RTrg+SELECT","START+SELECT","None"}},
+	{INPUT_MENU_X, NULL, -1, NULL, &inputs_X, 23, {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22}, 0, {"UP(pad)","DOWN(pad)","LEFT(pad)","RIGHT(pad)","TRIANGLE","CIRCLE","CROSS","SQUARE","START","SELECT","LTrg","RTrg","UP(analog)","DOWN(analog)","LEFT(analog)","RIGHT(analog)","LTrg+RTrg","LTrg+START","RTrg+START","LTrg+SELECT","RTrg+SELECT","START+SELECT","None"}},
+	{INPUT_MENU_Y, NULL, -1, NULL, &inputs_Y, 23, {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22}, 0, {"UP(pad)","DOWN(pad)","LEFT(pad)","RIGHT(pad)","TRIANGLE","CIRCLE","CROSS","SQUARE","START","SELECT","LTrg","RTrg","UP(analog)","DOWN(analog)","LEFT(analog)","RIGHT(analog)","LTrg+RTrg","LTrg+START","RTrg+START","LTrg+SELECT","RTrg+SELECT","START+SELECT","None"}},
+	{INPUT_MENU_L, NULL, -1, NULL, &inputs_TL, 23, {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22}, 0, {"UP(pad)","DOWN(pad)","LEFT(pad)","RIGHT(pad)","TRIANGLE","CIRCLE","CROSS","SQUARE","START","SELECT","LTrg","RTrg","UP(analog)","DOWN(analog)","LEFT(analog)","RIGHT(analog)","LTrg+RTrg","LTrg+START","RTrg+START","LTrg+SELECT","RTrg+SELECT","START+SELECT","None"}},
+	{INPUT_MENU_R, NULL, -1, NULL, &inputs_TR, 23, {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22}, 0, {"UP(pad)","DOWN(pad)","LEFT(pad)","RIGHT(pad)","TRIANGLE","CIRCLE","CROSS","SQUARE","START","SELECT","LTrg","RTrg","UP(analog)","DOWN(analog)","LEFT(analog)","RIGHT(analog)","LTrg+RTrg","LTrg+START","RTrg+START","LTrg+SELECT","RTrg+SELECT","START+SELECT","None"}},
+	{INPUT_MENU_START, NULL, -1, NULL, &inputs_START, 23, {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22}, 0, {"UP(pad)","DOWN(pad)","LEFT(pad)","RIGHT(pad)","TRIANGLE","CIRCLE","CROSS","SQUARE","START","SELECT","LTrg","RTrg","UP(analog)","DOWN(analog)","LEFT(analog)","RIGHT(analog)","LTrg+RTrg","LTrg+START","RTrg+START","LTrg+SELECT","RTrg+SELECT","START+SELECT","None"}},
+	{INPUT_MENU_SELECT, NULL, -1, NULL, &inputs_SELECT, 23, {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22}, 0, {"UP(pad)","DOWN(pad)","LEFT(pad)","RIGHT(pad)","TRIANGLE","CIRCLE","CROSS","SQUARE","START","SELECT","LTrg","RTrg","UP(analog)","DOWN(analog)","LEFT(analog)","RIGHT(analog)","LTrg+RTrg","LTrg+START","RTrg+START","LTrg+SELECT","RTrg+SELECT","START+SELECT","None"}},
+	{INPUT_MENU_MENU, NULL, -1, NULL, &inputs_MENU, 23, {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22}, 0, {"UP(pad)","DOWN(pad)","LEFT(pad)","RIGHT(pad)","TRIANGLE","CIRCLE","CROSS","SQUARE","START","SELECT","LTrg","RTrg","UP(analog)","DOWN(analog)","LEFT(analog)","RIGHT(analog)","LTrg+RTrg","LTrg+START","RTrg+START","LTrg+SELECT","RTrg+SELECT","START+SELECT","None"}},
+	{INPUT_MENU_TURBO, NULL, -1, NULL, &inputs_TURBO, 23, {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22}, 0, {"UP(pad)","DOWN(pad)","LEFT(pad)","RIGHT(pad)","TRIANGLE","CIRCLE","CROSS","SQUARE","START","SELECT","LTrg","RTrg","UP(analog)","DOWN(analog)","LEFT(analog)","RIGHT(analog)","LTrg+RTrg","LTrg+START","RTrg+START","LTrg+SELECT","RTrg+SELECT","START+SELECT","None"}},
+	{INPUT_MENU_FSKIPINC, NULL, -1, NULL, &inputs_FSKIPINC, 23, {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22}, 0, {"UP(pad)","DOWN(pad)","LEFT(pad)","RIGHT(pad)","TRIANGLE","CIRCLE","CROSS","SQUARE","START","SELECT","LTrg","RTrg","UP(analog)","DOWN(analog)","LEFT(analog)","RIGHT(analog)","LTrg+RTrg","LTrg+START","RTrg+START","LTrg+SELECT","RTrg+SELECT","START+SELECT","None"}},
+	{INPUT_MENU_FSKIPDEC, NULL, -1, NULL, &inputs_FSKIPDEC, 23, {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22}, 0, {"UP(pad)","DOWN(pad)","LEFT(pad)","RIGHT(pad)","TRIANGLE","CIRCLE","CROSS","SQUARE","START","SELECT","LTrg","RTrg","UP(analog)","DOWN(analog)","LEFT(analog)","RIGHT(analog)","LTrg+RTrg","LTrg+START","RTrg+START","LTrg+SELECT","RTrg+SELECT","START+SELECT","None"}},
+	{INPUT_MENU_GFXENGINE, NULL, -1, NULL, &inputs_GFXENGINE, 23, {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22}, 0, {"UP(pad)","DOWN(pad)","LEFT(pad)","RIGHT(pad)","TRIANGLE","CIRCLE","CROSS","SQUARE","START","SELECT","LTrg","RTrg","UP(analog)","DOWN(analog)","LEFT(analog)","RIGHT(analog)","LTrg+RTrg","LTrg+START","RTrg+START","LTrg+SELECT","RTrg+SELECT","START+SELECT","None"}},
+	{INPUT_MENU_SAVE_STATE, NULL, -1, NULL, &inputs_SAVE_STATE, 23, {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22}, 0, {"UP(pad)","DOWN(pad)","LEFT(pad)","RIGHT(pad)","TRIANGLE","CIRCLE","CROSS","SQUARE","START","SELECT","LTrg","RTrg","UP(analog)","DOWN(analog)","LEFT(analog)","RIGHT(analog)","LTrg+RTrg","LTrg+START","RTrg+START","LTrg+SELECT","RTrg+SELECT","START+SELECT","None"}},
+	{INPUT_MENU_LOAD_STATE, NULL, -1, NULL, &inputs_LOAD_STATE, 23, {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22}, 0, {"UP(pad)","DOWN(pad)","LEFT(pad)","RIGHT(pad)","TRIANGLE","CIRCLE","CROSS","SQUARE","START","SELECT","LTrg","RTrg","UP(analog)","DOWN(analog)","LEFT(analog)","RIGHT(analog)","LTrg+RTrg","LTrg+START","RTrg+START","LTrg+SELECT","RTrg+SELECT","START+SELECT","None"}}
 };
 
 
@@ -870,6 +912,8 @@ static int show_inputsmenu(char *mode) {
 	int retval;
 
 	if (mode) {mode[0]=0; return 0;}
+
+
 
 	while (get_pad()) pgWaitV();
 
@@ -949,7 +993,7 @@ static int show_inputsmenu(char *mode) {
 			// wait for no button pressed
 			while (get_pad()) pgWaitV();
 			//message asking a button press
-			sprintf(st, s9xTYL_msg[MENU_CONTROLS_INPUT_PRESS], os9xpsp_inputsmenu[sel].label);
+			sprintf(st, s9xTYL_msg[MENU_CONTROLS_INPUT_PRESS], GET_LABEL(os9xpsp_inputsmenu[sel]));
 			msgBoxLines(st,0);
 			//wait for a press
 			while (1) {
@@ -1016,10 +1060,28 @@ static int show_inputsmenu(char *mode) {
       }
 #endif
     }
-    else if(new_pad & PSP_CTRL_UP)      { sel--; os9x_beep1();   }
-    else if(new_pad & PSP_CTRL_DOWN)    { sel++; os9x_beep1();   }
-    else if(new_pad & PSP_CTRL_LTRIGGER)      { sel-=10;if (sel<0) sel=0; os9x_beep1();   }
-    else if(new_pad & PSP_CTRL_RTRIGGER)    { sel+=10;if (sel>=INPUTSMENU_ITEMS) sel=INPUTSMENU_ITEMS-1; os9x_beep1();   }
+    else if(new_pad & PSP_CTRL_UP)      {
+		do {
+			sel = (sel > 0) ? sel - 1 : INPUTSMENU_ITEMS - 1;
+		} while (os9xpsp_inputsmenu[sel].label_id == -1);
+		os9x_beep1();
+	}
+    else if(new_pad & PSP_CTRL_DOWN)    {
+		do {
+			sel = (sel < INPUTSMENU_ITEMS - 1) ? sel + 1 : 0;
+		} while (os9xpsp_inputsmenu[sel].label_id == -1);
+		os9x_beep1();
+	}
+    else if(new_pad & PSP_CTRL_LTRIGGER)      {
+		sel-=10; if (sel<0) sel=0;
+		while (os9xpsp_inputsmenu[sel].label_id == -1 && sel < INPUTSMENU_ITEMS - 1) sel++;
+		os9x_beep1();
+	}
+    else if(new_pad & PSP_CTRL_RTRIGGER)    {
+		sel+=10; if (sel>=INPUTSMENU_ITEMS) sel=INPUTSMENU_ITEMS-1;
+		while (os9xpsp_inputsmenu[sel].label_id == -1 && sel > 0) sel--;
+		os9x_beep1();
+	}
     else if(new_pad & PSP_CTRL_LEFT)    {
     	if (os9xpsp_inputsmenu[sel].value_int){
     		MENU_CHGVAL();
@@ -1190,32 +1252,48 @@ static int show_inputsmenu(char *mode) {
 		x=4; y=3;
 		for(i=0; i<rows; i++){
 			if(top+i >= INPUTSMENU_ITEMS) break;
-			if(top+i == sel) color = SEL_COL;
-			else			 color = FILE_COL;
 
-			if (color==SEL_COL) {
+			int x_pix = 10;
+			int y_pix = 25 + (i * 12);
+			int current_color = (top+i == sel) ? SEL_COL : FILE_COL;
 
+			const char *label = GET_LABEL(os9xpsp_inputsmenu[top+i]);
+			int is_sel = (top+i == sel);
+
+			if (is_sel) {
 				if (os9xpsp_inputsmenu[top+i].value_int) {
-					pgPrintSel(x, y, ((30)|(30<<5)|(31<<10)), os9xpsp_inputsmenu[top+i].label);
-					if (os9xpsp_inputsmenu[top+i].values_list_label[0]) {
-						int ind=os9xpsp_inputsmenu[top+i].value_index;
-						pgPrint(x+strlen(os9xpsp_inputsmenu[top+i].label), y, ((31)|(29<<5)|(30<<10)), os9xpsp_inputsmenu[top+i].values_list_label[ind]);
-					}	else pgPrintDec(x+strlen(os9xpsp_inputsmenu[top+i].label), y, ((31)|(29<<5)|(30<<10)), *(os9xpsp_inputsmenu[top+i].value_int));
-				} else if (os9xpsp_inputsmenu[top+i].menu_func) pgPrintSel(x, y, ((28)|(31<<5)|(28<<10)), os9xpsp_inputsmenu[top+i].label);
-				else pgPrintSel(x, y, ((24)|(24<<5)|(24<<10)), os9xpsp_inputsmenu[top+i].label);
-
+					mh_printSel(x_pix, y_pix, label, current_color);
+					const char *val_label = menu_get_value_label(&os9xpsp_inputsmenu[top+i], os9xpsp_inputsmenu[top+i].value_index);
+					if (val_label) {
+						mh_print(x_pix + mh_length(label), y_pix, val_label, ((31)|(29<<5)|(30<<10)));
+					}	else {
+						char tmp_dec[16];
+						sprintf(tmp_dec, "%d", *(os9xpsp_inputsmenu[top+i].value_int));
+						mh_print(x_pix + mh_length(label), y_pix, tmp_dec, ((31)|(29<<5)|(30<<10)));
+					}
+				} else if (os9xpsp_inputsmenu[top+i].menu_func) {
+					mh_printSel(x_pix, y_pix, label, ((28)|(31<<5)|(28<<10)));
+				} else {
+					mh_printSel(x_pix, y_pix, label, ((24)|(24<<5)|(24<<10)));
+				}
 			}
 			else {
 				if (os9xpsp_inputsmenu[top+i].value_int) {
-					pgPrint(x, y, ((20)|(20<<5)|(31<<10)), os9xpsp_inputsmenu[top+i].label);
-					if (os9xpsp_inputsmenu[top+i].values_list_label[0]) {
-						int ind=os9xpsp_inputsmenu[top+i].value_index;
-						pgPrint(x+strlen(os9xpsp_inputsmenu[top+i].label), y, ((31)|(24<<5)|(24<<10)), os9xpsp_inputsmenu[top+i].values_list_label[ind]);
-					}	else pgPrintDec(x+strlen(os9xpsp_inputsmenu[top+i].label), y, ((31)|(24<<5)|(24<<10)), *(os9xpsp_inputsmenu[top+i].value_int));
-				} else if (os9xpsp_inputsmenu[top+i].menu_func) pgPrint(x, y, ((16)|(24<<5)|(16<<10)), os9xpsp_inputsmenu[top+i].label);
-				else pgPrint(x, y, ((20)|(20<<5)|(20<<10)), os9xpsp_inputsmenu[top+i].label);
+					mh_print(x_pix, y_pix, label, current_color);
+					const char *val_label = menu_get_value_label(&os9xpsp_inputsmenu[top+i], os9xpsp_inputsmenu[top+i].value_index);
+					if (val_label) {
+						mh_print(x_pix + mh_length(label), y_pix, val_label, ((31)|(24<<5)|(24<<10)));
+					}	else {
+						char tmp_dec[16];
+						sprintf(tmp_dec, "%d", *(os9xpsp_inputsmenu[top+i].value_int));
+						mh_print(x_pix + mh_length(label), y_pix, tmp_dec, ((31)|(24<<5)|(24<<10)));
+					}
+				} else if (os9xpsp_inputsmenu[top+i].menu_func) {
+					mh_print(x_pix, y_pix, label, ((16)|(24<<5)|(16<<10)));
+				} else {
+					mh_print(x_pix, y_pix, label, ((20)|(20<<5)|(20<<10)));
+				}
 			}
-			y+=1;
 		}
 
 		pgScreenFlipV2();
@@ -3594,7 +3672,7 @@ static int menu_support(char *mode) {
 			pgFillBoxHalfer(menu_panel_pos, 14, 479, 272 - 15);
 			pgFillBoxHalfer(menu_panel_pos, 14, 479, 272 - 15);
 			pgFillBoxHalfer(menu_panel_pos, 14, 479, 272 - 15);
-			
+
 			// Draw panel border frames
 			pgDrawFrame(menu_panel_pos - 1, 14, menu_panel_pos - 1, 272 - 15, 12 | (12 << 5) | (12 << 10));
 			pgDrawFrame(menu_panel_pos - 2, 14, menu_panel_pos - 2, 272 - 15, 24 | (24 << 5) | (24 << 10));

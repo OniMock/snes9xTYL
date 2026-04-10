@@ -218,19 +218,19 @@
     [MENU_STATUS_CONTROLS_INPUT] = "%s Modo de detecção " SJIS_STAR " %s Menu ",
     [MENU_STATUS_CONTROLS_INPUT_0] = SJIS_STAR
     " " SJIS_UP "," SJIS_DOWN " Selecionar " SJIS_LEFT "," SJIS_RIGHT
-    " Alterar valor " SJIS_STAR " SELECT perfis padrão",
+    " " SJIS_STAR " SELECT perfis padrão",
     [MENU_STATUS_CONTROLS_INPUT_HELP_0] = SJIS_STAR
-    "      " SJIS_TRIANGLE " Ajuda       " SJIS_STAR "      " SJIS_UP
-    "," SJIS_DOWN " Selecionar " SJIS_LEFT "," SJIS_RIGHT " Alterar valor",
+    " " SJIS_TRIANGLE " Ajuda  " SJIS_STAR "  " SJIS_UP
+    "," SJIS_DOWN " Mover " SJIS_LEFT "," SJIS_RIGHT " Ajustar",
     [MENU_STATUS_CONTROLS_INPUT_HELP_1] = SJIS_STAR
-    "     " SJIS_TRIANGLE "   Ajuda      " SJIS_STAR "      " SJIS_UP
-    "," SJIS_DOWN " Selecionar " SJIS_LEFT "," SJIS_RIGHT " Alterar valor",
+    " " SJIS_TRIANGLE " Ajuda  " SJIS_STAR "  " SJIS_UP
+    "," SJIS_DOWN " Mover " SJIS_LEFT "," SJIS_RIGHT " Ajustar",
     [MENU_STATUS_CONTROLS_INPUT_HELP_2] = SJIS_STAR
-    "    " SJIS_TRIANGLE "     Ajuda     " SJIS_STAR "      " SJIS_UP
-    "," SJIS_DOWN " Selecionar " SJIS_LEFT "," SJIS_RIGHT " Alterar valor",
+    " " SJIS_TRIANGLE " Ajuda  " SJIS_STAR "  " SJIS_UP
+    "," SJIS_DOWN " Mover " SJIS_LEFT "," SJIS_RIGHT " Ajustar",
     [MENU_STATUS_CONTROLS_INPUT_HELP_3] = SJIS_STAR
-    "   " SJIS_TRIANGLE "       Ajuda    " SJIS_STAR "      " SJIS_UP
-    "," SJIS_DOWN " Selecionar " SJIS_LEFT "," SJIS_RIGHT " Alterar valor",
+    " " SJIS_TRIANGLE " Ajuda  " SJIS_STAR "  " SJIS_UP
+    "," SJIS_DOWN " Mover " SJIS_LEFT "," SJIS_RIGHT " Ajustar",
 
     [MENU_TITLE_CONTROLS_INPUT] =
         "[" PROJECT_NAME "] - Configuração de Entradas",
@@ -515,4 +515,61 @@
     [EXTENDING] = "Expandindo",
     [EXTENDING_TARGET] = "Expandindo alvo de %d para %d\n",
     [INIT_OSK] = "Inicializando OSK...",
+
+    // Help data
+    [HELP_SHOWPASS] = "Mostra quantas chamadas de renderização foram necessárias\npara desenhar a tela. Quanto menor, mais rápido.\nÚtil para avaliar o impacto dos hacks (abaixo).",
+    [HELP_APPLYHACKS] = "Aplica speed hacks do SNESAdvance, se disponíveis no banco de dados.\nUtilizado apenas durante o carregamento da ROM.",
+    [HELP_IGNORE_FIXCOL] = "Ignora alterações de cor fixa.\nEssas mudanças não irão disparar a atualização da tela.\nOs gráficos podem ser afetados (gradientes, etc).",
+    [HELP_IGNORE_WINCLIP] = "Ignora alterações de recorte de janela (window clipping).\nEssas mudanças não irão disparar a atualização da tela.\nOs gráficos podem ser afetados (áreas podem desaparecer, etc).",
+    [HELP_IGNORE_ADDSUB] = "Ignora alterações nos modos de adição/subtração (transparência).\nEssas mudanças não irão disparar a atualização da tela.\nPossível impacto gráfico (pixels opacos).",
+    [HELP_IGNORE_PALWRITE] = "Ignora alterações na paleta de cores durante o frame.\nEssas mudanças não irão disparar a atualização da tela.\nOs gráficos podem ser afetados (cores incorretas, etc).",
+    [HELP_OBJ] = "OBJ (sprites) Ligado/Desligado.\nUse para desativar a renderização de sprites.",
+    [HELP_BG0] = "BG0 Ligado/Desligado.\nUse para desativar a renderização do plano de fundo 0.",
+    [HELP_BG1] = "BG1 Ligado/Desligado.\nUse para desativar a renderização do plano de fundo 1.",
+    [HELP_BG2] = "BG2 Ligado/Desligado.\nUse para desativar a renderização do plano de fundo 2.",
+    [HELP_BG3] = "BG3 Ligado/Desligado.\nUse para desativar a renderização do plano de fundo 3.",
+    [HELP_EASY] = "Sem transparência.\nForça a renderização sem efeitos de transparência.\nPossível impacto gráfico (pixels opacos).",
+    [HELP_FASTSPRITE] = "Sprites rápidos.\nDesativa o tratamento de prioridade entre sprites.\nOs gráficos podem ser afetados.",
+
+    // Hack/Debug Menu Labels
+    [DEBUG_MENU_SHOW_PASS] = "Mostrar passes de render.: ",
+    [DEBUG_MENU_SPEED_HACKS] = "Speed hacks : ",
+    [DEBUG_MENU_IGNORE_FIXED_COL] = "Ignorar Cor Fixa : ",
+    [DEBUG_MENU_IGNORE_WINDOW] = "Ignorar Recorte Janela : ",
+    [DEBUG_MENU_IGNORE_ADDSUB] = "Ignorar Modos Add/Sub : ",
+    [DEBUG_MENU_IGNORE_PALETTE] = "Ignorar Escrita Paleta : ",
+    [DEBUG_MENU_SIMPLE_PALETTE] = "Escrita Paleta Simples : ",
+    [DEBUG_MENU_OLD_ACCEL] = "Acel. PSP Antiga : ",
+    [DEBUG_MENU_NO_TRANSPARENCY] = "Sem Transparência : ",
+    [DEBUG_MENU_FAST_SPRITES] = "Sprites Rápidos : ",
+    [DEBUG_MENU_OBJ] = "OBJ : ",
+    [DEBUG_MENU_BG0] = "BG0 : ",
+    [DEBUG_MENU_BG1] = "BG1 : ",
+    [DEBUG_MENU_BG2] = "BG2 : ",
+    [DEBUG_MENU_BG3] = "BG3 : ",
+    [DEBUG_MENU_SFX_OVERCLOCK] = "Overclock SFX : ",
+    [MENU_ON] = "Ligado",
+    [MENU_OFF] = "Desligado",
+
+    // Input Menu Labels
+    [INPUT_MENU_ANALOG_MAPPED] = "Analógico mapeado p/ direcional : ",
+    [INPUT_MENU_UP] = "CIMA : ",
+    [INPUT_MENU_DOWN] = "BAIXO : ",
+    [INPUT_MENU_LEFT] = "ESQUERDA : ",
+    [INPUT_MENU_RIGHT] = "DIREITA : ",
+    [INPUT_MENU_A] = "A : ",
+    [INPUT_MENU_B] = "B : ",
+    [INPUT_MENU_X] = "X : ",
+    [INPUT_MENU_Y] = "Y : ",
+    [INPUT_MENU_L] = "L : ",
+    [INPUT_MENU_R] = "R : ",
+    [INPUT_MENU_START] = "START : ",
+    [INPUT_MENU_SELECT] = "SELECT : ",
+    [INPUT_MENU_MENU] = "MENU : ",
+    [INPUT_MENU_TURBO] = "TURBO : ",
+    [INPUT_MENU_FSKIPINC] = "PULAR QUADROS + : ",
+    [INPUT_MENU_FSKIPDEC] = "PULAR QUADROS - : ",
+    [INPUT_MENU_GFXENGINE] = "ALTERAR MOTOR GRÁFICO : ",
+    [INPUT_MENU_SAVE_STATE] = "SALVAR ESTADO : ",
+    [INPUT_MENU_LOAD_STATE] = "CARREGAR ESTADO : ",
 },

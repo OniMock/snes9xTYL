@@ -6,6 +6,7 @@ enum {
 	MSG_JA,
 	MSG_CH,
 	MSG_PT,
+  MSG_ES,
 
 	MSG_TOTAL_LANG
 };

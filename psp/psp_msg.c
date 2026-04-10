@@ -9,6 +9,7 @@ const char *s9xTYL_msg_ml[MSG_TOTAL_LANG][MSG_TOTAL_ENTRIES] = {
 #include "lang/ja.c"
 #include "lang/ch.c"
 #include "lang/pt.c"
+#include "lang/es.c"
 };
 
 const char **s9xTYL_msg = s9xTYL_msg_ml[MSG_EN];
@@ -29,6 +30,9 @@ void psp_msg_init() {
 				break;
 			case PSP_SYSTEMPARAM_LANGUAGE_PORTUGUESE:
 				msg_lang = MSG_PT;
+				break;
+			case PSP_SYSTEMPARAM_LANGUAGE_SPANISH:
+				msg_lang = MSG_ES;
 				break;
 			default:
 				msg_lang = MSG_EN;

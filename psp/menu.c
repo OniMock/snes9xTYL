@@ -2413,6 +2413,7 @@ static int menu_language(char *mode) {
         else if (os9x_force_language == MSG_JA) strcpy(mode, "JP");
         else if (os9x_force_language == MSG_CH) strcpy(mode, "CN");
         else if (os9x_force_language == MSG_PT) strcpy(mode, "PT-BR");
+        else if (os9x_force_language == MSG_ES) strcpy(mode, "ES");
 		return 0;
 	}
 	menu_panel_pos=479;
@@ -2427,6 +2428,7 @@ static int menu_language(char *mode) {
         else if (new_value == MSG_JA) strcpy(lang_str, "Japanese");
         else if (new_value == MSG_CH) strcpy(lang_str, "Chinese");
         else if (new_value == MSG_PT) strcpy(lang_str, "Portuguese");
+        else if (new_value == MSG_ES) strcpy(lang_str, "Spanish");
 
 		mh_printLimit(menu_panel_pos + 5, 104, 479, 272, lang_str, 31 | (24 << 5) | (24 << 10));
 		mh_printLimit(menu_panel_pos + 5, 130, 479, 272, s9xTYL_msg[MENU_CHANGE_VALUE], PANEL_TEXTCMD_COL);

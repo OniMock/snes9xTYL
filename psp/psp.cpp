@@ -3076,7 +3076,7 @@ int scroll_message(char **msg_lines, int lines, int start_pos, int intro_message
 		//cheap scroller, using 3 screens
 
 		srctxt=(u16*)(0x44000000+(512*272*3)*2);
-		memset(srctxt,0x0,297*512*2*2);
+		memset(srctxt,0x0,297*512*2*2); // Clear 2x circular buffer to avoid stale data
 		for (i=0;(i<lines)&&(i<27);i++) if (msg_lines[i]) {
 			if (intro_message) {
 				if (i<(lines-2)) col1=0xffff;
@@ -3084,7 +3084,8 @@ int scroll_message(char **msg_lines, int lines, int start_pos, int intro_message
 				else col1=31|(10<<5)|(10<<10);
 			} else col1=31|(31<<5)|(31<<10);
 
-			mh_printLimit(0,i*11+272*3,480,272*5,msg_lines[i],col1);
+			// max_y = 272*3+594 to avoid clipping when j wraps past 27 (j*11+816 can reach 1388)
+			mh_printLimit(0,i*11+272*3,480,272*3+594,msg_lines[i],col1);
 		}
 		for (i=0;i<297*512*2;i++) {
 			if (!(srctxt[i])) srctxt[i]=0xFFFF;
@@ -3154,7 +3155,7 @@ int scroll_message(char **msg_lines, int lines, int start_pos, int intro_message
 		scroll_accel=0;
 		scroll_speed=1;
 		pad_val=0;
-		end_pos=(lines-24)*11;
+		end_pos=(lines-22)*11; // 247px visible / 11px per line = ~22 lines
 		if (end_pos<0) end_pos=0;
 
 		while (!exit_message) {
@@ -3180,7 +3181,7 @@ int scroll_message(char **msg_lines, int lines, int start_pos, int intro_message
 							else if (strstr(msg_lines[l], "No:")) col1 = (31|(0<<5)|(0<<10));
 							else col1 = 0xffff;
 						}
-						mh_printLimit(0,j*11+272*3,480,272*5,msg_lines[l],col1);
+						mh_printLimit(0,j*11+272*3,480,272*3+594,msg_lines[l],col1);
 						//highlight searched string by drawing over a string with non searched part blanked
 						if (found==l) {
 							char *p,*q;
@@ -3192,14 +3193,19 @@ int scroll_message(char **msg_lines, int lines, int start_pos, int intro_message
 							}
 							while (*p) *p++=' ';
 							col1=10|(10<<5)|(31<<10);
-							mh_printLimit(0,j*11+272*3,480,272*5,str_tmp,col1);
+							mh_printLimit(0,j*11+272*3,480,272*3+594,str_tmp,col1);
 						}
 					}
 					pg_drawframe=savedf;
+					// Flush CPU cache so the uncached for-loop below sees actual text pixels
+					sceKernelDcacheWritebackAll();
 					for (i=0;i<297*512;i++) {
 						if (!(srctxt[i])) srctxt[i]=0xFFFF;
 					}
 					if (fakedpos) {
+						// Clear the stale [0..fakedpos-1] region to prevent ghost text from previous frames
+						u16 *buf_base = (u16*)(0x44000000+(512*272*3)*2);
+						for (int _k=0;_k<fakedpos*512;_k++) buf_base[_k]=0xFFFF;
 						srctxt=(u16*)(0x44000000+(512*(272*3+ fakedpos) )*2);
 						srctxt2=(u16*)(0x44000000+(512*(272*3+ 297+fakedpos) )*2);
 						memcpy(srctxt2,srctxt,(297-fakedpos)*512*2);
@@ -3232,8 +3238,10 @@ int scroll_message(char **msg_lines, int lines, int start_pos, int intro_message
 					if (msg_lines[i]) {
 						savedf = pg_drawframe;
 						pg_drawframe = 0;
-						mh_printLimit(0, j * 11 + 272 * 3, 480, 272 * 5, msg_lines[i], col1);
+						mh_printLimit(0, j * 11 + 272 * 3, 480, 272*3+594, msg_lines[i], col1);
 						pg_drawframe = savedf;
+						// Flush CPU cache so the uncached for-loop below sees the text
+						sceKernelDcacheWritebackAll();
 					}
 				}
 
@@ -3282,11 +3290,11 @@ int scroll_message(char **msg_lines, int lines, int start_pos, int intro_message
 			if (g_imgCoffeeScroll && g_qr_line_start != -1) {
 				int qr_y = 12 + (g_qr_line_start * 11) - pos;
 				int screen_y_min = 12;
-				int screen_y_max = 247 - 1; 
-				
+				int screen_y_max = 247 - 1;
+
 				int slice_y_start = 0;
 				int slice_h = g_imgCoffeeScroll->height;
-				
+
 				if (qr_y < screen_y_min) {
 					slice_y_start = screen_y_min - qr_y;
 					slice_h -= slice_y_start;
@@ -3295,7 +3303,7 @@ int scroll_message(char **msg_lines, int lines, int start_pos, int intro_message
 				if (qr_y + slice_h > screen_y_max) {
 					slice_h = screen_y_max - qr_y;
 				}
-				
+
 				if (slice_h > 0 && qr_y < screen_y_max) {
 					image_put_slice(176, qr_y, g_imgCoffeeScroll, slice_y_start, slice_h, 256);
 				}
@@ -3468,7 +3476,7 @@ static void show_message() {
 		decrypt((char*)message,decrypted_message,message_size,password);
 
 		// Strip trailing padding from encrypted data to prevent gibberish
-		while (message_size > 0 && 
+		while (message_size > 0 &&
 			   ((unsigned char)decrypted_message[message_size - 1] < 32) &&
 			   decrypted_message[message_size - 1] != '\n' &&
 			   decrypted_message[message_size - 1] != '\r') {
@@ -3478,7 +3486,7 @@ static void show_message() {
 
 		p=decrypted_message;
 		p[message_size]=0;
-		
+
 		g_imgCoffeeScroll = load_bmp_buffer((unsigned char*)support_qr_coffee);
 		int qr_space_lines = g_imgCoffeeScroll ? ((g_imgCoffeeScroll->height / 10) + 2) : 15;
 
@@ -3488,9 +3496,9 @@ static void show_message() {
 		while (*p) {
 			i=0;
 			while ((p[i]!=0x0D)&&(p[i]!=0x0A)&&(p[i])) i++;
-			
+
 			if (strncmp(p, "[QR_COFFEE]", 11) == 0) {
-				lines += qr_space_lines; 
+				lines += qr_space_lines;
 			} else {
 				lines++;
 			}
@@ -3504,24 +3512,24 @@ static void show_message() {
 		}
 
 		lines+=BLANK_LINES;
-		
-		msg_lines=(char**)malloc(sizeof(char*)*(lines + 1)); 
+
+		msg_lines=(char**)malloc(sizeof(char*)*(lines + 1));
 		for (i=0;i<lines + 1 ;i++) {
 			msg_lines[i]=NULL;
 		}
-		
+
 		p=decrypted_message;
 		char* decrypted_message_end = decrypted_message + message_size;
 		for (i = BLANK_LINES; i < lines; i++) {
 			if (p >= decrypted_message_end) break;
-			
+
 			int len = strlen(p);
 			if (len > 0) {
 				if (strcmp(p, "[QR_COFFEE]") == 0) {
 					msg_lines[i] = (char*)malloc(1);
-					msg_lines[i][0] = 0; 
-					g_qr_line_start = i; 
-					i += (qr_space_lines - 1); 
+					msg_lines[i][0] = 0;
+					g_qr_line_start = i;
+					i += (qr_space_lines - 1);
 				} else {
 					msg_lines[i] = (char*)malloc(len + 1);
 					strcpy(msg_lines[i], p);
@@ -3529,7 +3537,7 @@ static void show_message() {
 			} else {
 				msg_lines[i] = NULL;
 			}
-			
+
 			p += len;
 			if (p + 2 <= decrypted_message_end && p[0] == 0 && p[1] == 0) {
 				p += 2;
@@ -3537,10 +3545,10 @@ static void show_message() {
 				p += 1;
 			}
 		}
-		
+
 		//free decrypted raw message
 		free(decrypted_message);
-		
+
 		scroll_message(msg_lines, lines, 0, 1, s9xTYL_msg[SCROLL_DISCLAIMER]);
 
 		if (g_imgCoffeeScroll) image_free(g_imgCoffeeScroll);

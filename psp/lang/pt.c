@@ -351,25 +351,25 @@
     [MENU_MISC_OSK_DANZEFF] = "Danzeff",
     [MENU_MISC_OSK_OFFICIAL] = "Oficial",
 
-    [MENU_STATUS_MISC_HACKDEBUG] = "%s Menu Principal   ",
+    [MENU_STATUS_MISC_HACKDEBUG] = "%s Voltar ",
     [MENU_STATUS_MISC_HACKDEBUG_FUNC] =
-        "%s OK     " SJIS_STAR "    %s Menu Principal   ",
+        "%s OK " SJIS_STAR " %s Menu Principal ",
     [MENU_STATUS_MISC_HACKDEBUG_0] =
-        SJIS_STAR "    " SJIS_UP "," SJIS_DOWN " Selecionar " SJIS_LEFT
-                  "," SJIS_RIGHT " Alterar valor",
+        SJIS_STAR " " SJIS_UP "," SJIS_DOWN " Mover " SJIS_LEFT
+                  "," SJIS_RIGHT " Ajustar",
 
     [MENU_STATUS_MISC_HACKDEBUG_HELP_0] = SJIS_STAR
-    "      " SJIS_TRIANGLE " Ajuda       " SJIS_STAR "      " SJIS_UP
-    "," SJIS_DOWN " Selecionar " SJIS_LEFT "," SJIS_RIGHT " Alterar valor",
+    "  " SJIS_TRIANGLE " Ajuda  " SJIS_STAR "  " SJIS_UP
+    "," SJIS_DOWN " Mover " SJIS_LEFT "," SJIS_RIGHT " Ajustar",
     [MENU_STATUS_MISC_HACKDEBUG_HELP_1] = SJIS_STAR
-    "     " SJIS_TRIANGLE "   Ajuda      " SJIS_STAR "      " SJIS_UP
-    "," SJIS_DOWN " Selecionar " SJIS_LEFT "," SJIS_RIGHT " Alterar valor",
+    "  " SJIS_TRIANGLE " Ajuda  " SJIS_STAR "  " SJIS_UP
+    "," SJIS_DOWN " Mover " SJIS_LEFT "," SJIS_RIGHT " Ajustar",
     [MENU_STATUS_MISC_HACKDEBUG_HELP_2] = SJIS_STAR
-    "    " SJIS_TRIANGLE "     Ajuda     " SJIS_STAR "      " SJIS_UP
-    "," SJIS_DOWN " Selecionar " SJIS_LEFT "," SJIS_RIGHT " Alterar valor",
+    "  " SJIS_TRIANGLE " Ajuda  " SJIS_STAR "  " SJIS_UP
+    "," SJIS_DOWN " Mover " SJIS_LEFT "," SJIS_RIGHT " Ajustar",
     [MENU_STATUS_MISC_HACKDEBUG_HELP_3] = SJIS_STAR
-    "   " SJIS_TRIANGLE "       Ajuda    " SJIS_STAR "      " SJIS_UP
-    "," SJIS_DOWN " Selecionar " SJIS_LEFT "," SJIS_RIGHT " Alterar valor",
+    "   " SJIS_TRIANGLE " Ajuda    " SJIS_STAR "  " SJIS_UP
+    "," SJIS_DOWN " Mover " SJIS_LEFT "," SJIS_RIGHT " Ajustar",
 
     [MENU_TITLE_MISC_HACKDEBUG] = "[" PROJECT_NAME "] - Menu",
 

@@ -181,7 +181,7 @@ jobs:
 
   release:
     name: Create GitHub Release
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/')
     needs: build
     runs-on: ubuntu-latest
     permissions:

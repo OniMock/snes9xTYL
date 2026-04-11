@@ -305,10 +305,46 @@ jobs:
           tag_name: ${{ steps.get_version.outputs.tag }}
           name: Snes9xTYL ${{ steps.get_version.outputs.tag }}
           body: |
-            Snes9xTYL ${{ steps.get_version.outputs.version }}
+            ## 🎮 Snes9xTYL Mod Release
 
-            Improvements and fixes for stability and performance.
+            A new version of **Snes9xTYL (Revival Project)** is now available.
 
+            ---
+
+            ## 📦 Downloads
+
+            ### ⚡ ME (Media Engine) — Recommended for PSP
+            - Best performance on real PSP hardware
+            - Uses Media Engine for audio
+            - ❌ Not compatible with PS Vita
+
+            👉 **Download:**
+            https://github.com/OniMock/snes9xTYL/releases/download/${{ steps.get_version.outputs.tag }}/snes9xTYLme_mod.zip
+
+            ---
+
+            ### 🧩 CM (Compatible) — Recommended for PS Vita / Adrenaline
+            - Compatible with Adrenaline, eCFW (ARK, VHBL, etc.)
+            - Works on PSP, but slower than ME
+
+            👉 **Download:**
+            https://github.com/OniMock/snes9xTYL/releases/download/${{ steps.get_version.outputs.tag }}/snes9xTYLcm_mod.zip
+
+            ---
+
+            > [!CAUTION]
+            > Before updating, backup your `SAVES` and/or `S9XTYLSAVES` folders.
+
+            ---
+
+            ## 💡 Tips
+
+            - Enable **"Ignore Palette writes"** and/or **"Simple Palette writes"** for better performance
+            - If a game shows a black screen, disable **"Speed hacks"** and reload
+
+            ---
+
+            ## 📝 Changelog
             ${{ steps.git-cliff.outputs.content }}
           files: |
             *.zip

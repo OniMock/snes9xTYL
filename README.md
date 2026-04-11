@@ -1,114 +1,183 @@
-# Snes9xTYL Mod
+# Snes9xTYL Mod (Revival Project)
 
-[![Build](https://github.com/OniMock/snes9xTYL/actions/workflows/build.yml/badge.svg)](https://github.com/OniMock/snes9xTYL/actions/workflows/build.yml)
-[![Release](https://img.shields.io/github/v/release/OniMock/snes9xTYL)](https://github.com/OniMock/snes9xTYL/releases)
+[![Build Status](https://github.com/OniMock/snes9xTYL/actions/workflows/build.yml/badge.svg)](https://github.com/OniMock/snes9xTYL/actions/workflows/build.yml)
+[![Latest Release](https://img.shields.io/github/v/release/OniMock/snes9xTYL)](https://github.com/OniMock/snes9xTYL/releases)
 ![Platform](https://img.shields.io/badge/platform-PSP%20%7C%20PSVita-blue)
 ![Downloads](https://img.shields.io/github/downloads/OniMock/snes9xTYL/total)
 
-Super Nintendo emulator for PlayStation Portable.
+A modernized and performance-focused revival of Snes9xTYL for PSP and PS Vita, designed to handle large ROM collections and improve real hardware performance.
 
-Download the latest compiled commit here: [Releases](https://github.com/OniMock/snes9xTYL/blob/mecm/Release/Releases.md)
+> [!CAUTION]
+> **Backup your data!** Before updating, make sure to backup your `SAVES` and/or `S9XTYLSAVES` folders just in case something goes wrong.
 
-***Before updating, make sure to backup your SAVES and/or S9XTYLSAVES folders just in case something goes wrong.***
+Snes9xTYL Mod is a resurrected and modernized fork of the classic Super Nintendo emulator for the PlayStation Portable (PSP) and PS Vita. This version focuses on performance optimizations, user convenience, and broader accessibility.
 
----
+## 📑 Table of Contents
 
-## Help and Tips
-
-- Some games run faster if "Ignore Palette writes" and/or "Simple Palette writes" are enabled on MISC -> Hack/debug menu.
-- If you get a black screen at loading a game, try disabling "Speed hacks" on MISC -> Hack/debug menu and then reload the game.
-
----
-
-## Features
-
-- Standby/sleep mode on "me" version.
-- Netplay (multiplayer) support.
-- Zipped ROM support.
-- IPS patch file (must have the same name as the game with `.IPS` extension: e.g., `SOE.ZIP` => `SOE.IPS`)
-- Compressed Savestate with small screenshot.
-- Auto save of SRAM on game change, exit & Snes reset.
-- Autoskip.
-- Gamma correction.
-- VSync support.
-- SDD1 encrypted ROMs (Star Ocean, Street Fighter Alpha 2, etc.).
-- SA1 (slow), SuperFX (slow), C4, DSP1, DSP2, DSP3, DSP4 support.
-- Multiple sound frequencies: 22kHz, 32kHz, 44kHz.
-- Multiple stretching modes with or without smoothing.
-- Detailed Battery information.
-- 222, 266, 300 & 333MHz PSP frequency.
-- Snapshot-based icon per game. Take a snapshot in-game (via GUI) to see it in the file browser.
-- 5 Rendering modes:
-  - **Mode0**: Optimized Snes9x
-  - **Mode1**: Original Snes9x
-  - **Mode2**: Hardware accelerated (using PSP's GU)
-  - **Mode3**: Adaptive rendering Mode 2 + Mode 1 (default)
-  - **Mode4**: Adaptive rendering Mode 2 + Mode 0
-
-This version supports nearly all the graphics effects of the SNES accelerated with PSP hardware. Exceptions: offset mode & mode 7. Priority and blending are fully emulated. Some minor graphic glitches may remain.
+- [🚀 Key Improvements](#-key-improvements)
+- [💻 Verified Environment](#-verified-environment)
+- [🛠️ Installation](#️-installation)
+- [💡 Help and Tips](#-help-and-tips)
+- [🎮 Features](#-features)
+- [🕹️ Controls](#️-controls)
+- [🎯 Project Goals](#-project-goals)
+- [💬 Feedback](#-feedback)
+- [🤝 Credits](#-credits)
 
 ---
 
-## Install
+## 🚀 Key Improvements
 
-Place the following in:
+- **⚡ Ultra-Fast Directory Browser**
+  - Before: ~20 seconds black screen to load ~1000 ROMs (hard limit)
+  - Now: loads in a few seconds and supports up to ~4000 ROMs per folder
+- **⭐ Favorites System**: Mark your most-played ROMs as favorites for instant access.
+  - Press **L (Left Trigger)** to add/remove a ROM from favorites
+- **🌍 Multi-Language Support**: Native runtime support for **Portuguese (PT-BR)**, **Spanish**, **English**, **Japanese**, and **Simplified Chinese**.
+- **📦 Automated Releases**: Integrated CI/CD pipeline for stable, verified builds on every update.
 
-```
-/PSP/GAME/snes9xTYL/  (or any other folder)
-+ EBOOT.PBP
-+ logo.bmp
-```
-
-You can put ROM files anywhere. A `SAVES` subdirectory will be created in your install directory. All savestate files, SRAM files & snapshots will be written in the `SAVES` folder.
-
----
-
-## Play
-
-Default controls:
-
-| PSP | SNES |
-|-----|------|
-| pad | pad |
-| LEFT TRIGGER + RIGHT TRIGGER | menu (cm version) |
-| CROSS | A |
-| CIRCLE | B |
-| SQUARE | X |
-| TRIANGLE | Y |
-| START | START |
-| SELECT | SELECT |
-| LEFT TRIGGER | L |
-| RIGHT TRIGGER | R |
+[↑ Back to top](#snes9xtyl-mod-revival-project)
 
 ---
 
-## Credits
+## 💻 Verified Environment
 
-### Special Thanks to
-- **Snes9x team** for the fantastic SNES emulator.
-- **YoyoFR** and **Laxer3a** for official Snes9xTYL.
-- **Ruka**, **33(76)** for mod of mecm.
-- **173210** for mod of Snes9xTYLmecm 091127.
-- **bubble2k16** for his work on Snes9x3DS. Many optimizations were ported from his version.
-- **esmjanus** - for all mods made.
-- **DraxTube** - for refactoring to use the latest version of PSPSDK.
+This mod is actively developed and verified on the following setup to ensure maximum stability:
 
-### Notes by YoyoFR
+- **Hardware**: PSP 3000
+- **Firmware**: 6.61
+- **CFW**: ARK-4
 
-snes9xTYL is based on:
+> [!NOTE]
+> Also compatible with other PSP models (1000/2000/Go/E1000) and PS Vita via Adrenaline/eCFW.
 
-- Little John for PalmOS - SNES module
-  [LJP](http://yoyofr92.free.fr)
+[↑ Back to top](#snes9xtyl-mod-revival-project)
 
-- which is based on Snes9x 1.39
-  [SNES9X](http://www.snes9x.com)
+---
 
-- unofficial PSPSDK from psp2dev community
-  www.ps2dev.org
+## 🛠️ Installation
+
+1.  Download the latest build from the [Releases](https://github.com/OniMock/snes9xTYL/releases) page.
+2.  Choose the variant that fits your needs:
+    - **ME (Media Engine)**: Best for all PSP models. Uses the Media Engine for hardware-accelerated sound.
+    - **CM (Compatible)**: Recommended for PS Vita (Adrenaline/eCFW) and legacy setups.
+3.  Copy the folder to `ms0:/PSP/GAME/snes9xTYL/` (or any other folder).
+4.  Ensure the following files are inside:
+    - `EBOOT.PBP`
+    - `logo.bmp` (Optional, for folder icon)
+    - Required `.prx` modules (for ME variant)
+5.  You can put ROM files anywhere. A `SAVES` subdirectory will be automatically created in your install directory to store savestates, SRAM files, and snapshots.
+
+[↑ Back to top](#snes9xtyl-mod-revival-project)
+
+---
+
+## 💡 Help and Tips
+
+- **⚡ Speed Boost**: Some games run faster if **"Ignore Palette writes"** and/or **"Simple Palette writes"** are enabled in the `MISC -> Hack/debug` menu.
+- **⚫ Black Screen Fix**: If you get a black screen when loading a game, try disabling **"Speed hacks"** in the `MISC -> Hack/debug` menu and then reload the game.
+
+[↑ Back to top](#snes9xtyl-mod-revival-project)
+
+---
+
+## 🎮 Features
+
+- **Performance**: 5 distinct rendering modes (including hardware acceleration via PSP's GU).
+- **Audio**: Multiple sampling rates (22kHz, 32kHz, 44kHz) and Media Engine utilization.
+- **Convenience**: Standby/Sleep mode support, auto-save SRAM on exit, and small compressed savestates with screenshots.
+- **Compatibility**: Supports SDD1 (Star Ocean), SA1, SuperFX, C4, and DSP chips.
+- **Visuals**: Gamma correction, VSync, smoothing filters, and snapshot-based icons per game.
+- **Extras**: Netplay (multiplayer), Zipped ROM support, and IPS patching.
+
+[↑ Back to top](#snes9xtyl-mod-revival-project)
+
+---
+
+## 🕹️ Controls
+
+| PSP Button         | SNES Function     |
+| :----------------- | :---------------- |
+| **D-Pad**          | D-Pad             |
+| **Cross**          | A                 |
+| **Circle**         | B                 |
+| **Square**         | X                 |
+| **Triangle**       | Y                 |
+| **L / R**          | L / R             |
+| **Start / Select** | Start / Select    |
+| **L + R**          | Menu (CM version) |
+| **Home/Note**      | Menu (ME version) |
+
+[↑ Back to top](#snes9xtyl-mod-revival-project)
+
+---
+
+## 🎯 Project Goals
+
+This project aims to go beyond maintenance and focus on:
+
+- Improving compatibility for problematic SNES titles
+- Optimizing performance on real PSP hardware
+- Enhancing usability without breaking the original experience
+
+Community feedback will help guide future improvements.
+
+[↑ Back to top](#snes9xtyl-mod-revival-project)
+
+## 💬 Feedback
+
+Have suggestions or specific games that need improvements?
+Feel free to open an issue or start a discussion — feedback is highly appreciated!
+
+[↑ Back to top](#snes9xtyl-mod-revival-project)
+
+## 🤝 Credits
+
+### Project Resurrector
+
+- **OniMock** (Current Maintainer & Refactoring)
+
+### Original Authors & Modders
+
+- **YoyoFR** & **Laxer3a** (Original Snes9xTYL)
+- **esmjanus** (Major Mod legacy)
+- **Ruka**, **33(76)**, **173210** (Mod contributors)
+
+### Contributors
+
+- **bubble2k16**: Optimizations from Snes9x3DS.
+- **DraxTube**: PSPSDK modern refactoring.
+- **Snes9x Team**: The foundation of it all.
+
+### Special Thanks
+
+- **psp2dev community**: For the PSPSDK.
+- **smiths, chp, bifuteki**: Personal thanks by YoyoFR.
+
+---
+
+## 📜 Original Notes (YoyoFR)
+
+> [!NOTE]
+> The section below preserves original notes from the original Snes9xTYL author (YoyoFR).
+
+Snes9xTYL is based on:
+
+- Little John for PalmOS – SNES module
+  http://yoyofr92.free.fr
+
+- Which is based on Snes9x 1.39
+  http://www.snes9x.com
+
+- Unofficial PSPSDK from the psp2dev community
+  http://www.ps2dev.org
 
 Personal thanks to: smiths, chp, bifuteki.
 
-Have fun!
-http://yoyofr92.free.fr
+— yoyofr
 
-yoyofr
+[↑ Back to top](#snes9xtyl-mod-revival-project)
+
+---
+
+_Built with ❤️ for the PSP community._

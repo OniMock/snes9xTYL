@@ -1,5 +1,9 @@
-
 # Snes9xTYL Mod
+
+[![Build](https://github.com/OniMock/snes9xTYL/actions/workflows/build.yml/badge.svg)](https://github.com/OniMock/snes9xTYL/actions/workflows/build.yml)
+[![Release](https://img.shields.io/github/v/release/OniMock/snes9xTYL)](https://github.com/OniMock/snes9xTYL/releases)
+![Platform](https://img.shields.io/badge/platform-PSP%20%7C%20PSVita-blue)
+![Downloads](https://img.shields.io/github/downloads/OniMock/snes9xTYL/total)
 
 Super Nintendo emulator for PlayStation Portable.
 

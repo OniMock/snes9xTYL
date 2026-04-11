@@ -3,12 +3,12 @@
 - #### s9xTYLme
 This version is for all PSP models, It uses Media Engine for sound emulation and is faster than s9xTYLcm. It is not compatible with PSVita.
 
-#### Download [snes9xTYLme_mod](https://github.com/OniMock/snes9xTYL/releases/latest/download/snes9xTYLme_mod.zip)
+#### Download [snes9xTYLme](https://github.com/OniMock/snes9xTYL/releases/latest/download/snes9xTYLme_mod.zip)
 
 - #### s9xTYLcm
 This version is mean to be used on PSVita with Adrenaline, eCFW ARK, VHBL, etc. It works on PSP too but is slower than s9xTYLme version.
 
-#### Download [snes9xTYLcm_mod.zip](https://github.com/OniMock/snes9xTYL/releases/latest/download/snes9xTYLcm_mod.zip)
+#### Download [snes9xTYLcm](https://github.com/OniMock/snes9xTYL/releases/latest/download/snes9xTYLcm_mod.zip)
 
 ***Before updating, make sure to backup your SAVES and/or S9XTYLSAVES folders just in case something goes wrong.
 

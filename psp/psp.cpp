@@ -357,6 +357,7 @@ int os9x_DisableHDMA;
 int os9x_DisableIRQ;
 #endif
 int os9x_speedlimit;
+int os9x_home_yield = 1;
 
 int os9x_sndfreq;
 int os9x_vol_adjust;
@@ -1705,15 +1706,16 @@ void S9xSyncSpeed()
 	}
 
 	if ( os9x_TurboMode ){
-		if( ++IPPU.FrameSkip >= Settings.TurboSkipFrames ){
-			IPPU.FrameSkip = 0;
-			IPPU.SkippedFrames = 0;
-			IPPU.RenderThisFrame = TRUE;
-		} else {
-			++IPPU.SkippedFrames;
-			IPPU.RenderThisFrame = FALSE;
-		}
-		return;
+	    if( ++IPPU.FrameSkip >= Settings.TurboSkipFrames ){
+	        IPPU.FrameSkip = 0;
+	        IPPU.SkippedFrames = 0;
+	        IPPU.RenderThisFrame = TRUE;
+	    } else {
+	        ++IPPU.SkippedFrames;
+	        IPPU.RenderThisFrame = FALSE;
+	    }
+	    if (os9x_home_yield) sceKernelDelayThread(1);
+	    return;
 	}
 
 	if (os9x_speedlimit){
@@ -1734,8 +1736,9 @@ void S9xSyncSpeed()
 		  	//wait to sync
 		  	waited = (now.tv_sec - next1.tv_sec) * 1000000 + now.tv_usec - next1.tv_usec;
 		  	while ( timercmp( &next1, &now, > ) ){
-					sceKernelLibcGettimeofday( &now, 0 );
-		  	}
+			    if (os9x_home_yield) sceKernelDelayThread(1);
+			    sceKernelLibcGettimeofday( &now, 0 );
+			}
 		  }
 		}
 
@@ -1767,11 +1770,11 @@ void S9xSyncSpeed()
 		IPPU.RenderThisFrame = ++IPPU.SkippedFrames > os9x_autofskip_SkipFrames;
 		if ( IPPU.RenderThisFrame ) IPPU.SkippedFrames = 0;
 	} else {
-		IPPU.RenderThisFrame = ++IPPU.SkippedFrames > Settings.SkipFrames;
-		if ( IPPU.RenderThisFrame ) IPPU.SkippedFrames = 0;
-	}
+        IPPU.RenderThisFrame = ++IPPU.SkippedFrames > Settings.SkipFrames;
+        if ( IPPU.RenderThisFrame ) IPPU.SkippedFrames = 0;
+    }
 
-
+    if (os9x_home_yield) sceKernelDelayThread(1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////

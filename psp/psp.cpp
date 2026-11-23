@@ -253,6 +253,13 @@ int os9x_save(const char *ext);
 int os9x_S9Xsave(const char *ext);
 }
 
+#ifdef USE_ADHOC
+extern "C" int psp_load_adhoc_drivers(void)
+{
+	return adhocLoadDrivers(&module_info);
+}
+#endif
+
 
 extern struct SCheatData Cheat;
 
@@ -2728,16 +2735,6 @@ int main(int argc,char **argv) {
 	//----------------
 #endif
 
-#ifdef USE_ADHOC
-	//network stuff
-	if (adhocLoadDrivers(&module_info) != 0) {
-		//pspDebugScreenInit();
-		//printf("Net driver load error\n");
-		//pgWaitVn(60*2);
-    //return 0;
-    msgBoxLines(s9xTYL_msg[ADHOC_DRIVERLOAD_ERR], 60 * 2);
-  }
-#endif
 /*#ifdef ME_SOUND
 //  me_data = me_struct_init();               // [jonny]
 //  me_startproc((u32)me_function, (u32)me_data); // [jonny]
@@ -2753,8 +2750,16 @@ int main(int argc,char **argv) {
             2*256 * 1024, // stack size (256KB is regular default)
             PSP_THREAD_ATTR_USER|PSP_THREAD_ATTR_VFPU, NULL);
 
+	if (g_mainthread < 0) {
+		ErrorExit(" Failed to create user thread");
+		return 0;
+	}
+
   // start user thread, then wait for it to do everything else
-  sceKernelStartThread(g_mainthread, 0, NULL);
+	  if (sceKernelStartThread(g_mainthread, 0, NULL) < 0) {
+		  ErrorExit(" Failed to start user thread");
+		  return 0;
+	  }
   sceKernelWaitThreadEnd(g_mainthread, NULL);
 
   sceKernelExitGame();
@@ -3806,8 +3811,12 @@ static int init_snes_rom() {
 					adhocTerm();
 					os9x_adhoc_active=0;
 				}
-				if (psp_initadhocgame()) { //try to initiate a adhoc game
-					msgBoxLines(s9xTYL_msg[ADHOC_INIT_ERR], 60);
+				int adhoc_result = psp_initadhocgame();
+				if (adhoc_result) { //try to initiate a adhoc game
+					if (adhoc_result == -2)
+						msgBoxLines(s9xTYL_msg[ADHOC_DRIVERLOAD_ERR], 60);
+					else
+						msgBoxLines(s9xTYL_msg[ADHOC_INIT_ERR], 60);
 					adhocTerm();  //unavailable, no netplay
 					os9x_adhoc_active=0;
 					os9x_netplay=0;

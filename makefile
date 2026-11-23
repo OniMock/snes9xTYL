@@ -2,14 +2,20 @@ user: makefile_multi
 	$(MAKE) -f $<
 home: makefile_multi
 	$(MAKE) -f $< HOME_HOOK_ON=1
+	(cd psp/homehookprx; make all)
 adhoc: makefile_multi
 	$(MAKE) -f $< USE_ADHOC=1
 mehome: makefile_multi
 	$(MAKE) -f $< ME_ACTIVE=1 HOME_HOOK_ON=1
+	(cd psp/mediaengineprx; make all)
+	(cd psp/homehookprx; make all)
 me: makefile_multi
 	$(MAKE) -f $< ME_ACTIVE=1
+	(cd psp/mediaengineprx; make all)
 mehomeadhoc: makefile_multi
 	$(MAKE) -f $< ME_ACTIVE=1 HOME_HOOK_ON=1 USE_ADHOC=1
+	(cd psp/mediaengineprx; make all)
+	(cd psp/homehookprx; make all)
 	
 # These compile without BUILD_PRX.
 mefat: makefile_multi
@@ -19,3 +25,6 @@ cm: makefile_multi
 	
 clean: makefile_multi
 	$(MAKE) -f $< clean
+	(cd psp/mediaengineprx; make clean)
+	(cd psp/homehookprx; make clean)
+	rm -f mediaengine.prx homehook.prx

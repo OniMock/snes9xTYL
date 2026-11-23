@@ -20,9 +20,9 @@ LIBS = -lpspkernel
 PSPSDK=$(shell psp-config --pspsdk-path)
 include $(PSPSDK)/lib/build.mak
 
-#all:
-#	psp-build-exports -s $(PRX_EXPORTS)
-#	@cp $(TARGET).prx ../../
-#	@cp $(TARGET).S ../
-#	@rm -f $(TARGET).prx
-#	@rm -f $(TARGET).S
+all:
+	psp-build-exports -s $(PRX_EXPORTS)
+	@cp $(TARGET).prx ../../
+	@cp $(TARGET).S ../
+	@rm -f $(TARGET).prx
+	@rm -f $(TARGET).S

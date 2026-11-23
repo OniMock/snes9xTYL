@@ -1596,7 +1596,7 @@ info(32,0,"transp");
 		sceGuTexMode(GU_PSM_T8,0,0,0); //8bit texture
 		
 		//clear the ZBuffer
-		sceGuScissor(0,starty,256,endy/*-starty*/+1);
+		sceGuScissor(0,starty,256,endy-starty+1);
 		sceGuClearDepth(0);
 		sceGuClear(GU_DEPTH_BUFFER_BIT);
 																						  		
@@ -1622,11 +1622,11 @@ info(32,1,"color win sub   ");
   			//info(32,15+c,st);
   			if (IPPU.Clip [1].Right [c][5] > IPPU.Clip [1].Left [c][5]){
 			 		//current rendering area
-	    		sceGuScissor(IPPU.Clip [1].Left [c][5],starty,(IPPU.Clip [1].Right [c][5]/*-IPPU.Clip [1].Left [c][5]*/)+1,endy/*-starty*/+1);
+	    		sceGuScissor(IPPU.Clip [1].Left [c][5],starty,IPPU.Clip [1].Right [c][5]-IPPU.Clip [1].Left [c][5]+1,endy-starty+1);
      			sceGuClear(GU_COLOR_BUFFER_BIT);
      		}
      	}
-     	sceGuScissor(0,starty,256,endy/*-starty*/+1);
+     	sceGuScissor(0,starty,256,endy-starty+1);
     } else {
     	// No colour window enabled on subscreen
 info(32,1,"no color win sub");
@@ -1667,11 +1667,11 @@ info(32,3,"color win main   ");
   		for (uint32 c = 0; c < IPPU.Clip [0].Count [5]; c++) {
   			if (IPPU.Clip [0].Right [c][5] > IPPU.Clip [0].Left [c][5]){
 		  		//current rendering area
-	     		sceGuScissor(IPPU.Clip [0].Left [c][5],starty,(IPPU.Clip [0].Right [c][5]/*-IPPU.Clip [0].Left [c][5]*/)+1,endy/*-starty*/+1);
+	     		sceGuScissor(IPPU.Clip [0].Left [c][5],starty,IPPU.Clip [0].Right [c][5]-IPPU.Clip [0].Left [c][5]+1,endy-starty+1);
      			sceGuClear(GU_COLOR_BUFFER_BIT);
      		}
      	}
-     	sceGuScissor(0,starty,256,endy/*-starty*/+1);    
+     	sceGuScissor(0,starty,256,endy-starty+1);
 	   		   		   	
 	   	// perhaps we should only do that when subscreen & mainscreen colour window aren't overlapping
 	   	// then we copy subscreen where there are pixels
@@ -1707,12 +1707,12 @@ info(32,3,"color win main   ");
   		for (uint32 c = 0; c < IPPU.Clip [0].Count [5]; c++) {
   			if (IPPU.Clip [0].Right [c][5] > IPPU.Clip [0].Left [c][5]){
 		  		//current rendering area
-	     		sceGuScissor(IPPU.Clip [0].Left [c][5],starty,(IPPU.Clip [0].Right [c][5]/*-IPPU.Clip [0].Left [c][5]*/)+1,endy/*-starty*/+1);
+	     		sceGuScissor(IPPU.Clip [0].Left [c][5],starty,IPPU.Clip [0].Right [c][5]-IPPU.Clip [0].Left [c][5]+1,endy-starty+1);
      			sceGuClear(GU_DEPTH_BUFFER_BIT);
      		}
      	}
      	// and back to whole  rendering area
-     	sceGuScissor(0,starty,256,endy/*-starty*/+1);
+     	sceGuScissor(0,starty,256,endy-starty+1);
     } else {
     	// Colour window disabled on mainscreen
 info(32,3,"no color win main");
@@ -1850,11 +1850,11 @@ info(32,5,"sub not added to back");
   				for (uint32 c = 0; c < IPPU.Clip [1].Count [5]; c++) {
   					if (IPPU.Clip [1].Right [c][5] > IPPU.Clip [1].Left [c][5]){
 			 				//current rendering area
-	    				sceGuScissor(IPPU.Clip [1].Left [c][5],starty,(IPPU.Clip [1].Right [c][5]/*-IPPU.Clip [1].Left [c][5]*/)+1,endy/*-starty*/+1);
+	    				sceGuScissor(IPPU.Clip [1].Left [c][5],starty,IPPU.Clip [1].Right [c][5]-IPPU.Clip [1].Left [c][5]+1,endy-starty+1);
      					sceGuDrawArray(GU_SPRITES,GU_TEXTURE_16BIT|GU_VERTEX_16BIT|GU_TRANSFORM_2D,2*4,0,_vertices);
      				}
      			}
-     			sceGuScissor(0,starty,256,endy/*-starty*/+1);
+     			sceGuScissor(0,starty,256,endy-starty+1);
      		} else {
      			sceGuDrawArray(GU_SPRITES,GU_TEXTURE_16BIT|GU_VERTEX_16BIT|GU_TRANSFORM_2D,2*4,0,_vertices);												
      		}
@@ -1903,15 +1903,15 @@ info(32,5,"sub not added to back");
 	  	if (IPPU.Clip [0].Count[5]) {
 	  		for (uint32 c = 0; c < IPPU.Clip [0].Count [5]; c++) {
 	  			if (IPPU.Clip [0].Right [c][5] > IPPU.Clip [0].Left [c][5]){
-		     		sceGuScissor(IPPU.Clip [0].Left [c][5],starty,(IPPU.Clip [0].Right [c][5]/*-IPPU.Clip [0].Left [c][5]*/)+1,endy/*-starty*/+1);
+		     		sceGuScissor(IPPU.Clip [0].Left [c][5],starty,IPPU.Clip [0].Right [c][5]-IPPU.Clip [0].Left [c][5]+1,endy-starty+1);
 	     			sceGuClear(GU_COLOR_BUFFER_BIT);	     			
 	     		}
 	     	}
-	     	sceGuScissor(0,starty,256,endy/*-starty*/+1);
+	     	sceGuScissor(0,starty,256,endy-starty+1);
 	     	sceGuClearDepth(0);
 	     	sceGuClear(GU_DEPTH_BUFFER_BIT);
 	    } else {
-	    	sceGuScissor(0,starty,256,endy/*-starty*/+1);
+	    	sceGuScissor(0,starty,256,endy-starty+1);
 	    	sceGuClearDepth(0);
 		   	sceGuClear(GU_COLOR_BUFFER_BIT|GU_DEPTH_BUFFER_BIT);
 		  }

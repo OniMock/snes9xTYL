@@ -949,15 +949,24 @@ static int mh_print_buff(int x,int y,int Mx,int My,const char *str,int col,unsig
 			unsigned char ch3 = (str[1] != 0 && (str[1] & 0xC0) == 0x80) ? (unsigned char)str[1] : 0;
 			int utf8key = (ch << 16) | (ch2 << 8) | ch3;
 			int sjis = utf8_to_sjis(utf8key);
-			if (sjis >= 0x8000) {
+			if (sjis >= 0) {
 				str += (ch3 ? 2 : 1);
-				unsigned char u = (sjis >> 8) & 0xFF;
-				unsigned char d = sjis & 0xFF;
-				if ((x+12<=Mx)&&(y+12<=My)&&(x>=0)&&(y>=0)) {
-					if (pg_shadow) Draw_Char_Zenkaku_shadow(x+1,y+1,u,d,vbuff,pitch,pg_init_with_bg);
-					Draw_Char_Zenkaku(x,y,u,d,col,vbuff,pitch,pg_init_with_bg);
+				if (sjis >= 0x8000) {
+					unsigned char u = (sjis >> 8) & 0xFF;
+					unsigned char d = sjis & 0xFF;
+					if ((x+12<=Mx)&&(y+12<=My)&&(x>=0)&&(y>=0)) {
+						if (pg_shadow) Draw_Char_Zenkaku_shadow(x+1,y+1,u,d,vbuff,pitch,pg_init_with_bg);
+						Draw_Char_Zenkaku(x,y,u,d,col,vbuff,pitch,pg_init_with_bg);
+					}
+					x+=12;
+				} else if ((sjis >= 0xA1) && (sjis <= 0xDF)) {
+					unsigned char hankaku = (unsigned char)sjis;
+					if ((x+6<=Mx)&&(y+12<=My)&&(x>=0)&&(y>=0)) {
+						if (pg_shadow) Draw_Char_Hankaku_shadow(x+1,y+1,hankaku,vbuff,pitch,pg_init_with_bg);
+						Draw_Char_Hankaku(x,y,hankaku,col,vbuff,pitch,pg_init_with_bg);
+					}
+					x+=6;
 				}
-				x+=12;
 				bef=0;
 				continue;
 			}

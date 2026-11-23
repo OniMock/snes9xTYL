@@ -64,14 +64,10 @@ int msgBoxLines(const char *msg,int delay_vblank) {
 	len=0;
 	width=0;
 	while ((c=msg[len])) {
-		if (((c>=0x80) && (c<0xa0)) || (c>=0xe0)) {
-			len++;
-		} else {
-			if (c=='\n') {
-				lines++;			
-				if (width<(len-j)) width=len-j;
-				j=len+1;
-			}
+		if (c=='\n') {
+			lines++;
+			if (width<(len-j)) width=len-j;
+			j=len+1;
 		}
 		len++;
 	}	
@@ -88,11 +84,7 @@ int msgBoxLines(const char *msg,int delay_vblank) {
 	for (i=0;i<lines;i++){
 		j=0;
 		while ((c=msg[len])) {
-			if (((c>=0x80) && (c<0xa0)) || (c>=0xe0)) {
-				str[j++]=msg[len++];
-			} else {
-				if (c=='\n') break;
-			}
+			if (c=='\n') break;
 			str[j++]=msg[len++];
 		}
 		if (msg[len]=='\n') len++;
@@ -124,14 +116,10 @@ static int msgBoxLinesRaw(const char *msg,int rev_line) {
 	len=0;
 	width=0;
 	while ((c=msg[len])) {
-		if (((c>=0x80) && (c<0xa0)) || (c>=0xe0)) {			
-			len++;
-		} else {
-			if (c=='\n') {
-				lines++;			
-				if (width<(len-j)) width=len-j;
-				j=len+1;
-			}
+		if (c=='\n') {
+			lines++;
+			if (width<(len-j)) width=len-j;
+			j=len+1;
 		}
 		len++;
 	}
@@ -148,11 +136,7 @@ static int msgBoxLinesRaw(const char *msg,int rev_line) {
 	for (i=0;i<lines;i++){
 		j=0;
 		while ((c=msg[len])) {
-			if (((c>=0x80) && (c<0xa0)) || (c>=0xe0)) {
-				str[j++]=msg[len++];
-			} else {
-				if (c=='\n') break;
-			}
+			if (c=='\n') break;
 			str[j++]=msg[len++];
 		}
 		if (msg[len]=='\n') len++;
@@ -187,14 +171,10 @@ void msgBoxLinesRawPosLimit(int x,int y,int w,int h,const char *msg) {
 	len=0;
 	width=0;
 	while ((c=msg[len])) {
-		if (((c>=0x80) && (c<0xa0)) || (c>=0xe0)) {			
-			len++;
-		} else {
-			if (c=='\n') {
-				lines++;			
-				if (width<(len-j)) width=len-j;
-				j=len+1;
-			}
+		if (c=='\n') {
+			lines++;
+			if (width<(len-j)) width=len-j;
+			j=len+1;
 		}
 		len++;
 	}
@@ -212,11 +192,7 @@ void msgBoxLinesRawPosLimit(int x,int y,int w,int h,const char *msg) {
 	for (i=0;i<lines;i++){
 		j=0;
 		while ((c=msg[len])) {
-			if (((c>=0x80) && (c<0xa0)) || (c>=0xe0)) {
-				str[j++]=msg[len++];
-			} else {
-				if (c=='\n') break;
-			}
+			if (c=='\n') break;
 			str[j++]=msg[len++];
 		}
 		if (msg[len]=='\n') len++;

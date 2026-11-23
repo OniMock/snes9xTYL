@@ -7,6 +7,7 @@ extern "C" {
 #include "pspadhoc.h"
 
 extern int g_Server;
+int psp_load_adhoc_drivers(void);
 int load_buffer_settings(uint8 *buffer);
 
 uint32 caCRC32(uint8 *array, uint32 size, register uint32 crc32 = 0xFFFFFFFF);
@@ -26,6 +27,9 @@ int psp_initadhocgame(void){
 	int retval;
 	//testing net stuff
 	//pspDebugScreenInit();
+
+	if (psp_load_adhoc_drivers() < 0)
+		return -2;
 
 	sprintf(str_id,"%s\\/%s",os9x_nickname,shortrom_filename);
 

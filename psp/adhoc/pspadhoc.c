@@ -41,15 +41,28 @@ int g_matchEvent=0;
 int g_matchOptLen=0;
 char g_matchOptData[1000];
 int matchChanged = 0;
+static int g_AdhocDriversLoaded = 0;
 
 ////////////////////////////////////////////////////////////////////
 
 // call from KERNEL thread
 int adhocLoadDrivers(SceModuleInfo* modInfoPtr)
 {
+	if (g_AdhocDriversLoaded)
+		return 0;
+
 #ifdef FW3X
-	sceUtilityLoadNetModule(PSP_NET_MODULE_COMMON);         // AHMAN
-	sceUtilityLoadNetModule(PSP_NET_MODULE_ADHOC);          // AHMAN
+	int err;
+	err = sceUtilityLoadNetModule(PSP_NET_MODULE_COMMON);
+	if (err < 0)
+		return err;
+
+	err = sceUtilityLoadNetModule(PSP_NET_MODULE_ADHOC);
+	if (err < 0)
+	{
+		sceUtilityUnloadNetModule(PSP_NET_MODULE_COMMON);
+		return err;
+	}
 #else
 	// libraries load where they want, patch workaround needed
 	LoadAndStartAndPatch(modInfoPtr, "flash0:/kd/ifhandle.prx"); // kernel
@@ -62,6 +75,7 @@ int adhocLoadDrivers(SceModuleInfo* modInfoPtr)
 	FlushCaches();
 #endif
 
+	g_AdhocDriversLoaded = 1;
 	return 0;
 }
 
@@ -858,6 +872,15 @@ int adhocTerm()
 			printf("sceNetTerm returned %x\n", err);
 		}
 		g_NetInit = false;
+	}
+
+	if(g_AdhocDriversLoaded)
+	{
+#ifdef FW3X
+		sceUtilityUnloadNetModule(PSP_NET_MODULE_ADHOC);
+		sceUtilityUnloadNetModule(PSP_NET_MODULE_COMMON);
+#endif
+		g_AdhocDriversLoaded = 0;
 	}
 
     return 0; // assume it worked

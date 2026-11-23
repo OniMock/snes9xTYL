@@ -83,7 +83,7 @@ int module_start(SceSize args, void *argp)
 	home_active = 0;
 	home_thread = sceKernelCreateThread("Home Button Thread",
 								home_button_thread,
-								0x11,
+								0x8,
 								0x200,
 								0,
 								NULL);

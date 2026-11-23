@@ -1694,7 +1694,7 @@ info(32,0,"transp");
 		sceGuTexMode(GU_PSM_T8,0,0,0); //8bit texture
 
 		//clear the ZBuffer
-		sceGuScissor(0,starty,256,endy/*-starty*/+1);
+		sceGuScissor(0,starty,256,endy-starty+1);
 		sceGuClearDepth(0);
 		sceGuClear(GU_DEPTH_BUFFER_BIT);
 																						  		
@@ -1734,12 +1734,12 @@ info(32,0,"transp");
 							break;
 
 						endc= IPPU.FixColorLines[i+1];
-						sceGuScissor(0,startc,256,endc);
+						sceGuScissor(0,startc,256,endc-startc);
 						sceGuClearColor(IPPU.FixColorLog [i]);
   						for (uint32 c = 0; c < IPPU.ClipFix [1].Count [5][g]; c++) {
   							if (IPPU.ClipFix [1].Right [c][5][g] > IPPU.ClipFix [1].Left [c][5][g]){
 			 						//current rendering area
-	    						sceGuScissor(IPPU.ClipFix [1].Left [c][5][g],startc,(IPPU.ClipFix [1].Right [c][5][g])+1,endc);
+	    						sceGuScissor(IPPU.ClipFix [1].Left [c][5][g],startc,IPPU.ClipFix [1].Right [c][5][g]-IPPU.ClipFix [1].Left [c][5][g]+1,endc-startc);
      							sceGuClear(GU_COLOR_BUFFER_BIT);
      						}
      					}
@@ -1751,7 +1751,7 @@ info(32,0,"transp");
   						for (uint32 c = 0; c < IPPU.ClipFix [1].Count [5][g]; c++) {
   							if (IPPU.ClipFix [1].Right [c][5][g] > IPPU.ClipFix [1].Left [c][5][g]){
 			 						//current rendering area
-	    						sceGuScissor(IPPU.ClipFix [1].Left [c][5][g],endc,(IPPU.ClipFix [1].Right [c][5][g])+1,endcl);
+	    						sceGuScissor(IPPU.ClipFix [1].Left [c][5][g],endc,IPPU.ClipFix [1].Right [c][5][g]-IPPU.ClipFix [1].Left [c][5][g]+1,endcl-endc);
      							sceGuClear(GU_COLOR_BUFFER_BIT);
      						}
      					}
@@ -1767,13 +1767,13 @@ info(32,0,"transp");
   					for (uint32 c = 0; c < IPPU.ClipFix [1].Count [5][g]; c++) {
   						if (IPPU.ClipFix [1].Right [c][5][g] > IPPU.ClipFix [1].Left [c][5][g]){
 			 					//current rendering area
-	    					sceGuScissor(IPPU.ClipFix [1].Left [c][5][g],IPPU.ClipFix [1].Start [5][g],(IPPU.ClipFix [1].Right [c][5][g])+1,IPPU.ClipFix [1].End [5][g]+1);
+	    					sceGuScissor(IPPU.ClipFix [1].Left [c][5][g],IPPU.ClipFix [1].Start [5][g],IPPU.ClipFix [1].Right [c][5][g]-IPPU.ClipFix [1].Left [c][5][g]+1,IPPU.ClipFix [1].End [5][g]-IPPU.ClipFix [1].Start [5][g]+1);
      						sceGuClear(GU_COLOR_BUFFER_BIT);
      					}
      				}
 				}
 			}
-			sceGuScissor(0,starty,256,endy+1);
+			sceGuScissor(0,starty,256,endy-starty+1);
 
 		} else {
 
@@ -1799,18 +1799,18 @@ info(32,0,"transp");
 				for(;i<IPPU.FixColorCount-1;i++)
 				{
 					endc= IPPU.FixColorLines[i+1];
-					sceGuScissor(0,startc,256,endc);
+					sceGuScissor(0,startc,256,endc-startc);
 					sceGuClearColor(IPPU.FixColorLog[i]);
 	   				sceGuClear(GU_COLOR_BUFFER_BIT);
 					startc=endc;
 				}
 				if(endc-1<endy)
 				{
-					sceGuScissor(0,endc,256,endy+1);
+					sceGuScissor(0,endc,256,endy+1-endc);
 					sceGuClearColor(IPPU.FixColorLog[i]);
 	   				sceGuClear(GU_COLOR_BUFFER_BIT);
 				}
-				sceGuScissor(0,starty,256,endy+1);
+				sceGuScissor(0,starty,256,endy-starty+1);
 			}
 			else
 			{
@@ -1870,7 +1870,7 @@ info(32,2,"nothing on subscreen");
 							break;
 
 						endc= IPPU.MainColorLines[i+1];
-						sceGuScissor(0,startc,256,endc);
+						sceGuScissor(0,startc,256,endc-startc);
 						col=(((IPPU.MainColorLog [i])&31)<<3)|(((IPPU.MainColorLog [i]>>5)&31)<<11)|(((IPPU.MainColorLog [i]>>10)&31)<<19);
 						if (rendering_beware_fix16) {
 							if (fixedcol==IPPU.ScreenColors [0]) col^=1<<19;
@@ -1880,7 +1880,7 @@ info(32,2,"nothing on subscreen");
 						for (uint32 c = 0; c < IPPU.ClipFix [0].Count [5][g]; c++) {
   							if (IPPU.ClipFix [0].Right [c][5][g] > IPPU.ClipFix [0].Left [c][5][g]){
 			 						//current rendering area
-	    						sceGuScissor(IPPU.ClipFix [0].Left [c][5][g],startc,(IPPU.ClipFix [0].Right [c][5][g])+1,endc);
+	    						sceGuScissor(IPPU.ClipFix [0].Left [c][5][g],startc,IPPU.ClipFix [0].Right [c][5][g]-IPPU.ClipFix [0].Left [c][5][g]+1,endc-startc);
      							sceGuClear(GU_COLOR_BUFFER_BIT);
      						}
      					}
@@ -1896,7 +1896,7 @@ info(32,2,"nothing on subscreen");
 						for (uint32 c = 0; c < IPPU.ClipFix [0].Count [5][g]; c++) {
   							if (IPPU.ClipFix [0].Right [c][5][g] > IPPU.ClipFix [0].Left [c][5][g]){
 			 						//current rendering area
-	    						sceGuScissor(IPPU.ClipFix [0].Left [c][5][g],endc,(IPPU.ClipFix [0].Right [c][5][g])+1,endcl);
+	    						sceGuScissor(IPPU.ClipFix [0].Left [c][5][g],endc,IPPU.ClipFix [0].Right [c][5][g]-IPPU.ClipFix [0].Left [c][5][g]+1,endcl-endc);
      							sceGuClear(GU_COLOR_BUFFER_BIT);
      						}
      					}
@@ -1916,13 +1916,13 @@ info(32,2,"nothing on subscreen");
   					for (uint32 c = 0; c < IPPU.ClipFix [0].Count [5][g]; c++) {
   						if (IPPU.ClipFix [0].Right [c][5][g] > IPPU.ClipFix [0].Left [c][5][g]){
 			 					//current rendering area
-	    					sceGuScissor(IPPU.ClipFix [0].Left [c][5][g],startcl,(IPPU.ClipFix [0].Right [c][5][g])+1,endcl);
+	    					sceGuScissor(IPPU.ClipFix [0].Left [c][5][g],startcl,IPPU.ClipFix [0].Right [c][5][g]-IPPU.ClipFix [0].Left [c][5][g]+1,endcl-startcl);
      						sceGuClear(GU_COLOR_BUFFER_BIT);
      					}
      				}
 				}
 			}
-     		sceGuScissor(0,starty,256,endy/*-starty*/+1);    
+     		sceGuScissor(0,starty,256,endy-starty+1);
 	   		   		   	
 	   		// perhaps we should only do that when subscreen & mainscreen colour window aren't overlapping
 	   		// then we copy subscreen where there are pixels
@@ -1962,13 +1962,13 @@ info(32,2,"nothing on subscreen");
   				for (uint32 c = 0; c < IPPU.ClipFix [0].Count [5][g]; c++) {
   					if (IPPU.ClipFix [0].Right [c][5][g] > IPPU.ClipFix [0].Left [c][5][g]){
 		  				//current rendering area
-	     				sceGuScissor(IPPU.ClipFix [0].Left [c][5][g],IPPU.ClipFix [0].Start [5][g],(IPPU.ClipFix [0].Right [c][5][g])+1,IPPU.ClipFix [0].End [5][g]+1);
+	     				sceGuScissor(IPPU.ClipFix [0].Left [c][5][g],IPPU.ClipFix [0].Start [5][g],IPPU.ClipFix [0].Right [c][5][g]-IPPU.ClipFix [0].Left [c][5][g]+1,IPPU.ClipFix [0].End [5][g]-IPPU.ClipFix [0].Start [5][g]+1);
      					sceGuClear(GU_DEPTH_BUFFER_BIT);
      				}
 				}
 			}
      		// and back to whole  rendering area
-     		sceGuScissor(0,starty,256,endy/*-starty*/+1);
+     		sceGuScissor(0,starty,256,endy-starty+1);
 
 		} else {//"no color win main"
     		// Colour window disabled on mainscreen
@@ -1992,18 +1992,18 @@ info(32,2,"nothing on subscreen");
 				for(;i<IPPU.MainColorCount-1;i++)
 				{
 					endc= IPPU.MainColorLines[i+1];
-					sceGuScissor(0,startc,256,endc);
+					sceGuScissor(0,startc,256,endc-startc);
 					sceGuClearColor((((IPPU.MainColorLog [i])&31)<<3)|(((IPPU.MainColorLog [i]>>5)&31)<<11)|(((IPPU.MainColorLog [i]>>10)&31)<<19));
 	   				sceGuClear(GU_COLOR_BUFFER_BIT|GU_DEPTH_BUFFER_BIT);
 					startc=endc;
 				}
 				if(endc-1<endy)
 				{
-					sceGuScissor(0,endc,256,endy+1);
+					sceGuScissor(0,endc,256,endy+1-endc);
 					sceGuClearColor((((IPPU.MainColorLog [i])&31)<<3)|(((IPPU.MainColorLog [i]>>5)&31)<<11)|(((IPPU.MainColorLog [i]>>10)&31)<<19));
 	   				sceGuClear(GU_COLOR_BUFFER_BIT|GU_DEPTH_BUFFER_BIT);
 				}
-				sceGuScissor(0,starty,256,endy+1);
+				sceGuScissor(0,starty,256,endy-starty+1);
 			}
 			else
 			{
@@ -2018,7 +2018,7 @@ info(32,2,"nothing on subscreen");
 		//invalidate last palette
 				
 		pspRenderScreenFix (GPUPack.GFX.Screen, false, SUB_SCREEN_DEPTH,1);
-	  	  	  	  
+
 		// now draw on final buffer 	  	 	
 		// if rendering mode == 0, then draw directly on final screen
 	  
@@ -2062,7 +2062,7 @@ info(32,2,"nothing on subscreen");
 			}		    
 			sceGuDrawArray(GU_SPRITES,GU_TEXTURE_16BIT|GU_VERTEX_16BIT|GU_TRANSFORM_2D,2*4,0,_vertices);
 		}
-		
+
 		//load subscreen texture
 		sceGuTexImage(0,256,256,256,(u16*)(0x44000000+512*272*2*2+256*240*2+0*256*256*2));
 		
@@ -2147,12 +2147,12 @@ info(32,2,"nothing on subscreen");
   						if (IPPU.ClipFix [1].Right [c][5][g] > IPPU.ClipFix [1].Left [c][5][g]){
 
 			 				//current rendering area
-							sceGuScissor(IPPU.ClipFix [1].Left [c][5][g],start,(IPPU.ClipFix [1].Right [c][5][g])+1,end);
+							sceGuScissor(IPPU.ClipFix [1].Left [c][5][g],start,IPPU.ClipFix [1].Right [c][5][g]-IPPU.ClipFix [1].Left [c][5][g]+1,end-start);
      						sceGuDrawArray(GU_SPRITES,GU_TEXTURE_16BIT|GU_VERTEX_16BIT|GU_TRANSFORM_2D,2*4,0,_vertices);
 						}
      				}
      			}
-     			sceGuScissor(0,starty,256,endy/*-starty*/+1);
+     			sceGuScissor(0,starty,256,endy-starty+1);
      		} else {
      			sceGuDrawArray(GU_SPRITES,GU_TEXTURE_16BIT|GU_VERTEX_16BIT|GU_TRANSFORM_2D,2*4,0,_vertices);												
      		}
@@ -2238,7 +2238,7 @@ info(32,2,"nothing on subscreen");
 							break;
 
 						endc= IPPU.MainColorLines[i+1];
-						sceGuScissor(0,startc,256,endc);
+						sceGuScissor(0,startc,256,endc-startc);
 						col=(((IPPU.MainColorLog [i])&31)<<3)|(((IPPU.MainColorLog [i]>>5)&31)<<11)|(((IPPU.MainColorLog [i]>>10)&31)<<19);
 						if (rendering_beware_fix16) {
 							if (fixedcol==IPPU.ScreenColors [0]) col^=1<<19;
@@ -2248,7 +2248,7 @@ info(32,2,"nothing on subscreen");
 						for (uint32 c = 0; c < IPPU.ClipFix [0].Count [5][g]; c++) {
   							if (IPPU.ClipFix [0].Right [c][5][g] > IPPU.ClipFix [0].Left [c][5][g]){
 			 						//current rendering area
-	    						sceGuScissor(IPPU.ClipFix [0].Left [c][5][g],startc,(IPPU.ClipFix [0].Right [c][5][g])+1,endc);
+	    						sceGuScissor(IPPU.ClipFix [0].Left [c][5][g],startc,IPPU.ClipFix [0].Right [c][5][g]-IPPU.ClipFix [0].Left [c][5][g]+1,endc-startc);
      							sceGuClear(GU_COLOR_BUFFER_BIT);
      						}
      					}
@@ -2264,7 +2264,7 @@ info(32,2,"nothing on subscreen");
 						for (uint32 c = 0; c < IPPU.ClipFix [0].Count [5][g]; c++) {
   							if (IPPU.ClipFix [0].Right [c][5][g] > IPPU.ClipFix [0].Left [c][5][g]){
 			 						//current rendering area
-	    						sceGuScissor(IPPU.ClipFix [0].Left [c][5][g],endc,(IPPU.ClipFix [0].Right [c][5][g])+1,endcl);
+	    						sceGuScissor(IPPU.ClipFix [0].Left [c][5][g],endc,IPPU.ClipFix [0].Right [c][5][g]-IPPU.ClipFix [0].Left [c][5][g]+1,endcl-endc);
      							sceGuClear(GU_COLOR_BUFFER_BIT);
      						}
      					}
@@ -2284,13 +2284,13 @@ info(32,2,"nothing on subscreen");
   					for (uint32 c = 0; c < IPPU.ClipFix [0].Count [5][g]; c++) {
   						if (IPPU.ClipFix [0].Right [c][5][g] > IPPU.ClipFix [0].Left [c][5][g]){
 			 					//current rendering area
-	    					sceGuScissor(IPPU.ClipFix [0].Left [c][5][g],startcl,(IPPU.ClipFix [0].Right [c][5][g])+1,endcl);
+	    					sceGuScissor(IPPU.ClipFix [0].Left [c][5][g],startcl,IPPU.ClipFix [0].Right [c][5][g]-IPPU.ClipFix [0].Left [c][5][g]+1,endcl-startcl);
      						sceGuClear(GU_COLOR_BUFFER_BIT);
      					}
      				}
 				}
 			}
-	     	sceGuScissor(0,starty,256,endy/*-starty*/+1);
+	     	sceGuScissor(0,starty,256,endy-starty+1);
 	     	sceGuClearDepth(0);
 	     	sceGuClear(GU_DEPTH_BUFFER_BIT);
 	    } else {
@@ -2307,23 +2307,23 @@ info(32,2,"nothing on subscreen");
 					for(;i<IPPU.MainColorCount-1;i++)
 				{
 					endc= IPPU.MainColorLines[i+1];
-					sceGuScissor(0,startc,256,endc);
+					sceGuScissor(0,startc,256,endc-startc);
 					sceGuClearColor((((IPPU.MainColorLog [i])&31)<<3)|(((IPPU.MainColorLog [i]>>5)&31)<<11)|(((IPPU.MainColorLog [i]>>10)&31)<<19));
 	   				sceGuClear(GU_COLOR_BUFFER_BIT|GU_DEPTH_BUFFER_BIT);
 					startc=endc;
 				}
 				if(endc<endy+1)
 				{
-					sceGuScissor(0,endc,256,endy+1);
+					sceGuScissor(0,endc,256,endy+1-endc);
 					sceGuClearColor((((IPPU.MainColorLog [i])&31)<<3)|(((IPPU.MainColorLog [i]>>5)&31)<<11)|(((IPPU.MainColorLog [i]>>10)&31)<<19));
 	   				sceGuClear(GU_COLOR_BUFFER_BIT|GU_DEPTH_BUFFER_BIT);
 				}
-				sceGuScissor(0,starty,256,endy+1);
+				sceGuScissor(0,starty,256,endy-starty+1);
 				sceGuClearDepth(0);//MAIN_SCREEN_DEPTH);//0??? seiken3 dialog
 			}
 			else
 			{
-				sceGuScissor(0,starty,256,endy/*-starty*/+1);
+				sceGuScissor(0,starty,256,endy-starty+1);
 				sceGuClearColor(col);	   	
 	   			//clear Z buffer, TODO : check if Zbuffer clear is needed each time (ADD_OR_SUB(5) only since no colour window ?)
 	  			sceGuClearDepth(0);//MAIN_SCREEN_DEPTH);//0??? seiken3 dialog

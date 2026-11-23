@@ -2429,11 +2429,10 @@ void S9xUpdateScreen (){
 				dst=(u32*)(0x44000000+512*2*(272*swap_buf+starty ));
 				for (int y=endy-starty+1;y;y--,dst+=256/2) __memcpy4a((long unsigned int*)dst,(long unsigned int*)src,256*2/4);
 			} else*/ {
-				for (int y=endy-starty+1;y;y--)
-					__memcpy4a(
-						(long unsigned int*)(0x44000000+512*272*2*2+256*240*2+2*256*256*2+starty*256*2),
-						(long unsigned int*)(GPUPack.GFX.Screen+starty*GPUPack.GFX.Pitch2),
-						256*2/4);
+				u32 *dst=(u32*)(0x44000000+512*272*2*2+256*240*2+2*256*256*2+starty*256*2);
+				u32 *src=(u32*)(GPUPack.GFX.Screen+starty*GPUPack.GFX.Pitch2);
+				for (int y=endy-starty+1;y;y--,dst+=256*2/4,src+=GPUPack.GFX.Pitch2/4)
+					__memcpy4a((long unsigned int*)dst,(long unsigned int*)src,256*2/4);
 			}
 			// put back cache off and writeback Dcache
 			GPUPack.GFX.Screen = (uint8*)CACHE_OFF(GPUPack.GFX.Screen);
@@ -2988,7 +2987,8 @@ PROF_END(11);
 				for (int y=endy-starty+1;y;y--,dst+=256/2) __memcpy4a((long unsigned int*)dst,(long unsigned int*)src,256*2/4);				
 			} else*/ {
 				dst=(u32*)(0x44000000+512*272*2*2+256*240*2+2*256*256*2+starty*256*2 );
-				for (int y=endy-starty+1;y;y--) __memcpy4a((long unsigned int*)dst,(long unsigned int*)src,256*2/4);				
+				for (int y=endy-starty+1;y;y--,dst+=256*2/4,src+=GPUPack.GFX.Pitch2/4)
+					__memcpy4a((long unsigned int*)dst,(long unsigned int*)src,256*2/4);
 			}
 	}
 	// put back cache off and writeback Dcache

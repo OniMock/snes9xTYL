@@ -263,6 +263,7 @@ void KillME(volatile struct me_struct *mei, int devkitVersion)
 	pspSdkSetK1(k1);
 }
 
+#if 0
 void ResetME(int devkitVersion){
 	unsigned int k1 = pspSdkSetK1(0);
 	int *meStarted;
@@ -318,6 +319,7 @@ void ResetME(int devkitVersion){
 	pspSdkSetK1(k1);
 
 }
+#endif
 int module_start(SceSize args, void *argp)
 {
 	mod = (SceModule2 *)sceKernelFindModuleByName("sceMeCodecWrapper");

@@ -292,7 +292,7 @@ u16 os9x_savestate_mini[128*120];
 
 int os9x_notfirstlaunch;
 
-unsigned int __attribute__((aligned(64))) list[262144*4];
+unsigned int __attribute__((aligned(64))) list[196608*4];
 
 int debug_count=0;
 int debug_counts[100];

@@ -137,7 +137,7 @@ extern int os9x_hack;
 void os9x_beep1();
 void os9x_beep2();
 
-extern unsigned int __attribute__((aligned(64))) list[262144*4];
+extern unsigned int __attribute__((aligned(64))) list[196608*4];
 
 extern volatile int *mixsample_flag,*emulapu_flag;
 

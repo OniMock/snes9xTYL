@@ -25,7 +25,9 @@ struct me_struct
 
 int InitME(volatile struct me_struct *mei, int devkitVersion);
 void KillME(volatile struct me_struct *mei, int devkitVersion);
+#if 0
 void ResetME(int devkitVersion);
+#endif
 int CallME(volatile struct me_struct *mei, int func, int param, int prelen, void *preadr, int postlen, void *postadr);
 int WaitME(volatile struct me_struct *mei);
 int BeginME(volatile struct me_struct *mei, int func, int param, int prelen, void *preadr, int postlen, void *postadr);

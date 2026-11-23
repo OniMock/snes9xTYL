@@ -407,9 +407,12 @@ typedef struct {
 volatile me_sound_t __attribute__((aligned(64))) me_sound_data;
 volatile struct me_struct *me_data;
 
-int devkit_version;
 bool8 s9xStandBy = false;
 
+#endif
+
+#if defined(ME_SOUND) || defined(HOME_HOOK)
+int devkit_version;
 #endif
 
 //static uint8 __attribute__((aligned(64))) 	GFX_Screen[SNES_WIDTH * SNES_HEIGHT_EXTENDED * 2];
